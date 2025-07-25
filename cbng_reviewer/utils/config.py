@@ -29,7 +29,7 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
                 "password": os.environ.get("TOOL_TOOLSDB_PASSWORD", ""),
             },
             "replica": {
-                "schema": os.environ.get("TOOL_TOOLSDB_SCHEMA", "enwiki_p"),
+                "schema": os.environ.get("TOOL_REPLICA_SCHEMA", "enwiki_p"),
                 "host": os.environ.get("TOOL_REPLICA_HOST", "enwiki.labsdb"),
                 "port": 3306,
                 "user": os.environ.get("TOOL_REPLICA_USER", ""),
