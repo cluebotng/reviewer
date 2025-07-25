@@ -1,0 +1,91 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h1>Registered Users</h1>
+                <p>These are users who have logged in, but posses no rights.</p>
+                <p>They should be periodically reviewed and appropriate accounts granted reviewer rights.</p>
+                <table class="table table-borderless">
+                    <tr>
+                        <th scope="col">Username</th>
+                        <th scope="col"></th>
+                    </tr>
+                    {% for user in registered_users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>
+                                <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input name="reviewer" type="hidden" value="1" />
+                                    <button class="btn btn-info" type="submit">Make Reviewer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td class="text-center" colspan="2">No entries found</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="col-6">
+                <h1>Administrators</h1>
+                <p>These are users who have admin rights.</p>
+                <table class="table table-borderless">
+                    <tr>
+                        <th scope="col">Username</th>
+                        <th scope="col"></th>
+                    </tr>
+                    {% for user in admin_users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>
+                                <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input name="admin" type="hidden" value="0" />
+                                    <button class="btn btn-danger" type="submit">Remove Admin Access</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1>Reviewers</h1>
+                <p>These are users who have reviewer rights.</p>
+                <table class="table table-striped">
+                    <tr>
+                        <th scope="col">Username</th>
+                        <th scope="col"></th>
+                    </tr>
+                    {% for user in reviewer_users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input name="reviewer" type="hidden" value="0" />
+                                            <button class="btn btn-warning" type="submit">Remove Reviewer Access</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-6">
+                                        <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input name="admin" type="hidden" value="0" />
+                                            <button class="btn btn-danger" type="submit">Grant Admin Access</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

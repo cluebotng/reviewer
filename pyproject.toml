@@ -1,0 +1,49 @@
+[project]
+name = "reviewer"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.0.0",
+    "social-auth-app-django",
+    "mysqlclient",
+    "requests",
+    "deepmerge",
+    "djangorestframework",
+    "django_bootstrap5",
+    "PyYAML",
+    "gunicorn",
+    "whitenoise",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.test.dependencies]
+tox = "4.24.1"
+tox-current-env = "0.0.14"
+black = "25.1.0"
+ruff = "0.9.7"
+djlint = "1.36.4"
+bandit = "1.8.3"
+
+[tool.ruff]
+exclude = ['*/migrations/*', 've/*', '.tox/*']
+line-length = 120
+
+[tool.djlint]
+profile = 'django'
+use_gitignore = true
+max_attribute_length = 120
+
+[tool.black]
+line-length = 120
+extend-exclude = '''
+(
+  ^/ve
+  |
+  ^.*/migrations/.*
+)
+'''
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

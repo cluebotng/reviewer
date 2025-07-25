@@ -1,0 +1,11 @@
+# Local overrides
+config.yaml
+
+# Byte compiled files
+*.py[cod]
+
+# Development tooling
+ve/
+.tox/
+*.sqlite3
+.coverage

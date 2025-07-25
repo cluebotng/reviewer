@@ -1,0 +1,100 @@
+---
+# The primary process (interface) runs as a "web service" which is separate from a "job",
+# see `service.template` for the equivalent settings for the web interface.
+#
+# Here are the "backend" (scheduled) jobs aka cron jobs.
+#
+
+# Management
+- name: cleanup-user-records
+  command: launcher ./manage.py cleanup_user_records
+  image: {{ target_image }}
+  schedule: '13 1 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/cleanup-user-records.stdout.log
+  filelog-stderr: logs/cleanup-user-records.stderr.log
+  emails: none
+
+- name: export-statistics
+  command: launcher ./manage.py export_statistics
+  image: {{ target_image }}
+  schedule: '13 9 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/export-statistics.stdout.log
+  filelog-stderr: logs/export-statistics.stderr.log
+  emails: none
+
+- name: import-reported-edits
+  command: launcher ./manage.py import_reported_edits
+  image: {{ target_image }}
+  schedule: '55 * * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/import-reported-edits.stdout.log
+  filelog-stderr: logs/import-reported-edits.stderr.log
+  emails: none
+
+- name: import-training-data
+  command: launcher ./manage.py import_training_data
+  image: {{ target_image }}
+  schedule: '15 * * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/import-training-data.stdout.log
+  filelog-stderr: logs/import-training-data.stderr.log
+  emails: none
+
+- name: mark-removed-edits-as-deleted
+  command: launcher ./manage.py update_deleted_edits
+  image: {{ target_image }}
+  schedule: '13 4 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/mark-removed-edits-as-deleted.stdout.log
+  filelog-stderr: logs/mark-removed-edits-as-deleted.stderr.log
+  emails: none
+
+- name: update-edit-classifications
+  command: launcher ./manage.py update_edit_classification
+  image: {{ target_image }}
+  schedule: '30 */2 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/update-edit-classifications.stdout.log
+  filelog-stderr: logs/update-edit-classifications.stderr.log
+  emails: none
+
+- name: add-edits-to-queue
+  command: launcher ./manage.py add_edits_to_queue
+  image: {{ target_image }}
+  schedule: '13 6 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/add-edits-to-queue.stdout.log
+  filelog-stderr: logs/add-edits-to-queue.stderr.log
+  emails: none
+
+# Extra jobs we run, beyond those directly related to the interface
+
+# Backups
+- name: backup-database
+  command: bash -c 'mysqldump --defaults-file={{ tool_dir }}/replica.my.cnf -h tools-db {{ database_user }}__reviewer | gzip -9 > {{ tool_dir }}/mysql_backups/$(date +"%d-%m-%Y_%H-%M-%S").sql.gz'
+  image: mariadb
+  schedule: '45 */2 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/backup-database.stdout.log
+  filelog-stderr: logs/backup-database.stderr.log
+  emails: none
+
+- name: prune-backups
+  command: bash -c 'find "{{ tool_dir }}/mysql_backups" -mtime +3 -delete'
+  image: bookworm
+  schedule: '30 5 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/prune-backups.stdout.log
+  filelog-stderr: logs/prune-backups.stderr.log
+  emails: none

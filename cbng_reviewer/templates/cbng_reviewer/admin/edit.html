@@ -1,0 +1,34 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="container">
+        <h1>{{ edit.id }}</h1>
+        <p>Flags:</p>
+        <ul>
+            <li>Has been deleted: {{ edit.deleted }}</li>
+            <li>Status: {{ edit.get_status_display }}</li>
+            <li>
+                Overall classification:
+                {% if edit.classification is not None %}
+                    {{ edit.get_classification_display }}
+                {% else %}
+                    pending
+                {% endif %}
+            </li>
+        </ul>
+        <p>Member of:</p>
+        <ul>
+            {% for edit_group in edit.groups.all %}
+                <li>
+                    <a href="{% url 'admin-edit-group' edit_group.id %}">{{ edit_group.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Classifications:</p>
+        <ul>
+            {% for classification in classifications %}
+                <li>{{ classification.get_classification_display }} by {{ classification.user.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}

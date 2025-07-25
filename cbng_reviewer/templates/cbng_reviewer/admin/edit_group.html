@@ -1,0 +1,21 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="container">
+        <form action="{% url 'admin-edit-group' edit_group.id %}" class="form" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% bootstrap_button button_type="submit" content="OK" %}
+            {% bootstrap_button button_type="reset" content="Cancel" %}
+        </form>
+        <hr />
+        <h2>Edits in group</h2>
+        <ul>
+            {% for edit in edit_group.edit_set.all %}
+                <li>
+                    <a href="{% url 'admin-edit' edit.id %}">{{ edit.id }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}

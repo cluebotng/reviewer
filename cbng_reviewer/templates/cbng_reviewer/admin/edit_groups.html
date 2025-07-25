@@ -1,0 +1,21 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% block content %}
+    <div class="container">
+        <table class="table table-borderless">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Weight</th>
+                <th scope="col"></th>
+            </tr>
+            {% for edit_group in edit_groups %}
+                <tr>
+                    <td>{{ edit_group.name }}</td>
+                    <td>{{ edit_group.weight }}</td>
+                    <td>
+                        <a href="{% url 'admin-edit-group' edit_group.id %}">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock content %}

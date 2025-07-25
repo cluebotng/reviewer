@@ -1,0 +1,26 @@
+{% extends "cbng_reviewer/base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}ClueBot NG Review Interface - Admin{% endblock title %}
+{% block sub_header %}
+    <nav class="d-flex flex-wrap align-items-center justify-content-center border-bottom mb-4">
+        <ul class="nav mb-2 justify-content-center mb-md-0">
+            <li class="nav-item">
+                <a class="nav-link px-2 link-secondary" href="{% url 'admin-users' %}">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-2 link-secondary" href="{% url 'admin-edit-groups' %}">Edit Groups</a>
+            </li>
+            {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link px-2 link-secondary" href="{% url 'admin:index' %}">Django Admin</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock sub_header %}
+{% block content %}
+    <div class="container text-center">
+        <p>As an administrator you can manage the configuration of users and edit groups.</p>
+        <p>It is important not to use your access to view classifications on edits when reviewing to avoid bias.</p>
+    </div>
+{% endblock content %}

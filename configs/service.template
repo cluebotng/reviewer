@@ -1,0 +1,4 @@
+# This is for the webservice
+type: buildservice
+mount: none
+health-check-path: /internal/health/

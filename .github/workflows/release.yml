@@ -1,0 +1,28 @@
+name: Release
+on: { push: { tags: [ 'v*' ] } }
+permissions:
+  deployments: write
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Package the source
+        run: |
+          tar -cvf reviewer.tar.gz *
+
+      - name: Crease a release
+        uses: ncipollo/release-action@v1
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          artifacts: "reviewer.tar.gz"
+
+#      - name: Trigger deployment job
+#        run: |
+#          curl \
+#          --fail-with-body \
+#          -X POST \
+#          'https://api.svc.toolforge.org/components/v1/tool/cluebotng-review/deployment?token=${{ secrets.TOOLFORGE_DEPLOY_TOKEN }}'
