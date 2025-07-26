@@ -21,7 +21,7 @@ class Command(BaseCommand):
         total_classifications = vandalism + constructive + skipped
 
         edit.status = 0 if total_classifications == 0 else 1
-        if total_classifications >= settings.CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY:
+        if total_classifications >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
             if 2 * skipped > vandalism + constructive:
                 edit.classification = 2
                 edit.status = 2
