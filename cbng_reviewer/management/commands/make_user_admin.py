@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from django.core.management import BaseCommand

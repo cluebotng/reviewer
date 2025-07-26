@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         """Import edits from the report interface."""
-        logger.info(f"Fetching reported edits")
+        logger.info("Fetching reported edits")
         report_interface = ReportInterface()
         added_edits = report_interface.create_entries_for_reported_edits()
 

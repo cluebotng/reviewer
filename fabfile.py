@@ -10,7 +10,7 @@ from fabric import Connection, Config, task
 def _get_latest_release() -> str:
     """Return the latest release tag from GitHub"""
     return "main"
-    r = requests.get(f"https://api.github.com/repos/cluebotng/reviewer/releases/latest")
+    r = requests.get("https://api.github.com/repos/cluebotng/reviewer/releases/latest")
     r.raise_for_status()
     return r.json()["tag_name"]
 
