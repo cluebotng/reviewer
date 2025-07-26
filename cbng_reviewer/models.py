@@ -59,7 +59,7 @@ class TrainingData(models.Model):
     edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
     timestamp = models.IntegerField()
 
-    comment = models.CharField(max_length=255)
+    comment = models.TextField()
     user = models.CharField(max_length=255)
     user_edit_count = models.IntegerField()
     user_distinct_pages = models.IntegerField()
