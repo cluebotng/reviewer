@@ -17,6 +17,7 @@ CLASSIFICATION_IDS = {i for i, _ in CLASSIFICATIONS}
 class User(AbstractUser):
     is_reviewer = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    is_bot = models.BooleanField(default=False)
     historical_edit_count = models.IntegerField(default=0)
 
 
