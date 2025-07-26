@@ -41,7 +41,7 @@ class Classification(models.Model):
     comment = models.TextField(null=True, default=None)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["edit", "user"], name="unique_edit_user")]
+        constraints = [models.UniqueConstraint(fields=["edit", "user"], name="one_edit_classification_per_user")]
 
 
 class Revision(models.Model):
@@ -52,7 +52,7 @@ class Revision(models.Model):
     text = models.BinaryField()
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["edit", "type"], name="unique_edit_type")]
+        constraints = [models.UniqueConstraint(fields=["edit", "type"], name="one_revision_type_per_edit")]
 
 
 class TrainingData(models.Model):

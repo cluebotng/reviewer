@@ -17,10 +17,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="classification",
-            constraint=models.UniqueConstraint(fields=("edit", "user"), name="unique_edit_user"),
+            constraint=models.UniqueConstraint(fields=("edit", "user"), name="one_edit_classification_per_user"),
         ),
         migrations.AddConstraint(
             model_name="revision",
-            constraint=models.UniqueConstraint(fields=("edit", "type"), name="unique_edit_type"),
+            constraint=models.UniqueConstraint(fields=("edit", "type"), name="one_revision_type_per_edit"),
         ),
     ]
