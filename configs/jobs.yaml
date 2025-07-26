@@ -76,6 +76,16 @@
   filelog-stderr: logs/add-reviews-from-report.stderr.log
   emails: none
 
+- name: add-reviews-from-huggle
+  command: launcher ./manage.py add_reviews_from_huggle
+  image: {{ target_image }}
+  schedule: '23 */2 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/add-reviews-from-huggle.stdout.log
+  filelog-stderr: logs/add-reviews-from-huggle.stderr.log
+  emails: none
+
 - name: add-edits-to-queue
   command: launcher ./manage.py add_edits_to_queue
   image: {{ target_image }}
