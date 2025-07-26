@@ -10,22 +10,23 @@ logger = logging.getLogger(__name__)
 
 
 class ReportInterface:
-    def fetch_edit_ids_requiring_review(self) -> Set[id]:
+    def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> Set[id]:
         r = requests.get(
             "https://cluebotng.toolforge.org/api/?action=review.export",
             timeout=10,
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Report Interface Fetch",
             },
+            params={"include_in_progress": True} if include_in_progress else {}
         )
         r.raise_for_status()
         return set(r.json())
 
-    def create_entries_for_reported_edits(self) -> Set[Edit]:
+    def create_entries_for_reported_edits(self, include_in_progress: bool = False) -> Set[Edit]:
         edit_group = EditGroup.objects.get(name=settings.CBNG_REPORT_EDIT_SET)
 
         added_edits = set()
-        for edit_id in self.fetch_edit_ids_requiring_review():
+        for edit_id in self.fetch_edit_ids_requiring_review(include_in_progress):
             edit, created = Edit.objects.get_or_create(id=edit_id)
             edit.classification = 1
 
