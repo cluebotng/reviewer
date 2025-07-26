@@ -40,6 +40,9 @@ class Classification(models.Model):
     classification = models.IntegerField(choices=CLASSIFICATIONS)
     comment = models.TextField(null=True, default=None)
 
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["edit", "user"], name="unique_edit_user")]
+
 
 class Revision(models.Model):
     edit = models.ForeignKey(Edit, on_delete=models.CASCADE)
@@ -48,9 +51,12 @@ class Revision(models.Model):
     timestamp = models.IntegerField()
     text = models.BinaryField()
 
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["edit", "type"], name="unique_edit_type")]
+
 
 class TrainingData(models.Model):
-    edit = models.ForeignKey(Edit, on_delete=models.CASCADE)
+    edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
     timestamp = models.IntegerField()
 
     comment = models.CharField(max_length=255)
