@@ -57,12 +57,12 @@ class EditSetDumper:
         current = ET.SubElement(wp_edit, "current")
         ET.SubElement(current, "minor").text = str(current_revision.minor)
         ET.SubElement(current, "timestamp").text = str(current_revision.timestamp)
-        ET.SubElement(current, "text").text = current_revision.text
+        ET.SubElement(current, "text").text = current_revision.text.decode('utf-8')
 
         previous = ET.SubElement(wp_edit, "previous")
         ET.SubElement(previous, "minor").text = str(previous_revision.minor)
         ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
-        ET.SubElement(previous, "text").text = previous_revision.text
+        ET.SubElement(previous, "text").text = previous_revision.text.decode('utf-8')
 
         ET.SubElement(wp_edit, "isVandalism").text = "true" if edit.classification == 0 else "false"
         return ET.tostring(wp_edit, encoding="unicode")

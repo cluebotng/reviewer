@@ -80,11 +80,11 @@ class EditGroupViewSet(viewsets.ModelViewSet):
         target_edits = edit_group.edit_set.exclude(classification=None)
 
         def _xml_generator():
-            yield "<WPEditSetParser>\n"
+            yield "<WPEditSet>\n"
             for edit in target_edits:
                 if wp_edit := dumper.generate_wp_edit(edit):
                     yield wp_edit
-            yield "</WPEditSetParser>\n"
+            yield "</WPEditSet>\n"
 
         return StreamingHttpResponse(_xml_generator(), content_type="text/xml")
 
@@ -127,3 +127,11 @@ def get_next_edit_id_for_review(request):
             return Response({"edit_id": selected_edit})
 
     return Response({"edit_id": None, "message": "No Pending Edit Found"})
+
+
+@api_view()
+def dump_edit_as_wp_edit(request, edit_id):
+    edit = get_object_or_404(Edit, id=edit_id)
+    if wp_edit := EditSetDumper().generate_wp_edit(edit):
+        return HttpResponse(wp_edit, content_type="text/xml")
+    raise Http404
