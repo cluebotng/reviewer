@@ -66,6 +66,16 @@
   filelog-stderr: logs/update-edit-classifications.stderr.log
   emails: none
 
+- name: add-reviews-from-report
+  command: launcher ./manage.py add_reviews_from_report
+  image: {{ target_image }}
+  schedule: '15 * * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/add-reviews-from-report.stdout.log
+  filelog-stderr: logs/add-reviews-from-report.stderr.log
+  emails: none
+
 - name: add-edits-to-queue
   command: launcher ./manage.py add_edits_to_queue
   image: {{ target_image }}
