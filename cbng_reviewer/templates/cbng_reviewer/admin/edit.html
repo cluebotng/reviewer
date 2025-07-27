@@ -21,6 +21,9 @@
             {% for edit_group in edit.groups.all %}
                 <li>
                     <a href="{% url 'admin-edit-group' edit_group.id %}">{{ edit_group.name }}</a>
+                    {% if edit_group.name == 'Legacy Report Interface Import' or edit_group.name == 'Report Interface Import' %}
+                    (<a href="https://cluebotng.toolforge.org/?page=View&new_id={{ edit.id }}">Report</a>)
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
