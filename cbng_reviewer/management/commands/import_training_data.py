@@ -16,7 +16,7 @@ class Command(BaseCommand):
         parser.add_argument("--force", action="store_true")
 
     def _handle_edit(self, edit: Edit, force: bool):
-        if TrainingData.objects.filter(edit=edit).exists() and not force:
+        if edit.has_training_data and not force:
             logger.debug(f"Already have training data for {edit.id}")
             return
 
