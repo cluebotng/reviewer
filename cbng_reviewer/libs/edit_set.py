@@ -162,14 +162,7 @@ class EditSetParser:
             # Parse
             return self.import_to_group(target_group, PosixPath(file.name), partial_run)
 
-    def _import_edit(self, target_group: EditGroup, wp_edit: WpEdit):
-        edit, created = Edit.objects.get_or_create(id=wp_edit.edit_id)
-        if created:
-            logger.info(f"Created edit for {edit.id}")
-            edit.classification = 0 if wp_edit.is_vandalism else 1
-            edit.status = 2
-            edit.save()
-
+    def _import_training_data(self, edit: Edit, target_group: EditGroup, wp_edit: WpEdit):
         TrainingData.objects.filter(edit=edit).delete()
         TrainingData.objects.create(
             edit=edit,
@@ -246,23 +239,32 @@ class EditSetParser:
                 # Handle the import logic
                 if context == "end" and current_edit:
                     wp_edit = WpEdit.from_xml(current_edit)
-                    if partial_run:
-                        try:
-                            edit = Edit.objects.get(id=wp_edit.edit_id)
-                        except Edit.DoesNotExist:
-                            pass
-                        else:
-                            if edit.has_training_data:
-                                logger.info(f"Skipping WpEdit entry for existing edit: {wp_edit.edit_id}")
-                                continue
+                    try:
+                        edit = Edit.objects.get(id=wp_edit.edit_id)
+                    except Edit.DoesNotExist:
+                        edit = None
+
+                    if partial_run and edit and edit.has_training_data:
+                        logger.info(f"Skipping WpEdit entry for existing edit: {wp_edit.edit_id}")
+                        continue
 
                     if self._wikipedia.has_revision_been_deleted(wp_edit.edit_id):
                         logger.info(f"Skipping WpEdit due to deletion: {wp_edit.edit_id}")
+                        if edit and not edit.deleted:
+                            logger.info(f"Marking edit as deleted: {edit.id}")
+                            edit.deleted = True
+                            edit.save()
                         return None
 
                     logger.info(f"Handling WpEdit entry: {wp_edit.edit_id}")
                     if wp_edit := self._flesh_out_edit(wp_edit):
-                        self._import_edit(target_group, wp_edit)
+                        if not edit:
+                            logger.info(f"Created edit for {wp_edit.edit_id}")
+                            edit = Edit.objects.create(
+                                id=wp_edit.edit_id, classification=0 if wp_edit.is_vandalism else 1, status=2
+                            )
+
+                        self._import_training_data(edit, target_group, wp_edit)
                     current_edit = None
 
             if current_edit is None:
