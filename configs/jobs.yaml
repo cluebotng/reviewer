@@ -46,15 +46,15 @@
   filelog-stderr: logs/import-training-data.stderr.log
   emails: none
 
-#- name: mark-removed-edits-as-deleted
-#  command: launcher ./manage.py update_deleted_edits
-#  image: {{ target_image }}
-#  schedule: '13 4 * * *'
-#  filelog: true
-#  mount: all
-#  filelog-stdout: logs/mark-removed-edits-as-deleted.stdout.log
-#  filelog-stderr: logs/mark-removed-edits-as-deleted.stderr.log
-#  emails: none
+- name: mark-removed-edits-as-deleted
+  command: launcher ./manage.py update_deleted_edits
+  image: {{ target_image }}
+  schedule: '13 4 * * *'
+  filelog: true
+  mount: all
+  filelog-stdout: logs/mark-removed-edits-as-deleted.stdout.log
+  filelog-stderr: logs/mark-removed-edits-as-deleted.stderr.log
+  emails: none
 
 - name: update-edit-classifications
   command: launcher ./manage.py update_edit_classification

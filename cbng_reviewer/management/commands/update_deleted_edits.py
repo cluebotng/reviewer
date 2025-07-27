@@ -49,8 +49,13 @@ class Command(BaseCommand):
                 Edit.objects.filter(id=options["edit_id"])
                 if options["edit_id"]
                 else
-                # Edit.objects.filter(deleted=False)
-                EditGroup.objects.get(name="Report Interface Import").edit_set.filter(deleted=False)
+                # TODO: Scope this to all groups once we have backfilled data
+                EditGroup.objects.get(
+                    name__in=[
+                        "Legacy Report Interface Import",
+                        "Report Interface Import"
+                    ]
+                ).edit_set.filter(deleted=False)
             ):
                 futures.append(executor.submit(self._handle_edit, edit))
 
