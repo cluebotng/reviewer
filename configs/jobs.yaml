@@ -100,7 +100,7 @@
 
 # Backups
 - name: backup-database
-  command: bash -c 'mysqldump --defaults-file={{ tool_dir }}/replica.my.cnf -h tools-db {{ database_user }}__reviewer | gzip -9 > {{ tool_dir }}/mysql_backups/$(date +"%d-%m-%Y_%H-%M-%S").sql.gz'
+  command: bash -c 'mkdir -p {{ tool_dir }}/mysql_backups/ && mysqldump --defaults-file={{ tool_dir }}/replica.my.cnf -h tools-db {{ database_user }}__reviewer | gzip -9 > {{ tool_dir }}/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
   image: mariadb
   schedule: '45 */2 * * *'
   filelog: true
