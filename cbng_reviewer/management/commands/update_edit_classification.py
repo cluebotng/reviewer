@@ -41,6 +41,14 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         """Update edit classification/status based on user classifications."""
         with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = []
             for edit in Edit.objects.exclude(status=2):
                 executor.submit(self._handle_edit, edit)
+
+            for future in futures:
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.exception(e)
+
             executor.shutdown()

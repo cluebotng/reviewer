@@ -26,9 +26,18 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Import training data for edits."""
+
         with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = []
             for edit in (
                 Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(deleted=False)
             ):
-                executor.submit(self._handle_edit, edit, options["force"])
+                futures.append(executor.submit(self._handle_edit, edit, options["force"]))
+
+            for future in futures:
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.exception(e)
+
             executor.shutdown()
