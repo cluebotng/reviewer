@@ -329,11 +329,16 @@ class Wikipedia:
             return None, None
 
         current_revision, previous_revision = None, None
-        if len(revisions) == 1:
-            current_offset = 1
-        else:
-            current_offset = 0
+        if text := next(iter(revisions[0]["slots"].values()), {}).get("*"):
+            current_revision = WikipediaRevision(
+                timestamp=datetime.fromisoformat(revisions[0]["timestamp"]),
+                user=revisions[0]["user"],
+                minor=self._is_revision_minor(revisions[0]),
+                comment=revisions[0]["comment"],
+                text=text,
+            )
 
+        if len(revisions) > 1:
             if text := next(iter(revisions[1]["slots"].values()), {}).get("*"):
                 previous_revision = WikipediaRevision(
                     timestamp=datetime.fromisoformat(revisions[1]["timestamp"]),
@@ -342,15 +347,6 @@ class Wikipedia:
                     comment=revisions[1]["comment"],
                     text=text,
                 )
-
-        if text := next(iter(revisions[current_offset]["slots"].values()), {}).get("*"):
-            current_revision = WikipediaRevision(
-                timestamp=datetime.fromisoformat(revisions[current_offset]["timestamp"]),
-                user=revisions[current_offset]["user"],
-                minor=self._is_revision_minor(revisions[current_offset]),
-                comment=revisions[current_offset]["comment"],
-                text=text,
-            )
 
         return current_revision, previous_revision
 
