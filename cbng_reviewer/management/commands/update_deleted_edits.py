@@ -46,10 +46,7 @@ class Command(BaseCommand):
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
             for edit_group in EditGroup.objects.get(
-                name__in=[
-                    "Legacy Report Interface Import",
-                    "Report Interface Import"
-                ]
+                name__in=["Legacy Report Interface Import", "Report Interface Import"]
             ):
                 for edit in edit_group.edit_set.filter(deleted=False):
                     futures.append(executor.submit(self._handle_edit, edit))

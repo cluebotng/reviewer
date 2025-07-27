@@ -1,10 +1,14 @@
-from django.forms import ModelForm
+from django import forms
 
 from cbng_reviewer.models import EditGroup
 
 
 # Create the form class.
-class EditGroupForm(ModelForm):
+class EditGroupForm(forms.ModelForm):
     class Meta:
         model = EditGroup
         fields = ["name", "weight"]
+
+
+class AddUserForm(forms.Form):
+    username = forms.CharField(max_length=255)

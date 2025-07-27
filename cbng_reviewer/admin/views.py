@@ -1,9 +1,11 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 
-from cbng_reviewer.admin.forms import EditGroupForm
+from cbng_reviewer.admin.forms import EditGroupForm, AddUserForm
 from cbng_reviewer.libs.django import admin_required
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
+from cbng_reviewer.libs.utils import create_user_with_central_auth_mapping
 from cbng_reviewer.models import User, EditGroup, Edit, Classification
 
 
@@ -14,10 +16,32 @@ def dashboard(request):
 
 @admin_required()
 def users(request):
+    if request.method == "POST":
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            if user := create_user_with_central_auth_mapping(form.cleaned_data["username"]):
+                if not user.is_reviewer:
+                    user.is_reviewer = True
+                    user.save()
+                    # Note: Don't send the user an email, assume this is a special case of discussion elsewhere
+                    IrcRelay().send_message(Messages().notify_irc_about_granted_admin_access(user))
+
+                    messages.add_message(request, messages.SUCCESS, "User created with reviewer rights")
+                else:
+                    messages.add_message(request, messages.SUCCESS, "User is already reviewer")
+            else:
+                messages.add_message(
+                    request, messages.ERROR, "The specified username could not be found in the central auth database"
+                )
+            return redirect("/admin/users/")
+    else:
+        form = AddUserForm
+
     return render(
         request,
         "cbng_reviewer/admin/users.html",
         {
+            "add_user_form": form,
             "admin_users": User.objects.filter(is_admin=1).order_by("date_joined"),
             "reviewer_users": User.objects.filter(is_reviewer=1).order_by("date_joined"),
             "registered_users": User.objects.filter(is_admin=0, is_reviewer=0).order_by("date_joined"),

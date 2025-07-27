@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 from social_django.models import UserSocialAuth
 
-from cbng_reviewer.libs.utils import notify_user_review_rights_granted
+from cbng_reviewer.libs.utils import notify_user_review_rights_granted, create_user_with_central_auth_mapping
 from cbng_reviewer.libs.wikipedia import Wikipedia
 from cbng_reviewer.models import User
 
@@ -18,23 +18,12 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Grant a user reviewer rights, creating the user record if it does not exist."""
-        try:
-            user = User.objects.get(username=options["username"])
-        except User.DoesNotExist:
-            central_uid = Wikipedia().fetch_user_central_id(options["username"])
-            if not central_uid:
-                logger.error("Could not find user on wikipedia, aborting")
-                return
+        if user := create_user_with_central_auth_mapping(options["username"]):
+            if user.is_reviewer:
+                logger.info(f"{user.username} is already a reviewer")
+            else:
+                logger.info(f"Marked {user.username} as a reviewer")
+                user.is_reviewer = True
+                user.save()
 
-            logger.info(f"No user record found for {options['username']}, creating entry ({central_uid})")
-            user = User.objects.create(username=options["username"])
-            UserSocialAuth.objects.create(provider="mediawiki", uid=central_uid, user_id=user.id)
-
-        if user.is_reviewer:
-            logger.info(f"{user.username} is already a reviewer")
-        else:
-            logger.info(f"Marked {user.username} as a reviewer")
-            user.is_reviewer = True
-            user.save()
-
-            notify_user_review_rights_granted(user)
+                notify_user_review_rights_granted(user)
