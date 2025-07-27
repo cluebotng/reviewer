@@ -62,6 +62,14 @@ class Statistics:
 
         return {username: stats for username, stats in user_statistics.items() if stats["total_classifications"] > 0}
 
+    def get_internal_statistics(self):
+        return {
+            "Number Of Administrators": User.objects.filter(is_admin=True).count(),
+            "Number Of Reviewers": User.objects.filter(is_reviewer=True).count(),
+            "Number Of Pending Accounts": User.objects.filter(is_reviewer=False).count(),
+            "Last Review": Classification.objects.all().order_by("-created")[0].created,
+        }
+
     def generate_wikimarkup(self) -> Optional[str]:
         users = self.get_user_statistics(True)
         edit_groups = self.get_edit_group_statistics()
@@ -93,4 +101,15 @@ class Statistics:
             markup += "}}\n"
 
         markup += "{{/UserFooter}}\n"
+
+        markup += "{{/InternalHeader}}\n"
+        for key, value in sorted(self.get_internal_statistics().items(), key=lambda x: x[0]):
+            markup += "{{/Internal\n"
+            markup += f"|key={key}\n"
+            markup += f"|value={value}\n"
+            markup += "}}\n"
+        markup += "{{/InternalFooter}}\n"
+
+        markup += "{{/FootNotes}}\n"
+
         return markup

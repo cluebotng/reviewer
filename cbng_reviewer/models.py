@@ -39,6 +39,7 @@ class Edit(models.Model):
 class Classification(models.Model):
     edit = models.ForeignKey(Edit, on_delete=models.PROTECT, related_name="user_classification")
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True)
     classification = models.IntegerField(choices=CLASSIFICATIONS)
     comment = models.TextField(null=True, default=None)
 
