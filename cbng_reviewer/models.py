@@ -45,8 +45,8 @@ class Edit(models.Model):
         return all(
             [
                 self.status == 2,
-                Revision.objects.filter(edit=self).count() in {1, 2},
                 TrainingData.objects.filter(edit=self).exists(),
+                Revision.objects.filter(edit=self).count() in {1, 2},
             ]
         )
 

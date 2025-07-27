@@ -5,7 +5,7 @@ from typing import Any
 from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.wikipedia import Wikipedia
-from cbng_reviewer.models import Edit, TrainingData
+from cbng_reviewer.models import Edit
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class Command(BaseCommand):
         parser.add_argument("--force", action="store_true")
 
     def _handle_edit(self, edit: Edit, force: bool):
-        if edit.has_training_data and not force:
+        if not force and edit.has_training_data:
             logger.debug(f"Already have training data for {edit.id}")
             return
 
