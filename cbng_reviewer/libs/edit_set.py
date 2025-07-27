@@ -158,7 +158,7 @@ class EditSetParser:
 
         return wp_edit
 
-    def download_and_import_to_group(self, target_group: EditGroup, path: str, partial_run: bool):
+    def download_and_import_to_group(self, target_group: EditGroup, path: str, skip_existing: bool):
         with tempfile.NamedTemporaryFile() as file:
             logger.info(f"Downloading editset to {file.name}")
             r = requests.get(
@@ -177,7 +177,7 @@ class EditSetParser:
                 file.write(chunk)
 
             # Parse
-            return self.import_to_group(target_group, PosixPath(file.name), partial_run)
+            return self.import_to_group(target_group, PosixPath(file.name), skip_existing)
 
     def _import_training_data(self, edit: Edit, target_group: EditGroup, wp_edit: WpEdit):
         TrainingData.objects.filter(edit=edit).delete()
@@ -223,7 +223,7 @@ class EditSetParser:
             logger.info(f"Adding {edit.id} to {target_group.name}")
             edit.groups.add(target_group)
 
-    def import_to_group(self, target_group: EditGroup, path: PosixPath, partial_run: bool):
+    def import_to_group(self, target_group: EditGroup, path: PosixPath, skip_existing: bool):
         mapped_fields = {
             "EditID": "edit_id",
             "isVandalism": "is_vandalism",
@@ -261,7 +261,7 @@ class EditSetParser:
                     except Edit.DoesNotExist:
                         edit = None
 
-                    if partial_run and edit and edit.has_training_data:
+                    if skip_existing and edit and edit.has_training_data:
                         logger.info(f"Skipping WpEdit entry for existing edit: {wp_edit.edit_id}")
                         continue
 

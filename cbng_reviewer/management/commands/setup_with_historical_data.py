@@ -39,7 +39,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--editset-dir")
         parser.add_argument("--editset-name")
-        parser.add_argument("--editset-partial-run", action="store_true", default=False)
+        parser.add_argument("--editset-skip-existing", action="store_true", default=False)
 
     def _load_file(self, path: str) -> Any:
         with (settings.BASE_DIR / "data" / path).open("r") as fh:
@@ -93,7 +93,7 @@ class Command(BaseCommand):
             edit.save()
 
     def _ensure_edit_set_data(
-        self, local_path: Optional[str] = None, name: Optional[str] = None, partial_run: bool = False
+        self, local_path: Optional[str] = None, name: Optional[str] = None, skip_existing: bool = False
     ):
         # These come from the 'edit set' files
         edit_set = EditSetParser()
@@ -107,9 +107,9 @@ class Command(BaseCommand):
             if local_path:
                 source_file = PosixPath(local_path) / path
                 if source_file.exists():
-                    edit_set.import_to_group(target_group, source_file, partial_run)
+                    edit_set.import_to_group(target_group, source_file, skip_existing)
             else:
-                edit_set.download_and_import_to_group(target_group, path, partial_run)
+                edit_set.download_and_import_to_group(target_group, path, skip_existing)
 
     def handle(self, *args: Any, **options: Any) -> None:
         if not options["editset_name"]:
@@ -118,4 +118,4 @@ class Command(BaseCommand):
             self._ensure_existing_edit_groups_exists()
             self._ensure_historical_statistics()
             self._ensure_historical_report_data()
-        self._ensure_edit_set_data(options["editset_dir"], options["editset_name"], options["editset_partial_run"])
+        self._ensure_edit_set_data(options["editset_dir"], options["editset_name"], options["editset_skip_existing"])
