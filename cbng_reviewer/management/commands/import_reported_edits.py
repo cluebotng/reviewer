@@ -17,7 +17,7 @@ class Command(BaseCommand):
         """Import edits from the report interface."""
         logger.info("Fetching reported edits")
         report_interface = ReportInterface()
-        added_edits = report_interface.create_entries_for_reported_edits(options['include_in_progress'])
+        added_edits = report_interface.create_entries_for_reported_edits(options["include_in_progress"])
 
         wikipedia = Wikipedia()
         for edit in added_edits:

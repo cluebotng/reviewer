@@ -17,7 +17,7 @@ class ReportInterface:
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Report Interface Fetch",
             },
-            params={"include_in_progress": True} if include_in_progress else {}
+            params={"include_in_progress": True} if include_in_progress else {},
         )
         r.raise_for_status()
         return set(r.json())

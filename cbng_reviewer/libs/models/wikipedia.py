@@ -1,9 +1,9 @@
-import dataclasses
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
 
-@dataclasses.dataclass
+@dataclass
 class WikipediaEdit:
     title: str
     namespace: str
@@ -12,7 +12,7 @@ class WikipediaEdit:
     current_revision: Optional["WikipediaRevision"] = None
 
 
-@dataclasses.dataclass
+@dataclass
 class WikipediaRevision:
     minor: bool
     timestamp: datetime
@@ -21,7 +21,7 @@ class WikipediaRevision:
     text: str
 
 
-@dataclasses.dataclass
+@dataclass
 class WikipediaPage:
     creation_user: str
     creation_time: datetime

@@ -1,9 +1,9 @@
-import dataclasses
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, Any, Optional
 
 
-@dataclasses.dataclass
+@dataclass
 class WpRevision:
     timestamp: int
     text: str
@@ -19,7 +19,7 @@ class WpRevision:
         return WpRevision(**data)
 
 
-@dataclasses.dataclass
+@dataclass
 class WpEdit:
     edit_id: int
     title: str

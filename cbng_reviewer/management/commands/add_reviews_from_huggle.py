@@ -31,6 +31,7 @@ class Command(BaseCommand):
         user, created = User.objects.get_or_create(username="Bot - Huggle")
         if created:
             user.is_bot = True
+            user.is_reviewer = True
             user.save()
 
         trusted_users = self._get_trusted_users()
