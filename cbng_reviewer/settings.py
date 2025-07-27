@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from cbng_reviewer.utils.config import load_config
@@ -103,6 +104,7 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": True,
+            'stream': sys.stdout
         },
     },
 }
