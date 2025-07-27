@@ -145,7 +145,7 @@ class EditSetParser:
 
         return wp_edit
 
-    def download_and_import_to_group(self, target_group: EditGroup, path: str):
+    def download_and_import_to_group(self, target_group: EditGroup, path: str, partial_run: bool):
         with tempfile.NamedTemporaryFile() as file:
             logger.info(f"Downloading edit to {file.name}")
             r = requests.get(
@@ -164,7 +164,7 @@ class EditSetParser:
                 file.write(chunk)
 
             # Parse
-            return self.import_to_group(target_group, PosixPath(file.name))
+            return self.import_to_group(target_group, PosixPath(file.name), partial_run)
 
     def _import_edit(self, target_group: EditGroup, wp_edit: WpEdit):
         edit, created = Edit.objects.get_or_create(id=wp_edit.edit_id)
@@ -216,7 +216,7 @@ class EditSetParser:
             logger.info(f"Adding {edit.id} to {target_group.name}")
             edit.groups.add(target_group)
 
-    def import_to_group(self, target_group: EditGroup, path: PosixPath):
+    def import_to_group(self, target_group: EditGroup, path: PosixPath, partial_run: bool):
         mapped_fields = {
             "EditID": "edit_id",
             "isVandalism": "is_vandalism",
@@ -249,6 +249,10 @@ class EditSetParser:
                 # Handle the import logic
                 if context == "end" and current_edit:
                     wp_edit = WpEdit.from_xml(current_edit)
+                    if partial_run and Edit.objects.filter(id=wp_edit.edit_id).exists():
+                        logger.info(f"Skipping WpEdit entry for existing edit {wp_edit.edit_id}")
+                        continue
+
                     logger.info(f"Handling WpEdit entry for {wp_edit.edit_id}")
                     if wp_edit := self._flesh_out_edit(wp_edit):
                         self._import_edit(target_group, wp_edit)
