@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.models import Edit, Classification
 
@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--force", action="store_true")
+
     def _handle_edit(self, edit: Edit):
         original_status, original_classification = edit.status, edit.classification
 
@@ -19,6 +22,10 @@ class Command(BaseCommand):
         skipped = Classification.objects.filter(edit=edit, classification=2).count()
 
         total_classifications = vandalism + constructive + skipped
+
+        if total_classifications == 0 and edit.status == 2 and edit.classification is not None:
+            logger.info(f"Not touching completed edit {edit.id}, likely historical")
+            return
 
         edit.status = 0 if total_classifications == 0 else 1
         if total_classifications >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
@@ -42,7 +49,7 @@ class Command(BaseCommand):
         """Update edit classification/status based on user classifications."""
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
-            for edit in Edit.objects.exclude(status=2):
+            for edit in Edit.objects.all() if options["force"] else Edit.objects.exclude(status=2):
                 executor.submit(self._handle_edit, edit)
 
             for future in futures:
