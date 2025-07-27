@@ -55,12 +55,12 @@ class EditSetDumper:
         ET.SubElement(common, "num_recent_reversions").text = str(training_data.page_num_recent_reverts)
 
         current = ET.SubElement(wp_edit, "current")
-        ET.SubElement(current, "minor").text = str(current_revision.minor)
+        ET.SubElement(current, "minor").text = "true" if current_revision.minor else "false"
         ET.SubElement(current, "timestamp").text = str(current_revision.timestamp)
         ET.SubElement(current, "text").text = current_revision.text.decode("utf-8")
 
         previous = ET.SubElement(wp_edit, "previous")
-        ET.SubElement(previous, "minor").text = str(previous_revision.minor)
+        ET.SubElement(previous, "minor").text = "true" if previous_revision.minor else "false"
         ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
         ET.SubElement(previous, "text").text = previous_revision.text.decode("utf-8")
 
