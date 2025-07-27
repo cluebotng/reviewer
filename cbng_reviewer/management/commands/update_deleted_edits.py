@@ -51,8 +51,8 @@ class Command(BaseCommand):
                     "Report Interface Import"
                 ]
             ):
-            for edit in edit_group.edit_set.filter(deleted=False):
-                futures.append(executor.submit(self._handle_edit, edit))
+                for edit in edit_group.edit_set.filter(deleted=False):
+                    futures.append(executor.submit(self._handle_edit, edit))
 
             for future in futures:
                 try:
