@@ -12,11 +12,33 @@ from cbng_reviewer.libs.wikipedia import Wikipedia
 from cbng_reviewer.models import User, EditGroup, Edit
 
 logger = logging.getLogger(__name__)
+KNOWN_EDIT_SETS = {
+    "Original Training Set - C - Train": "C/train.xml",
+    "Original Training Set - C - Trail": "C/trial.xml",
+    "Original Training Set - D - Train": "D/train.xml",
+    "Original Training Set - D - Trail": "D/trial.xml",
+    "Original Training Set - D - Bays Train": "D/bayestrain.xml",
+    "Original Training Set - D - All": "D/all.xml",
+    "Original Testing Training Set - Auto - Train": "Auto/train.xml",
+    "Original Testing Training Set - Auto - Trail": "Auto/trial.xml",
+    "Original Testing Training Set - Old Triplet - Train": "OldTriplet/train.xml",
+    "Original Testing Training Set - Old Triplet - Trail": "OldTriplet/trial.xml",
+    "Original Testing Training Set - Old Triplet - Bays Train": "OldTriplet/bayestrain.xml",
+    "Original Testing Training Set - Old Triplet - All": "OldTriplet/all.xml",
+    "Original Testing Training Set - Random Edits 50/50 - Train": "RandomEdits50-50/train.xml",
+    "Original Testing Training Set - Random Edits 50/50 - Trail": "RandomEdits50-50/trial.xml",
+    "Original Testing Training Set - Random Edits 50/50 - All": "RandomEdits50-50/all.xml",
+    "Original Testing Training Set - Very Large - Train": "VeryLarge/train.xml",
+    "Original Testing Training Set - Very Large - Trail": "VeryLarge/trial.xml",
+    "Original Testing Training Set - Very Large - Bays Train": "VeryLarge/bayestrain.xml",
+    "Original Testing Training Set - Very Large - All": "VeryLarge/all.xml",
+}
 
 
 class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--editset-dir")
+        parser.add_argument("--editset-name")
 
     def _load_file(self, path: str) -> Any:
         with (settings.BASE_DIR / "data" / path).open("r") as fh:
@@ -69,30 +91,13 @@ class Command(BaseCommand):
             edit.groups.add(target_group)
             edit.save()
 
-    def _ensure_edit_set_data(self, local_path: Optional[str]):
+    def _ensure_edit_set_data(self, local_path: Optional[str], name: Optional[str]):
         # These come from the 'edit set' files
         edit_set = EditSetParser()
-        for group_name, path in {
-            "Original Training Set - C - Train": "C/train.xml",
-            "Original Training Set - C - Trail": "C/trial.xml",
-            "Original Training Set - D - Train": "D/train.xml",
-            "Original Training Set - D - Trail": "D/trial.xml",
-            "Original Training Set - D - Bays Train": "D/bayestrain.xml",
-            "Original Training Set - D - All": "D/all.xml",
-            "Original Testing Training Set - Auto - Train": "Auto/train.xml",
-            "Original Testing Training Set - Auto - Trail": "Auto/trial.xml",
-            "Original Testing Training Set - Old Triplet - Train": "OldTriplet/train.xml",
-            "Original Testing Training Set - Old Triplet - Trail": "OldTriplet/trial.xml",
-            "Original Testing Training Set - Old Triplet - Bays Train": "OldTriplet/bayestrain.xml",
-            "Original Testing Training Set - Old Triplet - All": "OldTriplet/all.xml",
-            "Original Testing Training Set - Random Edits 50/50 - Train": "RandomEdits50-50/train.xml",
-            "Original Testing Training Set - Random Edits 50/50 - Trail": "RandomEdits50-50/trial.xml",
-            "Original Testing Training Set - Random Edits 50/50 - All": "RandomEdits50-50/all.xml",
-            "Original Testing Training Set - Very Large - Train": "VeryLarge/train.xml",
-            "Original Testing Training Set - Very Large - Trail": "VeryLarge/trial.xml",
-            "Original Testing Training Set - Very Large - Bays Train": "VeryLarge/bayestrain.xml",
-            "Original Testing Training Set - Very Large - All": "VeryLarge/all.xml",
-        }.items():
+        for group_name, path in KNOWN_EDIT_SETS.items():
+            if name and group_name != name:
+                continue
+
             logger.info(f"Ensuring editset {path}")
             target_group = EditGroup.objects.get(name=group_name)
 
@@ -104,9 +109,10 @@ class Command(BaseCommand):
                 edit_set.download_and_import_to_group(target_group, path)
 
     def handle(self, *args: Any, **options: Any) -> None:
-        self._ensure_existing_user_accounts_exist()
-        self._ensure_existing_access_exists()
-        self._ensure_existing_edit_groups_exists()
-        self._ensure_historical_statistics()
-        self._ensure_historical_report_data()
-        self._ensure_edit_set_data(options["editset_dir"])
+        if not options["editset_name"]:
+            self._ensure_existing_user_accounts_exist()
+            self._ensure_existing_access_exists()
+            self._ensure_existing_edit_groups_exists()
+            self._ensure_historical_statistics()
+            self._ensure_historical_report_data()
+        self._ensure_edit_set_data(options["editset_dir"], options["editset_name"])
