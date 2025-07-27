@@ -73,6 +73,14 @@ class EditSetParser:
         self._wikipedia = Wikipedia()
 
     def _flesh_out_edit(self, wp_edit: WpEdit) -> Optional[WpEdit]:
+        if not wp_edit.title:
+            if edit := self._wikipedia.get_edit_metadata(wp_edit.edit_id):
+                wp_edit.title = edit.title
+                wp_edit.namespace = edit.namespace
+            else:
+                logger.warning(f"Failed to flesh out title for edit {wp_edit.edit_id}")
+                return None
+
         if not wp_edit.page_made_time or not wp_edit.creator:
             if page_metadata := self._wikipedia.get_page_creation_metadata(wp_edit.title, wp_edit.namespace):
                 wp_edit.page_made_time = page_metadata.creation_time

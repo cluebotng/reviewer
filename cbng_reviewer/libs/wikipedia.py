@@ -67,7 +67,7 @@ class Wikipedia:
         return data.get("query", {}).get("tokens", {}).get("logintoken")
 
     def has_revision_been_deleted(self, revision_id: int) -> bool:
-        # This is similar to get_page_revisions & )get_edit_metadata but,
+        # This is similar to get_page_revisions & get_edit_metadata but,
         # we explicitly check for the removal keys.
         # If this returns true we will start trashing data, so it is quite specific
 
@@ -252,7 +252,7 @@ class Wikipedia:
     # This should provide a somewhat consistent view as to what the bot would have seen at the time the edit
     # was (roughly) processed.
 
-    def _get_edit_metadata(self, revision_id: int) -> Optional[WikipediaEdit]:
+    def get_edit_metadata(self, revision_id: int) -> Optional[WikipediaEdit]:
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -355,7 +355,7 @@ class Wikipedia:
         return current_revision, previous_revision
 
     def fetch_edit(self, revision_id: int) -> Optional[WikipediaEdit]:
-        if edit := self._get_edit_metadata(revision_id):
+        if edit := self.get_edit_metadata(revision_id):
             current, previous = self.get_page_revisions(edit.title, revision_id)
             if current:
                 edit.current_revision = current
