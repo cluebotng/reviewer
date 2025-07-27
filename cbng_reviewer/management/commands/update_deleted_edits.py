@@ -5,7 +5,7 @@ from typing import Any
 from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.wikipedia import Wikipedia
-from cbng_reviewer.models import Edit, Revision, TrainingData, Classification, EditGroup
+from cbng_reviewer.models import Edit, Revision, TrainingData, Classification
 
 logger = logging.getLogger(__name__)
 

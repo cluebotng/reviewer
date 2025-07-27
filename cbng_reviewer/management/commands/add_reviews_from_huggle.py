@@ -5,7 +5,6 @@ import requests
 from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 
-from cbng_reviewer.libs.wikipedia import Wikipedia
 from cbng_reviewer.models import User, Edit, Classification, TrainingData
 
 logger = logging.getLogger(__name__)
@@ -37,7 +36,6 @@ class Command(BaseCommand):
         trusted_users = self._get_trusted_users()
         our_classified_edits = Classification.objects.filter(user=user).values_list("edit__id", flat=True)
 
-        wikipedia = Wikipedia()
         for edit in (
             Edit.objects.filter(id=options["edit_id"])
             if options["edit_id"]

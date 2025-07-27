@@ -3,11 +3,8 @@ from typing import Any
 
 from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
-from social_django.models import UserSocialAuth
 
 from cbng_reviewer.libs.utils import notify_user_review_rights_granted, create_user_with_central_auth_mapping
-from cbng_reviewer.libs.wikipedia import Wikipedia
-from cbng_reviewer.models import User
 
 logger = logging.getLogger(__name__)
 
