@@ -1,6 +1,7 @@
 import logging
 
 from django.template import loader
+from django.utils.html import escape
 
 from cbng_reviewer.libs.models.message import Message
 from cbng_reviewer.models import User
@@ -22,21 +23,7 @@ class Messages:
         )
 
     def notify_irc_about_pending_account(self, user: User) -> Message:
-        template = loader.get_template("cbng_reviewer/messages/notify_irc_about_pending_account.txt")
-        return Message(
-            body=template.render(
-                {
-                    "user": user,
-                }
-            )
-        )
+        return Message(body=f'\x0314[[\x0303 New User Account \x0314]]\x0301 {escape(user.username)}')
 
     def notify_irc_about_reviewer_access(self, user: User) -> Message:
-        template = loader.get_template("cbng_reviewer/messages/notify_irc_about_reviewer_access.txt")
-        return Message(
-            body=template.render(
-                {
-                    "user": user,
-                }
-            )
-        )
+        return Message(body=f'\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}')
