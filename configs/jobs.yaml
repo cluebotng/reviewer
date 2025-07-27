@@ -36,15 +36,15 @@
   filelog-stderr: logs/import-reported-edits.stderr.log
   emails: none
 
-- name: import-training-data
-  command: launcher ./manage.py import_training_data
-  image: {{ target_image }}
-  schedule: '15 * * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/import-training-data.stdout.log
-  filelog-stderr: logs/import-training-data.stderr.log
-  emails: none
+#- name: import-training-data
+#  command: launcher ./manage.py import_training_data
+#  image: {{ target_image }}
+#  schedule: '15 * * * *'
+#  filelog: true
+#  mount: all
+#  filelog-stdout: logs/import-training-data.stdout.log
+#  filelog-stderr: logs/import-training-data.stderr.log
+#  emails: none
 
 #- name: mark-removed-edits-as-deleted
 #  command: launcher ./manage.py update_deleted_edits
