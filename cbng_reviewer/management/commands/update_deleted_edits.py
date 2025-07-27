@@ -5,7 +5,7 @@ from typing import Any
 from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.wikipedia import Wikipedia
-from cbng_reviewer.models import Edit, Revision, TrainingData, Classification
+from cbng_reviewer.models import Edit, Revision, TrainingData, Classification, EditGroup
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         self._wikipedia = Wikipedia()
+        self._review_groups = set(
+            EditGroup.objects.filter(name={"Report Interface Import", "Legacy Report Interface Import"}).values_list(
+                "id", flat=True
+            )
+        )
         super(Command, self).__init__(*args, **kwargs)
 
     def add_arguments(self, parser: CommandParser) -> None:
@@ -28,13 +33,18 @@ class Command(BaseCommand):
         if edit.status == 2 and edit.has_training_data:
             logger.info(f"Keeping edit {edit.id} with local data")
         else:
-            # We are an incomplete edit without training data,
-            # we can never be used for training, but we might be referenced in e.g. the report interface,
-            # keep the 'meta' entry around for export purposes
-            logger.info(f"Cleaning dangling edit {edit.id}")
+            # We are an incomplete edit without training data, we can never be used for training.
+            # Cleanup any (partial) associated data
             Classification.objects.filter(edit=edit).delete()
             TrainingData.objects.filter(edit=edit).delete()
             Revision.objects.filter(edit=edit).delete()
+
+            # If we are in one of the review groups, then keep the 'meta' entry around for export/reporting purposes
+            if set(edit.groups.values_list("id", flat=True)) & self._review_groups:
+                logger.debug(f"Keeping dangling edit {edit.id}")
+            else:
+                logger.info(f"Removing dangling edit {edit.id}")
+                edit.delete()
 
         # Set the flag
         if not edit.deleted:
