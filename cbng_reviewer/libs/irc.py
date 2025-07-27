@@ -18,7 +18,7 @@ class IrcRelay:
             logger.warning(f"Skipping irc message due to missing channel or text: {target_channel} / {text}")
             return
 
-        if not settings.CBNG_ENABLE_MESSAGING:
+        if not settings.CBNG_ENABLE_IRC_MESSAGING:
             logger.debug(f"Skipping sending message to {target_channel} ({text})")
             return False
 

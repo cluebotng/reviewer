@@ -207,4 +207,5 @@ CBNG_SAMPLED_EDITS_LOOKBACK_DAYS = 7
 CBNG_SAMPLED_EDITS_EDIT_SET = "Sampled Main Namespace Edits"
 CBNG_REPORT_EDIT_SET = "Report Interface Import"
 CBNG_ADMIN_ONLY = CONFIG["cbng"]["admin_only"]
-CBNG_ENABLE_MESSAGING = CONFIG["cbng"]["enable_messaging"]
+CBNG_ENABLE_IRC_MESSAGING = CONFIG["cbng"]["enable_irc_messaging"]
+CBNG_ENABLE_USER_MESSAGING = CONFIG["cbng"]["enable_user_messaging"]

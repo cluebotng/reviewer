@@ -46,7 +46,8 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
         },
         "cbng": {
             "admin_only": os.environ.get("CBNG_ADMIN_ONLY", "") == "true",
-            "enable_messaging": os.environ.get("CBNG_ENABLE_MESSAGING", "") == "true",
+            "enable_irc_messaging": os.environ.get("CBNG_ENABLE_IRC_MESSAGING", "true") == "true",
+            "enable_user_messaging": os.environ.get("CBNG_ENABLE_USER_MESSAGING", "") == "true",
         },
         "irc_relay": {
             "host": os.environ.get("IRC_RELAY_HOST", "irc-relay.tool-cluebotng.svc.tools.local"),

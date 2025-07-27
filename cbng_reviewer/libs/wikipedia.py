@@ -162,7 +162,7 @@ class Wikipedia:
         return self._send_user_email(username, message.subject, message.body)
 
     def _send_user_email(self, username: str, subject: str, content: str) -> bool:
-        if not settings.CBNG_ENABLE_MESSAGING:
+        if not settings.CBNG_ENABLE_USER_MESSAGING:
             logger.debug(f"Skipping sending email to {username} ({subject})")
             return False
 
