@@ -249,9 +249,15 @@ class EditSetParser:
                 # Handle the import logic
                 if context == "end" and current_edit:
                     wp_edit = WpEdit.from_xml(current_edit)
-                    if partial_run and Edit.objects.filter(id=wp_edit.edit_id).exists():
-                        logger.info(f"Skipping WpEdit entry for existing edit {wp_edit.edit_id}")
-                        continue
+                    if partial_run:
+                        try:
+                            edit = Edit.objects.get(id=wp_edit.edit_id)
+                        except Edit.DoesNotExist:
+                            pass
+                        else:
+                            if edit.has_training_data:
+                                logger.info(f"Skipping WpEdit entry for existing edit {wp_edit.edit_id}")
+                                continue
 
                     logger.info(f"Handling WpEdit entry for {wp_edit.edit_id}")
                     if wp_edit := self._flesh_out_edit(wp_edit):
