@@ -35,6 +35,21 @@ class Edit(models.Model):
     status = models.IntegerField(choices=STATUSES, default=0)
     classification = models.IntegerField(choices=CLASSIFICATIONS, null=True)
 
+    @property
+    def has_training_data(self):
+        # If we are a completed edit, with stored training data and stored revision data,
+        # then we can be used for training, even if the original revision has been deleted.
+        #
+        # If we do not have the training/revision data stored and the edit is not completed,
+        # then it never will be, so we can remove it as dangling.
+        return all(
+            [
+                self.status == 2,
+                Revision.objects.filter(edit=self).count() in {1, 2},
+                TrainingData.objects.filter(edit=self).exists(),
+            ]
+        )
+
 
 class Classification(models.Model):
     edit = models.ForeignKey(Edit, on_delete=models.PROTECT, related_name="user_classification")
