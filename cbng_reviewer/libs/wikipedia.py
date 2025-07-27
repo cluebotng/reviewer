@@ -120,12 +120,11 @@ class Wikipedia:
             return True
 
         revisions = next(iter(data.get("query", {}).get("pages", {}).values()), {}).get("revisions", [])
-        if len(revisions) == 1:
-            previous_revision = {}
-            current_revision = revisions[0]
-        else:
-            previous_revision = revisions[0]
-            current_revision = revisions[1]
+
+        current_revision = next(iter(revisions[0]["slots"].values()), {})
+        previous_revision = {}
+        if len(revisions) > 1:
+            previous_revision = next(iter(revisions[1]["slots"].values()), {})
 
         return any(
             [
