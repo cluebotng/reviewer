@@ -5,8 +5,6 @@
         <h1>{{ edit.id }}</h1>
         <p>Flags:</p>
         <ul>
-            <li>Has been deleted: {{ edit.deleted }}</li>
-            <li>Has training data: {{ edit.has_training_data }}</li>
             <li>Status: {{ edit.get_status_display }}</li>
             <li>
                 Overall classification:
@@ -16,6 +14,12 @@
                     pending
                 {% endif %}
             </li>
+            {% if edit.deleted %}
+            <li>Revision or user has been deleted</li>
+            {% endif %}
+            {% if edit.has_training_data %}
+            <li>Edit has training data: <a href="https://cluebotng-review.toolforge.org/api/v1/edit/{{ edit.id }}/dump-wpedit/">View WPEdit</a></li>
+            {% endif %}
         </ul>
         <p>Member of:</p>
         <ul>
