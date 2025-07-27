@@ -147,7 +147,7 @@ class EditSetParser:
 
     def download_and_import_to_group(self, target_group: EditGroup, path: str, partial_run: bool):
         with tempfile.NamedTemporaryFile() as file:
-            logger.info(f"Downloading edit to {file.name}")
+            logger.info(f"Downloading editset to {file.name}")
             r = requests.get(
                 f"https://cluebotng-editsets.toolforge.org/{path}",
                 timeout=10,
@@ -174,25 +174,26 @@ class EditSetParser:
             edit.status = 2
             edit.save()
 
-            TrainingData.objects.filter(edit=edit).delete()
-            TrainingData.objects.create(
-                edit=edit,
-                timestamp=wp_edit.current.timestamp.timestamp(),
-                comment=wp_edit.comment,
-                user=wp_edit.user,
-                user_edit_count=wp_edit.user_edit_count,
-                user_distinct_pages=wp_edit.user_distinct_pages,
-                user_warns=wp_edit.user_warns,
-                user_reg_time=wp_edit.user_reg_time.timestamp(),
-                prev_user=wp_edit.prev_user,
-                page_title=wp_edit.title,
-                page_namespace=settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID[wp_edit.namespace.lower()],
-                page_created_time=wp_edit.page_made_time.timestamp(),
-                page_creator=wp_edit.creator,
-                page_num_recent_edits=wp_edit.num_recent_edits,
-                page_num_recent_reverts=wp_edit.num_recent_reversions,
-            )
+        TrainingData.objects.filter(edit=edit).delete()
+        TrainingData.objects.create(
+            edit=edit,
+            timestamp=wp_edit.current.timestamp.timestamp(),
+            comment=wp_edit.comment,
+            user=wp_edit.user,
+            user_edit_count=wp_edit.user_edit_count,
+            user_distinct_pages=wp_edit.user_distinct_pages,
+            user_warns=wp_edit.user_warns,
+            user_reg_time=wp_edit.user_reg_time.timestamp(),
+            prev_user=wp_edit.prev_user,
+            page_title=wp_edit.title,
+            page_namespace=settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID[wp_edit.namespace.lower()],
+            page_created_time=wp_edit.page_made_time.timestamp(),
+            page_creator=wp_edit.creator,
+            page_num_recent_edits=wp_edit.num_recent_edits,
+            page_num_recent_reverts=wp_edit.num_recent_reversions,
+        )
 
+        if wp_edit.current or wp_edit.previous:
             Revision.objects.filter(edit=edit).delete()
             if wp_edit.current:
                 Revision.objects.create(
