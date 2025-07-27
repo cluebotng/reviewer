@@ -207,7 +207,7 @@ class EditSetParser:
             if wp_edit.previous:
                 Revision.objects.create(
                     edit=edit,
-                    type=0,
+                    type=1,
                     minor=wp_edit.previous.minor,
                     timestamp=wp_edit.previous.timestamp.timestamp(),
                     text=wp_edit.previous.text.encode("utf-8"),
