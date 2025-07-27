@@ -45,7 +45,7 @@ class Command(BaseCommand):
         """Update edit classification based on user classifications."""
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
-            for edit_group in EditGroup.objects.get(
+            for edit_group in EditGroup.objects.filter(
                 name__in=["Legacy Report Interface Import", "Report Interface Import"]
             ):
                 for edit in edit_group.edit_set.filter(deleted=False):
