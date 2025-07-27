@@ -1,0 +1,13 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% block content %}
+    <div class="container">
+        <h1>{{ user.username }}</h1>
+        <ul>
+            {% for classification in classifications %}
+                <li>
+                    <a href="{% url 'admin-edit' classification.edit.id %}">{{ classification.edit.id }}</a> as {{ classification.get_classification_display }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}

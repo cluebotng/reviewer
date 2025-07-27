@@ -42,9 +42,11 @@ def users(request):
         "cbng_reviewer/admin/users.html",
         {
             "add_user_form": form,
-            "admin_users": User.objects.filter(is_admin=1).order_by("date_joined"),
-            "reviewer_users": User.objects.filter(is_reviewer=1).order_by("date_joined"),
-            "registered_users": User.objects.filter(is_admin=0, is_reviewer=0).order_by("date_joined"),
+            "admin_users": User.objects.filter(is_admin=True).order_by("date_joined"),
+            "reviewer_users": User.objects.filter(is_reviewer=True).exclude(is_bot=True).order_by("date_joined"),
+            "registered_users": User.objects.filter(is_admin=False, is_reviewer=False, is_bot=False).order_by(
+                "date_joined"
+            ),
         },
     )
 
@@ -85,6 +87,16 @@ def edit_groups(request):
         {
             "edit_groups": EditGroup.objects.all(),
         },
+    )
+
+
+@admin_required()
+def view_user(request, id: int):
+    user = get_object_or_404(User, id=id)
+    return render(
+        request,
+        "cbng_reviewer/admin/user.html",
+        {"user": user, "classifications": Classification.objects.filter(user=user)},
     )
 
 
