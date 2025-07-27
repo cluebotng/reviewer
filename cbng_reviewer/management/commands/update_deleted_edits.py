@@ -45,11 +45,10 @@ class Command(BaseCommand):
         """Update edit classification based on user classifications."""
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
-            for edit_group in EditGroup.objects.filter(
-                name__in=["Legacy Report Interface Import", "Report Interface Import"]
+            for edit in (
+                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(deleted=False)
             ):
-                for edit in edit_group.edit_set.filter(deleted=False):
-                    futures.append(executor.submit(self._handle_edit, edit))
+                futures.append(executor.submit(self._handle_edit, edit))
 
             for future in futures:
                 try:
