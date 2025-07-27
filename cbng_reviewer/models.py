@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 STATUSES = (
@@ -79,9 +79,17 @@ class TrainingData(models.Model):
 
 
 @receiver(post_save, sender=User)
-def notify_irc(sender, instance, created, **kwargs):
+def notify_irc_about_pending_account(sender, instance, created, **kwargs):
     if created:
         from cbng_reviewer.libs.irc import IrcRelay
         from cbng_reviewer.libs.messages import Messages
 
         IrcRelay().send_message(Messages().notify_irc_about_pending_account(instance))
+
+
+@receiver(pre_delete, sender=User)
+def notify_irc_about_deleted_account(sender, instance, **kwargs):
+    from cbng_reviewer.libs.irc import IrcRelay
+    from cbng_reviewer.libs.messages import Messages
+
+    IrcRelay().send_message(Messages().notify_irc_about_deleted_account(instance))

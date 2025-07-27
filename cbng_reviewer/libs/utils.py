@@ -6,5 +6,5 @@ from cbng_reviewer.models import User
 
 def notify_user_review_rights_granted(user: User):
     messages = Messages()
-    IrcRelay().send_message(messages.notify_irc_about_reviewer_access(user))
+    IrcRelay().send_message(messages.notify_irc_about_granted_reviewer_access(user))
     Wikipedia().send_user_message(user.username, messages.notify_user_about_reviewer_access(user))

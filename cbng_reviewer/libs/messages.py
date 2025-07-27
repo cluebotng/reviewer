@@ -23,7 +23,10 @@ class Messages:
         )
 
     def notify_irc_about_pending_account(self, user: User) -> Message:
-        return Message(body=f'\x0314[[\x0303 New User Account \x0314]]\x0301 {escape(user.username)}')
+        return Message(body=f"\x0314[[\x0303 New User Account \x0314]]\x0301 {escape(user.username)}")
 
-    def notify_irc_about_reviewer_access(self, user: User) -> Message:
-        return Message(body=f'\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}')
+    def notify_irc_about_deleted_account(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x0304 Removed User Account \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_granted_reviewer_access(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}")
