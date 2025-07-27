@@ -46,6 +46,12 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
         },
         "cbng": {
             "admin_only": os.environ.get("CBNG_ADMIN_ONLY", "") == "true",
+            "enable_emailing": os.environ.get("CBNG_ENABLE_EMAILING", "") == "true",
+        },
+        "irc_relay": {
+            "host": os.environ.get("IRC_RELAY_HOST", "irc-relay.tool-cluebotng.svc.tools.local"),
+            "port": int(os.environ.get("IRC_RELAY_PORT", "3334")),
+            "channel": "#wikipedia-en-cbngreview",
         },
     }
     cfg = always_merger.merge(cfg, _load_yaml(base_dir / "config.yaml"))

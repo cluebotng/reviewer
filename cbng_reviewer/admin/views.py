@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from cbng_reviewer.admin.forms import EditGroupForm
 from cbng_reviewer.libs.django import admin_required
+from cbng_reviewer.libs.utils import notify_user_review_rights_granted
 from cbng_reviewer.models import User, EditGroup, Edit, Classification
 
 
@@ -35,6 +36,11 @@ def user_change_flag(request, id: int):
             user.is_admin = admin_flag == "1"
 
         user.save()
+
+        # Do this after the save - only if we changed the reviewer status
+        if user.is_reviewer and request.POST.get("reviewer"):
+            notify_user_review_rights_granted(user)
+
     return redirect("/admin/users/")
 
 

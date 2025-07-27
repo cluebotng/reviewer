@@ -61,3 +61,36 @@ class Statistics:
                 }
 
         return {username: stats for username, stats in user_statistics.items() if stats["total_classifications"] > 0}
+
+    def generate_wikimarkup(self) -> Optional[str]:
+        users = self.get_user_statistics(True)
+        edit_groups = self.get_edit_group_statistics()
+
+        # We expect data - don't wipe the current page if we didn't find some
+        if not users or not edit_groups:
+            return None
+
+        markup = "{{/EditGroupHeader}}\n"
+        for name, stats in sorted(edit_groups.items(), key=lambda s: s[0]):
+            markup += "{{/EditGroup\n"
+            markup += f"|name={name}\n"
+            markup += f"|weight={stats['weight']}\n"
+            markup += f"|notdone={stats['pending']}\n"
+            markup += f"|partial={stats['in_progress']}\n"
+            markup += f"|done={stats['done']}\n"
+            markup += "}}\n"
+        markup += "{{/EditGroupFooter}}\n"
+
+        markup += "{{/UserHeader}}\n"
+
+        for username, stats in sorted(users.items(), key=lambda s: s[1]["total_classifications"]):
+            markup += "{{/User\n"
+            markup += f"|nick={username}\n"
+            markup += f"|admin={'true' if stats['is_admin'] else 'false'}\n"
+            markup += f"|count={stats['total_classifications']}\n"
+            markup += f"|accuracy={stats['accuracy'] if stats['accuracy'] else 'NaN'}\n"
+            markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
+            markup += "}}\n"
+
+        markup += "{{/UserFooter}}\n"
+        return markup

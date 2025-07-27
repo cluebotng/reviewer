@@ -1,0 +1,1 @@
+\x0314[[\x0303 New User Account \x0314]]\x0301 {{ user.username }}

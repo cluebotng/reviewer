@@ -1,0 +1,13 @@
+Hello {{ user.username }},
+
+Your account has been approved for reviewer access on the ClueBot NG Review Interface <https://cluebotng-review.toolforge.org>.
+
+Once logged in, please review the instructions displayed on the landing page, then make your first review.
+
+If you have questions, feel free to contact one of the admin team:
+
+{% for username in administrators %}{{ username }}
+{% endfor %}
+
+Thanks,
+The ClueBot NG Review Interface Team

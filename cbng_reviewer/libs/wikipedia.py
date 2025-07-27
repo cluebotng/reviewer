@@ -7,6 +7,7 @@ import requests
 from django.conf import settings
 from django.db import connections
 
+from cbng_reviewer.libs.models.message import Message
 from cbng_reviewer.libs.models.wikipedia import (
     WikipediaEdit,
     WikipediaRevision,
@@ -105,31 +106,34 @@ class Wikipedia:
         )
         r.raise_for_status()
 
-    def generate_statistics_wikimarkup(self, group_stats: Dict[str, Dict[str, int]], user_stats: Dict[str, int]):
-        markup = "{{/EditGroupHeader}}\n"
-        for name, stats in sorted(group_stats.items(), key=lambda s: s[0]):
-            markup += "{{/EditGroup\n"
-            markup += f"|name={name}\n"
-            markup += f"|weight={stats['weight']}\n"
-            markup += f"|notdone={stats['pending']}\n"
-            markup += f"|partial={stats['in_progress']}\n"
-            markup += f"|done={stats['done']}\n"
-            markup += "}}\n"
-        markup += "{{/EditGroupFooter}}\n"
+    def send_user_message(self, username: str, message: Message) -> bool:
+        if not message.subject or not message.body:
+            logger.warning(f"Skipping user email due to missing subject or body: {message}")
+            return False
+        return self._send_user_email(username, message.subject, message.body)
 
-        markup += "{{/UserHeader}}\n"
+    def _send_user_email(self, username: str, subject: str, content: str) -> bool:
+        if not settings.CBNG_ENABLE_EMAILING:
+            logger.info(f"Skipping sending email to {username} ({subject})")
+            return False
 
-        for username, stats in sorted(user_stats.items(), key=lambda s: s[1]["total_classifications"]):
-            markup += "{{/User\n"
-            markup += f"|nick={username}\n"
-            markup += f"|admin={'true' if stats['is_admin'] else 'false'}\n"
-            markup += f"|count={stats['total_classifications']}\n"
-            markup += f"|accuracy={stats['accuracy'] if stats['accuracy'] else 'NaN'}\n"
-            markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
-            markup += "}}\n"
-
-        markup += "{{/UserFooter}}\n"
-        return markup
+        r = self._session.post(
+            "https://en.wikipedia.org/w/api.php",
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Send User Email",
+            },
+            data={
+                "format": "json",
+                "action": "emailuser",
+                "target": username,
+                "subject": subject,
+                "text": content,
+                "token": self._get_csrf_token(),
+            },
+        )
+        r.raise_for_status()
+        data = r.json()
+        return data.get("emailuser", {}).get("result") == "Success"
 
     def fetch_user_central_id(self, username: str) -> Optional[int]:
         r = self._session.get(

@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 STATUSES = (
     (0, "Pending"),
@@ -74,3 +76,12 @@ class TrainingData(models.Model):
 
     page_num_recent_edits = models.IntegerField()
     page_num_recent_reverts = models.IntegerField()
+
+
+@receiver(post_save, sender=User)
+def notify_irc(sender, instance, created, **kwargs):
+    if created:
+        from cbng_reviewer.libs.irc import IrcRelay
+        from cbng_reviewer.libs.messages import Messages
+
+        IrcRelay().send_message(Messages().notify_irc_about_pending_account(instance))
