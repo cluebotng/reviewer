@@ -21,8 +21,12 @@ logger = logging.getLogger(__name__)
 class Wikipedia:
     _RE_NS_PREFIX = re.compile(rf'^({"|".join(settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID.keys())}):', re.IGNORECASE)
 
-    def __init__(self):
+    def __init__(self, require_authentication: bool = False, skip_authenticate: bool = False):
         self._session = requests.session()
+        if not skip_authenticate and settings.WIKIPEDIA_USERNAME and settings.WIKIPEDIA_PASSWORD:
+            self.login(settings.WIKIPEDIA_USERNAME, settings.WIKIPEDIA_PASSWORD)
+        elif require_authentication:
+            raise ValueError("Asked to authenticate but no credentials")
 
     def _clean_page_title(self, title: str) -> str:
         title = self._RE_NS_PREFIX.sub("", title)
@@ -63,6 +67,36 @@ class Wikipedia:
         return data.get("query", {}).get("tokens", {}).get("logintoken")
 
     def has_revision_been_deleted(self, revision_id: int) -> bool:
+        # This is similar to get_page_revisions & )get_edit_metadata but,
+        # we explicitly check for the removal keys.
+        # If this returns true we will start trashing data, so it is quite specific
+
+        # First get the page title
+        r = self._session.get(
+            "https://en.wikipedia.org/w/api.php",
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Edit Metadata",
+            },
+            params={
+                "format": "json",
+                "action": "query",
+                "rawcontinue": 1,
+                "prop": "revisions",
+                "rvslots": "*",
+                "revids": revision_id,
+            },
+        )
+        r.raise_for_status()
+        page_data = r.json()
+
+        if "badrevids" in page_data.get("query", {}).keys():
+            return True
+
+        page_title = next(iter(page_data.get("query", {}).get("pages", {}).values()), {}).get("title")
+        if not page_title:
+            return True
+
+        # Now get the revision data
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -72,9 +106,11 @@ class Wikipedia:
                 "format": "json",
                 "action": "query",
                 "prop": "revisions",
-                "revids": revision_id,
+                "titles": page_title,
+                "rvstartid": revision_id,
+                "rvlimit": 2,
                 "rvslots": "*",
-                "rvprop": "content",
+                "rvprop": "user|content",
             },
         )
         r.raise_for_status()
@@ -83,11 +119,24 @@ class Wikipedia:
         if "badrevids" in data.get("query", {}).keys():
             return True
 
-        page_data = next(iter(data.get("query", {}).get("pages", {}).values()), {})
-        revision = next(iter(page_data["revisions"][0]["slots"].values()), {})
-        return (
-            "texthidden" in revision.keys()
-        )  # `*` (content) will be replaced with this key if the revision is deleted
+        revisions = next(iter(data.get("query", {}).get("pages", {}).values()), {}).get("revisions", [])
+        if len(revisions) == 1:
+            previous_revision = {}
+            current_revision = revisions[0]
+        else:
+            previous_revision = revisions[0]
+            current_revision = revisions[1]
+
+        return any(
+            [
+                "texthidden" in previous_revision,
+                "userhidden" in previous_revision,
+                "suppressed" in previous_revision,
+                "current_revision" in current_revision,
+                "userhidden" in current_revision,
+                "suppressed" in previous_revision,
+            ]
+        )
 
     def update_statistics_page(self, content: str):
         r = self._session.post(
@@ -113,8 +162,8 @@ class Wikipedia:
         return self._send_user_email(username, message.subject, message.body)
 
     def _send_user_email(self, username: str, subject: str, content: str) -> bool:
-        if not settings.CBNG_ENABLE_EMAILING:
-            logger.info(f"Skipping sending email to {username} ({subject})")
+        if not settings.CBNG_ENABLE_MESSAGING:
+            logger.debug(f"Skipping sending email to {username} ({subject})")
             return False
 
         r = self._session.post(
@@ -222,6 +271,10 @@ class Wikipedia:
         r.raise_for_status()
         data = r.json()
 
+        if "badrevids" in data.get("query", {}).keys():
+            logger.warning(f"Bad revision id {revision_id}")
+            return None
+
         page_data = next(iter(data.get("query", {}).get("pages", {}).values()), None)
         if not page_data:
             logger.warning(f"Found no pages for {revision_id}")
@@ -253,7 +306,7 @@ class Wikipedia:
                 "prop": "revisions",
                 "titles": page_title,
                 "rvstartid": revision_id,
-                "rvlimit": 5,
+                "rvlimit": 2,
                 "rvslots": "*",
                 "rvprop": "user|content|flags|timestamp|comment",
             },
@@ -266,7 +319,11 @@ class Wikipedia:
             logger.warning(f"Found no pages for {revision_id}")
             return None, None
 
-        revisions = page_data.get("revisions", [])
+        revisions = [
+            revision
+            for revision in page_data.get("revisions", [])
+            if "texthidden" not in revision and "userhidden" not in revision
+        ]
         if not revisions:
             logger.warning(f"Missing revisions for {revision_id}")
             return None, None

@@ -100,12 +100,7 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": True,
-            'stream': sys.stdout
-        },
+        "": {"handlers": ["console"], "level": "INFO", "propagate": True, "stream": sys.stdout},
     },
 }
 
@@ -212,4 +207,4 @@ CBNG_SAMPLED_EDITS_LOOKBACK_DAYS = 7
 CBNG_SAMPLED_EDITS_EDIT_SET = "Sampled Main Namespace Edits"
 CBNG_REPORT_EDIT_SET = "Report Interface Import"
 CBNG_ADMIN_ONLY = CONFIG["cbng"]["admin_only"]
-CBNG_ENABLE_EMAILING = CONFIG["cbng"]["enable_emailing"]
+CBNG_ENABLE_MESSAGING = CONFIG["cbng"]["enable_messaging"]

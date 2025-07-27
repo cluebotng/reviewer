@@ -18,6 +18,10 @@ class IrcRelay:
             logger.warning(f"Skipping irc message due to missing channel or text: {target_channel} / {text}")
             return
 
+        if not settings.CBNG_ENABLE_MESSAGING:
+            logger.debug(f"Skipping sending message to {target_channel} ({text})")
+            return False
+
         payload = f"{target_channel}:{text}\n".encode("utf-8")
         logger.info(f"Sending to IRC Relay: {payload}")
         try:

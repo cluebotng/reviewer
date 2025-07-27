@@ -15,10 +15,7 @@ class Command(BaseCommand):
         """Export stats to wikipedia."""
         statistics = Statistics()
 
-        wikipedia = Wikipedia()
-        if settings.WIKIPEDIA_USERNAME and settings.WIKIPEDIA_PASSWORD:
-            wikipedia.login(settings.WIKIPEDIA_USERNAME, settings.WIKIPEDIA_PASSWORD)
-
+        wikipedia = Wikipedia(True)
         if wiki_markup := statistics.generate_wikimarkup():
             wikipedia.update_statistics_page(wiki_markup)
         else:
