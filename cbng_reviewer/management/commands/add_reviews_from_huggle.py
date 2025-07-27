@@ -39,26 +39,18 @@ class Command(BaseCommand):
         for edit in (
             Edit.objects.filter(id=options["edit_id"])
             if options["edit_id"]
-            else Edit.objects.exclude(status=2).exclude(deleted=True)
+            else Edit.objects.exclude(status=2).exclude(pk__in=our_classified_edits).exclude(deleted=True)
         ):
+            if edit.id in our_classified_edits:
+                logger.info(f"We have already processed {edit.id}")  # make --edit-id more friendly
+                continue
+
             try:
                 training_data = TrainingData.objects.get(edit=edit)
             except TrainingData.DoesNotExist:
                 # We will handle this after `import_training_data` has run
                 continue
 
-            if edit.id in our_classified_edits:
-                # Cleanup bad entries
-                if training_data.user not in trusted_users:
-                    logger.info(f"Removing classification for non-trusted user {training_data.user}")
-                    Classification.objects.filter(edit=edit, user=user, classification=1).delete()
-                    continue
-
-                # Make --edit-id more friendly
-                logger.info(f"We have already processed {edit.id}")
-                continue
-
-            # Add an entry if we don't have one
             if training_data.user in trusted_users:
                 logger.info(f"Leaving constructive review for {edit.id} by {user.username}")
                 Classification.objects.create(edit=edit, user=user, classification=1, comment="Trusted User")
