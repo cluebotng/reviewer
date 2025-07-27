@@ -41,7 +41,7 @@ class Command(BaseCommand):
         for edit in (
             Edit.objects.filter(id=options["edit_id"])
             if options["edit_id"]
-            else Edit.objects.exclude(status=2).exclude(pk__in=our_classified_edits)
+            else Edit.objects.exclude(status=2).exclude(pk__in=our_classified_edits).exclude(deleted=True)
         ):
             if edit.id in our_classified_edits:
                 logger.info(f"We have already processed {edit.id}")  # make --edit-id more friendly
