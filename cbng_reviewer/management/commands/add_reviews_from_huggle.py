@@ -50,13 +50,8 @@ class Command(BaseCommand):
             try:
                 training_data = TrainingData.objects.get(edit=edit)
             except TrainingData.DoesNotExist:
-                logger.info(f"Fetching training data for {edit.id}")
-                wikipedia.create_training_data_for_edit(edit)
-                try:
-                    training_data = TrainingData.objects.get(edit=edit)
-                except TrainingData.DoesNotExist:
-                    logger.info(f"Skipping edit due to no training data: {edit.id}")
-                    continue
+                # We will handle this after `import_training_data` has run
+                continue
 
             if training_data.user in trusted_users:
                 logger.info(f"Leaving constructive review for {edit.id} by {user.username}")
