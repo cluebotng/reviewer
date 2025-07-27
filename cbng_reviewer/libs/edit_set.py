@@ -73,10 +73,6 @@ class EditSetParser:
         self._wikipedia = Wikipedia()
 
     def _flesh_out_edit(self, wp_edit: WpEdit) -> Optional[WpEdit]:
-        if self._wikipedia.has_revision_been_deleted(wp_edit.edit_id):
-            logger.info(f"Skipping edit that has been deleted: {wp_edit.edit_id}")
-            return None
-
         if not wp_edit.page_made_time or not wp_edit.creator:
             if page_metadata := self._wikipedia.get_page_creation_metadata(wp_edit.title, wp_edit.namespace):
                 wp_edit.page_made_time = page_metadata.creation_time
@@ -257,10 +253,14 @@ class EditSetParser:
                             pass
                         else:
                             if edit.has_training_data:
-                                logger.info(f"Skipping WpEdit entry for existing edit {wp_edit.edit_id}")
+                                logger.info(f"Skipping WpEdit entry for existing edit: {wp_edit.edit_id}")
                                 continue
 
-                    logger.info(f"Handling WpEdit entry for {wp_edit.edit_id}")
+                    if self._wikipedia.has_revision_been_deleted(wp_edit.edit_id):
+                        logger.info(f"Skipping WpEdit due to deletion: {wp_edit.edit_id}")
+                        return None
+
+                    logger.info(f"Handling WpEdit entry: {wp_edit.edit_id}")
                     if wp_edit := self._flesh_out_edit(wp_edit):
                         self._import_edit(target_group, wp_edit)
                     current_edit = None
