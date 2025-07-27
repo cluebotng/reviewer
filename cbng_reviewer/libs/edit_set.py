@@ -91,26 +91,27 @@ class EditSetParser:
                 logger.error(f"Failed to flesh out creation for edit {wp_edit.edit_id}")
                 return None
 
-        if not wp_edit.current.text or not wp_edit.current.timestamp:
+        if (not wp_edit.current.text or not wp_edit.current.timestamp) or (
+            wp_edit.previous and not wp_edit.previous.text
+        ):
             current_revision, previous_revision = self._wikipedia.get_page_revisions(wp_edit.title, wp_edit.edit_id)
             if current_revision:
                 logger.warning(f"Overriding current revision for {wp_edit.edit_id}")
                 wp_edit.current.timestamp = current_revision.timestamp
                 wp_edit.current.text = current_revision.text
                 wp_edit.current.minor = current_revision.minor
-
-                if previous_revision:
-                    logger.warning(f"Overriding previous revision for {wp_edit.edit_id}")
-                    wp_edit.previous.timestamp = previous_revision.timestamp
-                    wp_edit.previous.text = previous_revision.text
-                    wp_edit.previous.minor = previous_revision.minor
-
-                    wp_edit.prev_user = previous_revision.user
-                else:
-                    wp_edit.previous = None
             else:
                 logger.error(f"Failed to flesh out revision for edit {wp_edit.edit_id}")
                 return None
+
+            if previous_revision:
+                logger.warning(f"Overriding previous revision for {wp_edit.edit_id}")
+                wp_edit.previous.timestamp = previous_revision.timestamp
+                wp_edit.previous.text = previous_revision.text
+                wp_edit.previous.minor = previous_revision.minor
+                wp_edit.prev_user = previous_revision.user
+            else:
+                wp_edit.previous = None
 
         if not wp_edit.user_reg_time:
             if user_reg_time := self._wikipedia.get_user_registration_time(wp_edit.user):
