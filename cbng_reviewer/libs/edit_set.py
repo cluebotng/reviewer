@@ -147,7 +147,7 @@ class EditSetParser:
 
     def download_and_import_to_group(self, target_group: EditGroup, path: str):
         with tempfile.NamedTemporaryFile() as file:
-            # Download
+            logger.info(f'Downloading edit to {file.name}')
             r = requests.get(
                 f"https://cluebotng-editsets.toolforge.org/{path}",
                 timeout=10,
@@ -174,6 +174,7 @@ class EditSetParser:
             edit.status = 2
             edit.save()
 
+            TrainingData.objects.filter(edit=edit).delete()
             TrainingData.objects.create(
                 edit=edit,
                 timestamp=wp_edit.current.timestamp.timestamp(),
@@ -192,6 +193,7 @@ class EditSetParser:
                 page_num_recent_reverts=wp_edit.num_recent_reversions,
             )
 
+            Revision.objects.filter(edit=edit).delete()
             if wp_edit.current:
                 Revision.objects.create(
                     edit=edit,
@@ -247,6 +249,7 @@ class EditSetParser:
                 # Handle the import logic
                 if context == "end" and current_edit:
                     wp_edit = WpEdit.from_xml(current_edit)
+                    logger.info(f'Handling WpEdit entry for {wp_edit.edit_id}')
                     if wp_edit := self._flesh_out_edit(wp_edit):
                         self._import_edit(target_group, wp_edit)
                     current_edit = None
