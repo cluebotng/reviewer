@@ -1,7 +1,6 @@
 import logging
 from typing import Any
 
-from django.conf import settings
 from django.core.management import BaseCommand
 
 from cbng_reviewer.libs.stats import Statistics

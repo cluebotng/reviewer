@@ -2,11 +2,10 @@ import logging
 from typing import Any, Dict, List
 
 import requests
-from django.conf import settings
 from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 
-from cbng_reviewer.models import User, Edit, Classification, EditGroup
+from cbng_reviewer.models import User, Edit, Classification
 
 logger = logging.getLogger(__name__)
 
