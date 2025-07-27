@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from cbng_reviewer.admin.forms import EditGroupForm
 from cbng_reviewer.libs.django import admin_required
-from cbng_reviewer.libs.utils import notify_user_review_rights_granted, notify_user_admin_rights_granted
+from cbng_reviewer.libs.irc import IrcRelay
+from cbng_reviewer.libs.messages import Messages
 from cbng_reviewer.models import User, EditGroup, Edit, Classification
 
 
@@ -28,16 +29,24 @@ def users(request):
 def user_change_flag(request, id: int):
     if request.method == "POST":
         user = get_object_or_404(User, id=id)
+        messages = Messages()
+        irc_relay = IrcRelay()
 
         if reviewer_flag := request.POST.get("reviewer"):
             user.is_reviewer = reviewer_flag == "1"
-            if user.is_reviewer:
-                notify_user_review_rights_granted(user)
+            irc_relay.send_message(
+                messages.notify_irc_about_granted_reviewer_access(user)
+                if user.is_reviewer
+                else messages.notify_irc_about_removed_reviewer_access(user)
+            )
 
         if admin_flag := request.POST.get("admin"):
             user.is_admin = admin_flag == "1"
-            if user.is_admin:
-                notify_user_admin_rights_granted(user)
+            irc_relay.send_message(
+                messages.notify_irc_about_granted_admin_access(user)
+                if user.is_admin
+                else messages.notify_irc_about_removed_admin_access(user)
+            )
 
         user.save()
 

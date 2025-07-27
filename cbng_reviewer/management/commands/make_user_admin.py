@@ -5,7 +5,8 @@ from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 from social_django.models import UserSocialAuth
 
-from cbng_reviewer.libs.utils import notify_user_admin_rights_granted, notify_user_super_rights_granted
+from cbng_reviewer.libs.irc import IrcRelay
+from cbng_reviewer.libs.messages import Messages
 from cbng_reviewer.libs.wikipedia import Wikipedia
 from cbng_reviewer.models import User
 
@@ -19,6 +20,9 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Grant a user administrator rights, creating the user record if it does not exist."""
+        messages = Messages()
+        irc_relay = IrcRelay()
+
         try:
             user = User.objects.get(username=options["username"])
         except User.DoesNotExist:
@@ -37,7 +41,7 @@ class Command(BaseCommand):
             logger.info(f"Marked {user.username} as an admin")
             user.is_admin = True
             user.save()
-            notify_user_admin_rights_granted(user)
+            irc_relay.send_message(messages.notify_irc_about_granted_admin_access(user))
 
         if options["super"]:
             if user.is_superuser:
@@ -47,4 +51,4 @@ class Command(BaseCommand):
                 user.is_staff = True
                 user.is_superuser = True
                 user.save()
-                notify_user_super_rights_granted(user)
+                irc_relay.send_message(messages.notify_irc_about_granted_super_access(user))

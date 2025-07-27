@@ -26,7 +26,7 @@ class Messages:
         return Message(body=f"\x0314[[\x0303 New User Account \x0314]]\x0301 {escape(user.username)}")
 
     def notify_irc_about_deleted_account(self, user: User) -> Message:
-        return Message(body=f"\x0314[[\x0304 Removed User Account \x0314]]\x0301 {escape(user.username)}")
+        return Message(body=f"\x0314[[\x0313 Removed User Account \x0314]]\x0301 {escape(user.username)}")
 
     def notify_irc_about_granted_reviewer_access(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}")
@@ -36,3 +36,9 @@ class Messages:
 
     def notify_irc_about_granted_super_access(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0313 Superuser Access Granted \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_removed_reviewer_access(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x0304 Reviewer Access Removed \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_removed_admin_access(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x034 Admin Access Removed \x0314]]\x0301 {escape(user.username)}")
