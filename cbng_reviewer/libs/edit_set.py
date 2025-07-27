@@ -77,26 +77,30 @@ class EditSetParser:
             if edit := self._wikipedia.get_edit_metadata(wp_edit.edit_id):
                 wp_edit.title = edit.title
                 wp_edit.namespace = edit.namespace
+                logger.warning(f"Overriding title/namespace for {wp_edit.edit_id}")
             else:
-                logger.warning(f"Failed to flesh out title for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out title for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.page_made_time or not wp_edit.creator:
             if page_metadata := self._wikipedia.get_page_creation_metadata(wp_edit.title, wp_edit.namespace):
                 wp_edit.page_made_time = page_metadata.creation_time
                 wp_edit.creator = page_metadata.creation_user
+                logger.warning(f"Overriding page_made_time/creator for {wp_edit.edit_id}")
             else:
-                logger.warning(f"Failed to flesh out creation for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out creation for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.current.text or not wp_edit.current.timestamp:
             current_revision, previous_revision = self._wikipedia.get_page_revisions(wp_edit.title, wp_edit.edit_id)
             if current_revision:
+                logger.warning(f"Overriding current revision for {wp_edit.edit_id}")
                 wp_edit.current.timestamp = current_revision.timestamp
                 wp_edit.current.text = current_revision.text
                 wp_edit.current.minor = current_revision.minor
 
                 if previous_revision:
+                    logger.warning(f"Overriding previous revision for {wp_edit.edit_id}")
                     wp_edit.previous.timestamp = previous_revision.timestamp
                     wp_edit.previous.text = previous_revision.text
                     wp_edit.previous.minor = previous_revision.minor
@@ -105,46 +109,51 @@ class EditSetParser:
                 else:
                     wp_edit.previous = None
             else:
-                logger.warning(f"Failed to flesh out revision for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out revision for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.user_reg_time:
             if user_reg_time := self._wikipedia.get_user_registration_time(wp_edit.user):
+                logger.warning(f"Overriding user_reg_time for {wp_edit.edit_id}")
                 wp_edit.user_reg_time = user_reg_time
             else:
-                logger.warning(f"Failed to flesh out user registration time for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out user registration time for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.user_warns:
             if user_warns := self._wikipedia.get_user_warning_count(wp_edit.user, wp_edit.current.timestamp):
+                logger.warning(f"Overriding user_warns for {wp_edit.edit_id}")
                 wp_edit.user_warns = user_warns
             else:
-                logger.warning(f"Failed to flesh out user warns count for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out user warns count for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.user_edit_count:
             if user_edits := self._wikipedia.get_user_edit_count(wp_edit.user, wp_edit.current.timestamp):
+                logger.warning(f"Overriding user_edit_count for {wp_edit.edit_id}")
                 wp_edit.user_edit_count = user_edits
             else:
-                logger.warning(f"Failed to flesh out user warns count for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out user warns count for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.num_recent_reversions:
             if revert_count := self._wikipedia.get_page_recent_revert_count(
                 wp_edit.user, wp_edit.namespace, wp_edit.current.timestamp
             ):
+                logger.warning(f"Overriding num_recent_reversions for {wp_edit.edit_id}")
                 wp_edit.num_recent_reversions = revert_count
             else:
-                logger.warning(f"Failed to flesh out page revert count for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out page revert count for edit {wp_edit.edit_id}")
                 return None
 
         if not wp_edit.num_recent_edits:
             if edit_count := self._wikipedia.get_page_recent_edit_count(
                 wp_edit.user, wp_edit.namespace, wp_edit.current.timestamp
             ):
+                logger.warning(f"Overriding num_recent_edits for {wp_edit.edit_id}")
                 wp_edit.num_recent_edits = edit_count
             else:
-                logger.warning(f"Failed to flesh out page edit count for edit {wp_edit.edit_id}")
+                logger.error(f"Failed to flesh out page edit count for edit {wp_edit.edit_id}")
                 return None
 
         return wp_edit
