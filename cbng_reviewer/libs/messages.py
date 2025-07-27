@@ -30,3 +30,9 @@ class Messages:
 
     def notify_irc_about_granted_reviewer_access(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_granted_admin_access(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x0313 Admin Access Granted \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_granted_super_access(self, user: User) -> Message:
+        return Message(body=f"\x0314[[\x0313 Superuser Access Granted \x0314]]\x0301 {escape(user.username)}")
