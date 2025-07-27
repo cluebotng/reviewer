@@ -262,7 +262,11 @@ class EditSetParser:
                         edit = None
 
                     if skip_existing and edit and edit.has_training_data:
-                        logger.info(f"Skipping WpEdit entry for existing edit: {wp_edit.edit_id}")
+                        if not edit.groups.filter(pk=target_group.pk).exists():
+                            logger.info(f"Adding {edit.id} to {target_group.name}")
+                            edit.groups.add(target_group)
+
+                        logger.info(f"Skipping WpEdit import for existing edit: {wp_edit.edit_id}")
                         continue
 
                     if self._wikipedia.has_revision_been_deleted(wp_edit.edit_id):
