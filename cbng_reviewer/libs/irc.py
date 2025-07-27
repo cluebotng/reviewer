@@ -18,7 +18,7 @@ class IrcRelay:
             logger.warning(f"Skipping irc message due to missing channel or text: {target_channel} / {text}")
             return
 
-        payload = f"{channel}:{text}\n".encode("utf-8")
+        payload = f"{target_channel}:{text}\n".encode("utf-8")
         logger.info(f"Sending to IRC Relay: {payload}")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
