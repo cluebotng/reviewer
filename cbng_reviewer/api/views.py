@@ -53,6 +53,7 @@ class EditGroupViewSet(viewsets.ModelViewSet):
             2 => statusNameToId('Reviewed - Included in dataset as Vandalism'),
             3 => statusNameToId('Reviewed - Included in dataset as Constructive'),
             4 => statusNameToId('Reviewed - Not included in dataset'),
+            5 => statusNameToId('Edit Data Has Been Removed'),
             """
             if edit.status == 0:
                 return 0
@@ -66,10 +67,15 @@ class EditGroupViewSet(viewsets.ModelViewSet):
                 return 4
 
         edit_statuses = {}
-        for classified_edit in edit_group.edit_set.filter(deleted=False):
-            report_status = _calculate_report_status(classified_edit)
+        for edit in edit_group.edit_set.filter(deleted=False):
+            report_status = _calculate_report_status(edit)
             if report_status is not None:
-                edit_statuses[classified_edit.id] = report_status
+                edit_statuses[edit.id] = report_status
+
+        # This is basically just to provide some feedback to the user/report interface
+        # We can never use this for training as we are missing data
+        for edit in edit_group.edit_set.filter(deleted=True).exclude(status=2):
+            edit_statuses[edit.id] = 5
 
         return Response(edit_statuses)
 
