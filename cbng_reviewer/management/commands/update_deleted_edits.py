@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
             # If we are in one of the review groups, then keep the 'meta' entry around for export/reporting purposes
             if set(edit.groups.values_list("id", flat=True)) & self._review_groups:
-                logger.debug(f"Keeping dangling edit {edit.id}")
+                logger.info(f"Keeping dangling edit {edit.id}")
             else:
                 logger.info(f"Removing dangling edit {edit.id}")
                 edit.delete()
