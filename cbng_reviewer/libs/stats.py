@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class Statistics:
     def get_edit_group_statistics(self):
         return {
-            edit_group.name: {
+            edit_group.contextual_name: {
                 "weight": edit_group.weight,
                 "pending": edit_group.edit_set.filter(status=0).count(),
                 "partial": edit_group.edit_set.filter(status=1).count(),

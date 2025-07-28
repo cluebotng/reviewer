@@ -9,7 +9,7 @@
             </tr>
             {% for edit_group in edit_groups %}
                 <tr>
-                    <td>{% if edit_group.related_to %}{{ edit_group.related_to.name }} - {% endif %}{{ edit_group.name }}</td>
+                    <td>{{ edit_group.contextual_name }}</td>
                     <td>{{ edit_group.weight }}</td>
                     <td>
                         <a href="{% url 'admin-edit-group' edit_group.id %}">Edit</a>

@@ -36,8 +36,17 @@ class EditGroup(models.Model):
     related_to = models.ForeignKey("EditGroup", on_delete=models.PROTECT, null=True, blank=True)
     group_type = models.IntegerField(choices=EDIT_SET_TYPES, default=0)
 
-    def __str__(self):
+    @property
+    def contextual_name(self):
+        if self.related_to:
+            return f'{self.related_to.name} - {self.name}'
         return self.name
+
+    def __str__(self):
+        return self.contextual_name
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["name", "related_to"], name="unique_contextual_name")]
 
 
 class Edit(models.Model):
