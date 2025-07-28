@@ -22,7 +22,7 @@ class Command(BaseCommand):
         wikipedia = Wikipedia()
         for edit in added_edits:
             if wikipedia.has_revision_been_deleted(edit.id):
-                logger.info(f"Edit has been deleted, marking as such")
+                logger.info(f"Edit has been deleted, marking as such: {edit.id}")
                 edit.deleted = True
                 edit.save()
             else:
