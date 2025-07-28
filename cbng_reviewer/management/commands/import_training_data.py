@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--workers", type=int, default=5)
         parser.add_argument("--edit-id")
         parser.add_argument("--force", action="store_true")
 
@@ -27,7 +28,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         """Import training data for edits."""
 
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
             for edit in (
                 Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(deleted=False)

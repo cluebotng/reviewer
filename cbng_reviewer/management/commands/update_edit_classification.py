@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--force", action="store_true")
+        parser.add_argument("--workers", type=int, default=5)
 
     def _handle_edit(self, edit: Edit):
         original_status, original_classification = edit.status, edit.classification
@@ -47,7 +48,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Update edit classification/status based on user classifications."""
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
             for edit in Edit.objects.all() if options["force"] else Edit.objects.exclude(status=2):
                 executor.submit(self._handle_edit, edit)
