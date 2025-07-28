@@ -39,6 +39,11 @@ class Command(BaseCommand):
                 # We didn't import it yet
                 continue
 
+            # If we are a deleted edit, then don't add any classifications
+            # updated_deleted_edits will just remove these again
+            if edit.deleted and not edit.has_training_data:
+                continue
+
             for username in usernames:
                 # Most report admins are reviewers, but do not assume this
                 if user := username_to_reviewers.get(username):

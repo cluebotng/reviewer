@@ -2,7 +2,6 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from django.conf import settings
 from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.wikipedia import Wikipedia
