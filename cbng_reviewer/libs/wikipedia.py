@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Dict, Any
 import requests
 from django.conf import settings
 from django.db import connections
+from requests.adapters import HTTPAdapter
 
 from cbng_reviewer.libs.models.message import Message
 from cbng_reviewer.libs.models.wikipedia import (
@@ -23,6 +24,8 @@ class Wikipedia:
 
     def __init__(self, require_authentication: bool = False, skip_authenticate: bool = False):
         self._session = requests.session()
+        self._session.mount("https://", HTTPAdapter(pool_maxsize=50))
+
         if not skip_authenticate and settings.WIKIPEDIA_USERNAME and settings.WIKIPEDIA_PASSWORD:
             self.login(settings.WIKIPEDIA_USERNAME, settings.WIKIPEDIA_PASSWORD)
         elif require_authentication:
