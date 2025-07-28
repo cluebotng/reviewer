@@ -127,10 +127,19 @@ def get_next_edit_id_for_review(request):
             potential_edits := edit_group.edit_set.filter(deleted=False)
             .exclude(status=2)
             .exclude(id__in=edits_already_classified)
-            .values_list("id", flat=True)
+            .values_list("id", "status")
         ):
-            selected_edit = random.choice(potential_edits)  # nosec: B311
-            return Response({"edit_id": selected_edit})
+            # Prefer edits that are in progress (complete them before starting new edits)
+            selected_edit = None
+            if potential_in_progress := [edit_id for edit_id, status in potential_edits if status == 1]:
+                selected_edit = random.choice(potential_in_progress)  # nosec: B311
+
+            # Otherwise any edit
+            elif potential_pending := [edit_id for edit_id, status in potential_edits if status == 0]:
+                selected_edit = random.choice(potential_pending)  # nosec: B311
+
+            if selected_edit:
+                return Response({"edit_id": selected_edit})
 
     return Response({"edit_id": None, "message": "No Pending Edit Found"})
 
