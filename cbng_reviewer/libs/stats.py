@@ -41,7 +41,7 @@ class Statistics:
     def get_user_statistics(self, extended=True):
         user_statistics = {}
 
-        for user in sorted(User.objects.all(), key=lambda u: u.username):
+        for user in sorted(User.objects.exclude(is_bot=True), key=lambda u: u.username):
             if not user.is_reviewer:
                 continue
 
