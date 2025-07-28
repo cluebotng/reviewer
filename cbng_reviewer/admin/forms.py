@@ -7,7 +7,7 @@ from cbng_reviewer.models import EditGroup
 class EditGroupForm(forms.ModelForm):
     class Meta:
         model = EditGroup
-        fields = ["name", "weight"]
+        fields = ["name", "weight", "related_to", "group_type"]
 
 
 class AddUserForm(forms.Form):

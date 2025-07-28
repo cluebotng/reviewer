@@ -14,6 +14,12 @@ CLASSIFICATIONS = (
     (2, "Skipped"),
 )
 CLASSIFICATION_IDS = {i for i, _ in CLASSIFICATIONS}
+EDIT_SET_TYPES = (
+    (0, "Generic"),
+    (1, "Reported False Positives"),
+    (2, "Training"),
+    (3, "Trial"),
+)
 
 
 class User(AbstractUser):
@@ -26,6 +32,12 @@ class User(AbstractUser):
 class EditGroup(models.Model):
     name = models.CharField(max_length=255, unique=True)
     weight = models.IntegerField(default=0)
+
+    related_to = models.ForeignKey("EditGroup", on_delete=models.PROTECT, null=True, blank=True)
+    group_type = models.IntegerField(choices=EDIT_SET_TYPES, default=0)
+
+    def __str__(self):
+        return self.name
 
 
 class Edit(models.Model):
