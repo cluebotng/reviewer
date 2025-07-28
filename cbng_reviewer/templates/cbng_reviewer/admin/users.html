@@ -75,14 +75,15 @@
                             <td>{{ user.username }}</td>
                             <td>
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-6 text-center">
                                         <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
                                             {% csrf_token %}
                                             <input name="reviewer" type="hidden" value="0" />
                                             <button class="btn btn-warning" type="submit">Remove Reviewer Access</button>
                                         </form>
+                                        <a href="{% url 'admin-view-user' user.id %}">View Classifications</a>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 text-center">
                                         <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
                                             {% csrf_token %}
                                             <input name="admin" type="hidden" value="0" />
