@@ -14,8 +14,8 @@ class Statistics:
             edit_group.name: {
                 "weight": edit_group.weight,
                 "pending": edit_group.edit_set.filter(status=0).count(),
-                "in_progress": edit_group.edit_set.filter(status=1).count(),
-                "done": edit_group.edit_set.exclude(status=2).count(),
+                "partial": edit_group.edit_set.filter(status=1).count(),
+                "done": edit_group.edit_set.filter(status=2).count(),
             }
             for edit_group in EditGroup.objects.all()
         }
@@ -84,7 +84,7 @@ class Statistics:
             markup += f"|name={name}\n"
             markup += f"|weight={stats['weight']}\n"
             markup += f"|notdone={stats['pending']}\n"
-            markup += f"|partial={stats['in_progress']}\n"
+            markup += f"|partial={stats['partial']}\n"
             markup += f"|done={stats['done']}\n"
             markup += "}}\n"
         markup += "{{/EditGroupFooter}}\n"
