@@ -18,6 +18,7 @@ class Statistics:
                 "done": edit_group.edit_set.filter(status=2).count(),
             }
             for edit_group in EditGroup.objects.all()
+            if edit_group.edit_set.count() > 0
         }
 
     def _calculate_accuracy(self, user: User) -> Tuple[Optional[float], int]:
