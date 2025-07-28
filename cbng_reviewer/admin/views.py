@@ -96,7 +96,7 @@ def view_user(request, id: int):
     return render(
         request,
         "cbng_reviewer/admin/user.html",
-        {"user": user, "classifications": Classification.objects.filter(user=user)},
+        {"user": user, "classifications": Classification.objects.filter(user=user).prefetch_related("edit")},
     )
 
 
