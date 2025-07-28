@@ -21,5 +21,10 @@ class Command(BaseCommand):
 
         wikipedia = Wikipedia()
         for edit in added_edits:
-            logger.info(f"Fetching training data for {edit.id}")
-            wikipedia.create_training_data_for_edit(edit)
+            if wikipedia.has_revision_been_deleted(edit.id):
+                logger.info(f"Edit has been deleted, marking as such")
+                edit.deleted = True
+                edit.save()
+            else:
+                logger.info(f"Fetching training data for {edit.id}")
+                wikipedia.create_training_data_for_edit(edit)
