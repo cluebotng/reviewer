@@ -24,7 +24,7 @@ class Statistics:
     def _calculate_accuracy(self, user: User) -> Tuple[Optional[float], int]:
         total, correct = 0, 0
         for classification in (
-            Classification.objects.filter(user=user).filter(status=2).exclude(edit__classification=None).prefetch_related("edit")
+            Classification.objects.filter(user=user).filter(edit__status=2).exclude(edit__classification=None).prefetch_related("edit")
         ):
             # Skipped
             if classification.edit.classification == 2 or classification.classification == 2:
