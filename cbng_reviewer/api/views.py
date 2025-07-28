@@ -83,7 +83,7 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     def dump(self, *args, **kwargs):
         edit_group = self.get_object()
         dumper = EditSetDumper()
-        target_edits = edit_group.edit_set.exclude(classification=None)
+        target_edits = edit_group.edit_set.filter(status=2).exclude(classification=None)
 
         def _xml_generator():
             yield "<WPEditSet>\n"
@@ -137,7 +137,7 @@ def get_next_edit_id_for_review(request):
 
 @api_view()
 def dump_edit_as_wp_edit(request, edit_id):
-    edit = get_object_or_404(Edit, id=edit_id)
+    edit = get_object_or_404(Edit, id=edit_id, status=2)
     if wp_edit := EditSetDumper().generate_wp_edit(edit):
         return HttpResponse(wp_edit, content_type="text/xml")
     raise Http404
