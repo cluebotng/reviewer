@@ -2,6 +2,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
+from django.conf import settings
 from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.wikipedia import Wikipedia
@@ -14,9 +15,9 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         self._wikipedia = Wikipedia()
         self._review_groups = set(
-            EditGroup.objects.filter(name={"Report Interface Import", "Legacy Report Interface Import"}).values_list(
-                "id", flat=True
-            )
+            EditGroup.objects.filter(
+                name__in={"Report Interface Import", "Legacy Report Interface Import"}
+            ).values_list("id", flat=True)
         )
         super(Command, self).__init__(*args, **kwargs)
 
