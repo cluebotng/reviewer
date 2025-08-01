@@ -1,0 +1,10 @@
+<WPEditSet>
+    <Dog>
+        <Goes>Woof</Goes>
+    </Dog>
+    <Cat>
+        <Goes>
+            Purr
+        </Goes>
+    </Cat>
+</WPEditSet>

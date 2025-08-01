@@ -4,7 +4,8 @@ from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 
-from cbng_reviewer.libs.wikipedia import Wikipedia
+from cbng_reviewer.libs.edit_set.utils import import_training_data
+from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
 from cbng_reviewer.models import Edit
 
 logger = logging.getLogger(__name__)
@@ -21,9 +22,12 @@ class Command(BaseCommand):
             logger.debug(f"Already have training data for {edit.id}")
             return
 
-        logger.info(f"Fetching training data for {edit.id}")
-        wikipedia = Wikipedia()
-        wikipedia.create_training_data_for_edit(edit)
+        wp_edit = WikipediaTraining().build_wp_edit(edit)
+        if wp_edit.has_complete_training_data:
+            logger.info(f"Importing training data from {wp_edit}")
+            import_training_data(edit, wp_edit)
+        else:
+            logger.warning(f"Failed to generate training data for {wp_edit}")
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Import training data for edits."""

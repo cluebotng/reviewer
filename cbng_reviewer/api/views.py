@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from cbng_reviewer.api.serializers import EditGroupSerializer
 from cbng_reviewer.libs.django import reviewer_required
-from cbng_reviewer.libs.edit_set import EditSetDumper
+from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
 from cbng_reviewer.models import EditGroup, Edit, Classification, CLASSIFICATION_IDS
 
 
@@ -21,29 +21,10 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     queryset = EditGroup.objects.all()
     serializer_class = EditGroupSerializer
 
-    @action(detail=True, url_path="deleted-edits")
-    def deleted_edits(self, *args, **kwargs):
-        edit_group = self.get_object()
-        deleted_edit_ids = edit_group.edit_set.filter(deleted=True).values_list("id", flat=True)
-        return Response(deleted_edit_ids)
-
-    @action(detail=True, url_path="completed-classifications")
-    def completed_edits(self, *args, **kwargs):
-        edit_group = self.get_object()
-        return Response(
-            {
-                classified_edit.id: classified_edit.classification
-                for classified_edit in edit_group.edit_set.filter(deleted=False, status=2).exclude(classification=None)
-            }
-        )
-
     @action(detail=True, url_path="dump-report-status")
     def report_status(self, *args, **kwargs):
         edit_group = self.get_object()
-        if edit_group.name not in {
-            "Legacy Report Interface Import",
-            "Report Interface Import",
-        }:
+        if edit_group.group_type != 1:
             raise Http404
 
         def _calculate_report_status(edit: Edit) -> Optional[int]:
@@ -89,7 +70,7 @@ class EditGroupViewSet(viewsets.ModelViewSet):
             yield "<WPEditSet>\n"
             for edit in target_edits:
                 if wp_edit := dumper.generate_wp_edit(edit):
-                    yield wp_edit
+                    yield f"{wp_edit}\n"
             yield "</WPEditSet>\n"
 
         return StreamingHttpResponse(_xml_generator(), content_type="text/xml")
@@ -99,6 +80,9 @@ class EditGroupViewSet(viewsets.ModelViewSet):
 @api_view(["POST"])
 def store_edit_classification(request):
     edit = get_object_or_404(Edit, id=request.data.get("edit_id"))
+    if Classification.objects.filter(edit=edit, user=request.user).exists():
+        return Response({"message": "Review already stored"})
+
     user_classification = request.data.get("classification")
     if user_classification not in CLASSIFICATION_IDS:
         return HttpResponse(status=400, content="Invalid classification")
@@ -108,13 +92,17 @@ def store_edit_classification(request):
     ):
         return Response({"require_confirmation": True})
 
+    comment = request.data.get("comment", "")
+    if len(comment.strip()) == 0:
+        comment = None
+
     Classification.objects.create(
         edit=edit,
         user=request.user,
         classification=user_classification,
-        comment=request.data.get("comment"),
+        comment=comment,
     )
-    return Response({})
+    return Response({"message": "Review stored"})
 
 
 @reviewer_required()

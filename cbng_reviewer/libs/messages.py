@@ -4,7 +4,7 @@ from django.template import loader
 from django.utils.html import escape
 
 from cbng_reviewer.libs.models.message import Message
-from cbng_reviewer.models import User
+from cbng_reviewer.models import User, Edit
 
 logger = logging.getLogger(__name__)
 
@@ -42,3 +42,8 @@ class Messages:
 
     def notify_irc_about_removed_admin_access(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x034 Admin Access Removed \x0314]]\x0301 {escape(user.username)}")
+
+    def notify_irc_about_edit_completion(self, edit: Edit) -> Message:
+        return Message(
+            body=f"\x0314[[\x031 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]"
+        )

@@ -4,6 +4,7 @@ from typing import Set
 import requests
 from django.conf import settings
 
+from cbng_reviewer import tasks
 from cbng_reviewer.models import EditGroup, Edit
 
 logger = logging.getLogger(__name__)
@@ -22,10 +23,8 @@ class ReportInterface:
         r.raise_for_status()
         return set(r.json())
 
-    def create_entries_for_reported_edits(self, include_in_progress: bool = False) -> Set[Edit]:
+    def create_entries_for_reported_edits(self, include_in_progress: bool = False):
         edit_group = EditGroup.objects.get(name=settings.CBNG_REPORT_EDIT_SET)
-
-        added_edits = set()
         for edit_id in self.fetch_edit_ids_requiring_review(include_in_progress):
             edit, created = Edit.objects.get_or_create(id=edit_id)
             edit.classification = 1
@@ -34,11 +33,11 @@ class ReportInterface:
             if created:
                 logger.info(f"Created edit {edit.id}, adding to {edit_group.name}")
                 edit.groups.add(edit_group)
-                added_edits.add(edit)
+                tasks.import_training_data.apply_async([edit.id])
+
             elif not edit.groups.filter(pk=edit_group.pk).exists():
                 logger.info(f"Adding edit {edit.id} to {edit_group.name}")
                 edit.groups.add(edit_group)
+
             else:
                 logger.debug(f"Edit {edit.id} already exists if target group")
-
-        return added_edits

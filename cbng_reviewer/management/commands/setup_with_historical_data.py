@@ -1,5 +1,7 @@
+import functools
 import json
 import logging
+import tempfile
 from pathlib import PosixPath
 from typing import Any, Optional
 
@@ -7,8 +9,10 @@ from django.conf import settings
 from django.core.management import BaseCommand, CommandParser
 from social_django.models import UserSocialAuth
 
-from cbng_reviewer.libs.edit_set import EditSetParser
-from cbng_reviewer.libs.wikipedia import Wikipedia
+from cbng_reviewer.libs.edit_set.parser import EditSetParser
+from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
+from cbng_reviewer.libs.utils import download_file
+from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User, EditGroup, Edit
 
 logger = logging.getLogger(__name__)
@@ -46,7 +50,7 @@ class Command(BaseCommand):
             return json.loads(fh.read())
 
     def _ensure_existing_user_accounts_exist(self):
-        wikipedia = Wikipedia()
+        wikipedia_reader = WikipediaReader()
         logger.info("Ensuring user accounts")
         for username in self._load_file("user_accounts.json"):
             if not User.objects.filter(username=username).exists():
@@ -54,7 +58,7 @@ class Command(BaseCommand):
 
                 # If the user has a central uid map it to our internal user,
                 # so when they authenticate with OAuth things just work
-                if central_uid := wikipedia.fetch_user_central_id(username):
+                if central_uid := wikipedia_reader.get_central_auth_user_id(username):
                     UserSocialAuth.objects.create(provider="mediawiki", uid=central_uid, user_id=user.id)
                 else:
                     logger.warning(f"Not creating mapping for {username} due to no central auth id")
@@ -96,7 +100,7 @@ class Command(BaseCommand):
         self, local_path: Optional[str] = None, name: Optional[str] = None, skip_existing: bool = False
     ):
         # These come from the 'edit set' files
-        edit_set = EditSetParser()
+        editset_parser = EditSetParser()
         for group_name, path in KNOWN_EDIT_SETS.items():
             if name and group_name != name:
                 continue
@@ -104,12 +108,23 @@ class Command(BaseCommand):
             logger.info(f"Ensuring editset {path}")
             target_group = EditGroup.objects.get(name=group_name)
 
+            callback_func = functools.partial(
+                import_wp_edit_to_edit_group,
+                target_group=target_group,
+                skip_existing=skip_existing,
+            )
+
             if local_path:
                 source_file = PosixPath(local_path) / path
                 if source_file.exists():
-                    edit_set.import_to_group(target_group, source_file, skip_existing)
+                    editset_parser.read_file(source_file, callback_func)
             else:
-                edit_set.download_and_import_to_group(target_group, path, skip_existing)
+                with tempfile.NamedTemporaryFile() as file:
+                    source_url = f"https://cluebotng-editsets.toolforge.org/{path}"
+                    target_file = PosixPath(file)
+                    logger.info(f"Downloading {source_url} to {target_file.as_posix()}")
+                    download_file(target_file, source_url)
+                    editset_parser.read_file(target_file, callback_func)
 
     def handle(self, *args: Any, **options: Any) -> None:
         if not options["editset_name"]:

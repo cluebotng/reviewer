@@ -13,11 +13,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         self._wikipedia = Wikipedia()
-        self._review_groups = set(
-            EditGroup.objects.filter(
-                name__in={"Report Interface Import", "Legacy Report Interface Import"}
-            ).values_list("id", flat=True)
-        )
+        self._review_groups = set(EditGroup.objects.filter(group_type=1).values_list("id", flat=True))
         super(Command, self).__init__(*args, **kwargs)
 
     def add_arguments(self, parser: CommandParser) -> None:

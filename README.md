@@ -36,6 +36,7 @@ see https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images
 ## Development
 
 For development purposes a local configuration file will be required along the lines of
+
 ```
 django:
   debug: true
@@ -78,10 +79,10 @@ Removing the env var or setting to a value other than `true` will disable `admin
 
 ### Deployment
 
-Ideally everything would be deployed on push (https://wikitech.wikimedia.org/wiki/Help:Toolforge/Deploy_your_tool#Creating_a_deployment),
-however web services are not currently supported.
+Ideally everything would be deployed on push, however web services are not currently supported.
 
 For now, things can be managed using `fabric` as with the production bot.
+
 ```
 fab deploy
 ```

@@ -1,5 +1,5 @@
 name: CI
-on: { pull_request: {}, push: {} }
+on: { pull_request: { }, push: { } }
 concurrency:
   group: ${{ github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -8,20 +8,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ "ruff", "djlint", "bandit", "pytest", "black" ]
+        target: [ "ruff", "djlint", "bandit", "test", "black" ]
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.13
           cache: 'pip'
+
       - name: Install Poetry
         run: curl -sSL https://install.python-poetry.org | python -
+
       - name: Install python dependencies
         run: poetry install --with test
+
+      - name: Setup MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql -u root -proot -e 'CREATE USER `cbng_reviewer`@'localhost' identified by ""' 2> /dev/null
+          mysql -u root -proot -e 'GRANT ALL PRIVILEGES ON *.* TO `cbng_reviewer`@localhost' 2> /dev/null
+
+          cat > config.yaml <<<'EOF'
+          mysql:
+            default:
+              user: cbng_reviewer
+              host: 127.0.0.1
+            replica:
+              user: cbng_reviewer
+              host: 127.0.0.1
+          cbng:
+            enable_user_messaging: false
+            enable_irc_messaging: false
+          EOF
+        if: matrix.target == 'test'
+
       - name: Run tox target
         run: poetry run tox --current-env -e ${{ matrix.target }}
 

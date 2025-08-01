@@ -1,7 +1,14 @@
+import logging
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+
+from cbng_reviewer import tasks
+
+logger = logging.getLogger(__name__)
 
 STATUSES = (
     (0, "Pending"),
@@ -39,7 +46,7 @@ class EditGroup(models.Model):
     @property
     def contextual_name(self):
         if self.related_to:
-            return f'{self.related_to.name} - {self.name}'
+            return f"{self.related_to.name} - {self.name}"
         return self.name
 
     def __str__(self):
@@ -71,6 +78,53 @@ class Edit(models.Model):
             ]
         )
 
+    def update_classification(
+        self,
+        skip_completed_with_no_internal_classifications: bool = True,
+        skip_deleted_edits_with_classifications: bool = True,
+    ) -> bool:
+        original_status, original_classification = self.status, self.classification
+
+        vandalism = Classification.objects.filter(edit=self, classification=0).count()
+        constructive = Classification.objects.filter(edit=self, classification=1).count()
+        skipped = Classification.objects.filter(edit=self, classification=2).count()
+        total_classifications = vandalism + constructive + skipped
+
+        if skip_completed_with_no_internal_classifications and (
+            total_classifications == 0 and self.status == 2 and self.classification is not None
+        ):
+            logger.info(f"Not touching completed edit {self.id}, likely historical")
+            return False
+
+        if skip_deleted_edits_with_classifications and (
+            self.status == 2 and self.deleted and self.classification is not None
+        ):
+            logger.info(f"Not touching deleted edit {self.id}, likely historical")
+            return False
+
+        self.status = 0 if total_classifications == 0 else 1
+        if total_classifications >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
+            if 2 * skipped > vandalism + constructive:
+                self.classification = 2
+                self.status = 2
+
+            elif constructive >= 3 * vandalism:
+                self.classification = 1
+                self.status = 2
+
+            elif vandalism >= 3 * constructive:
+                self.classification = 0
+                self.status = 2
+
+        if self.status != original_status or self.classification != original_classification:
+            logger.info(f"Updating {self.id} to {self.get_classification_display()} [{self.get_status_display()}]")
+            self.save()
+
+        if self.status == 2 and self.status != original_status and self.classification is not None:
+            tasks.notify_irc_about_completed_edit.apply_async([self.id])
+
+        return True
+
 
 class Classification(models.Model):
     edit = models.ForeignKey(Edit, on_delete=models.PROTECT, related_name="user_classification")
@@ -98,7 +152,7 @@ class TrainingData(models.Model):
     edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
     timestamp = models.IntegerField()
 
-    comment = models.TextField()
+    comment = models.TextField(null=True)
     user = models.CharField(max_length=255)
     user_edit_count = models.IntegerField()
     user_distinct_pages = models.IntegerField()
@@ -130,3 +184,13 @@ def notify_irc_about_deleted_account(sender, instance, **kwargs):
     from cbng_reviewer.libs.messages import Messages
 
     IrcRelay().send_message(Messages().notify_irc_about_deleted_account(instance))
+
+
+@receiver(post_save, sender=Classification)
+def update_edit_classification_from_classification(sender, instance, **kwargs):
+    tasks.update_edit_classification.apply_async([instance.edit_id])
+
+
+@receiver(post_save, sender=Edit)
+def update_edit_classification_from_edit(sender, instance, created, **kwargs):
+    tasks.update_edit_classification.apply_async([instance.id])

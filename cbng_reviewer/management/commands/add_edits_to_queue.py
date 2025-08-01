@@ -5,6 +5,7 @@ from typing import Any
 from django.conf import settings
 from django.core.management import BaseCommand
 
+from cbng_reviewer import tasks
 from cbng_reviewer.libs.wikipedia import Wikipedia
 from cbng_reviewer.models import EditGroup, Edit
 
@@ -34,5 +35,5 @@ class Command(BaseCommand):
                 logger.info(f"Created entry for {edit.id}")
                 edit.groups.add(edit_group)
 
-                logger.info(f"Fetching training data for {edit.id}")
-                wikipedia.create_training_data_for_edit(edit)
+                logger.info(f"Triggering fetch of training data for {edit.id}")
+                tasks.import_training_data.apply_async([edit.id])
