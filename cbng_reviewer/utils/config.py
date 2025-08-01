@@ -54,6 +54,12 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
             "port": int(os.environ.get("IRC_RELAY_PORT", "3334")),
             "channel": "#wikipedia-en-cbngreview",
         },
+        "redis": {
+            "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng.svc.tools.local"),
+            "port": int(os.environ.get("REDIS_PORT", "6379")),
+            "db": os.environ.get("REDIS_DB", "0"),
+            "password": os.environ.get("REDIS_PASSWORD"),
+        },
     }
     cfg = always_merger.merge(cfg, _load_yaml(base_dir / "config.yaml"))
     if runtime_cfg := os.environ.get("CBNG_REVIEWER_CONFIG"):

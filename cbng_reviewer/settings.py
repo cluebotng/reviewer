@@ -77,14 +77,6 @@ DATABASES = {
         "PASSWORD": CONFIG["mysql"]["replica"]["password"],
         "OPTIONS": {"charset": "utf8mb4"},
     },
-    "old": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "cbng_reviewng",
-        "HOST": CONFIG["mysql"]["default"]["host"],
-        "USER": CONFIG["mysql"]["default"]["user"],
-        "PASSWORD": CONFIG["mysql"]["default"]["password"],
-        "OPTIONS": {"charset": "utf8mb4"},
-    },
 }
 
 LOGGING = {
@@ -197,6 +189,19 @@ WIKIPEDIA_NAMESPACE_ID_TO_NAME = {v: k for k, v in WIKIPEDIA_NAMESPACE_NAME_TO_I
 IRC_RELAY_HOST = CONFIG["irc_relay"]["host"]
 IRC_RELAY_PORT = CONFIG["irc_relay"]["port"]
 IRC_RELAY_CHANNEL = CONFIG["irc_relay"]["channel"]
+
+REDIS_HOST = CONFIG["redis"]["host"]
+REDIS_PORT = CONFIG["redis"]["port"]
+REDIS_DB = CONFIG["redis"]["db"]
+REDIS_PASSWORD = CONFIG["redis"]["password"]
+
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_URL = (
+    f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+    if REDIS_PASSWORD
+    else f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+)
 
 CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT = 2
 CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY = 30

@@ -12,6 +12,7 @@ dependencies = [
     "PyYAML",
     "gunicorn",
     "whitenoise",
+    "celery[redis]",
 ]
 
 [tool.poetry]
