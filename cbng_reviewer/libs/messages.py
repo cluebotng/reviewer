@@ -45,5 +45,5 @@ class Messages:
 
     def notify_irc_about_edit_completion(self, edit: Edit) -> Message:
         return Message(
-            body=f"\x0314[[\x031 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]"
+            body=f"\x0314[[\x036 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]"
         )
