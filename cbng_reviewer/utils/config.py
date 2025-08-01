@@ -55,7 +55,7 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
             "channel": "#wikipedia-en-cbngreview",
         },
         "redis": {
-            "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng.svc.tools.local"),
+            "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng-review.svc.tools.local"),
             "port": 6379,
             "db": 0,
             "password": os.environ.get("REDIS_PASSWORD"),
