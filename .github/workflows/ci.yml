@@ -53,12 +53,15 @@ jobs:
           EOF
         if: matrix.target == 'test'
 
-      - name: Collect static
-        run: poetry run ./manage.py collectstatic
+      - name: Run Django tests
+        run: |
+          poetry run ./manage.py collectstatic
+          poetry run ./manage.py test
         if: matrix.target == 'test'
 
       - name: Run tox target
         run: poetry run tox --current-env -e ${{ matrix.target }}
+        if: matrix.target != 'test'
 
   container:
     runs-on: ubuntu-latest
