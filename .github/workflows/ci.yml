@@ -22,6 +22,10 @@ jobs:
         env: { "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD": "1" }
         ports: [3306:3306]
 
+      redis:
+        image: ${{ matrix.target == 'test' && 'redis' || '' }}
+        ports: [6379:6379]
+
     steps:
       - uses: actions/checkout@v4
 
@@ -47,6 +51,8 @@ jobs:
             replica:
               user: root
               host: 127.0.0.1
+          redis:
+            host: 127.0.0.1
           cbng:
             enable_user_messaging: false
             enable_irc_messaging: false
