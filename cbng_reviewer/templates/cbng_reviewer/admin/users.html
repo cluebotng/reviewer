@@ -86,7 +86,7 @@
                                     <div class="col-6 text-center">
                                         <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
                                             {% csrf_token %}
-                                            <input name="admin" type="hidden" value="0" />
+                                            <input name="admin" type="hidden" value="1" />
                                             <button class="btn btn-danger" type="submit">Grant Admin Access</button>
                                         </form>
                                     </div>

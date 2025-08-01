@@ -5,7 +5,7 @@
         <ul>
             {% for classification in classifications %}
                 <li>
-                    <a href="{% url 'admin-edit' classification.edit.id %}">{{ classification.edit.id }}</a> [{{ classification.edit.get_status_display }}] as {{ classification.get_classification_display }}
+                    <a href="{% url 'admin-edit' classification.edit.id %}">{{ classification.edit.id }}</a> [{{ classification.edit.get_status_display }}] as {{ classification.get_classification_display }}{% if classification.comment %} ({{ classification.comment }}){% endif %}
                 </li>
             {% endfor %}
         </ul>
