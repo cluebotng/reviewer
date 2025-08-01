@@ -91,5 +91,8 @@ def deploy(_ctx):
     # Restart web service
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart -r 4")
 
+    # Restart worker
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-worker")
+
     # Ensure cron jobs are setup
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {TOOL_DIR / 'jobs.yaml'}")
