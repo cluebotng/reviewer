@@ -56,8 +56,8 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
         },
         "redis": {
             "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng.svc.tools.local"),
-            "port": int(os.environ.get("REDIS_PORT", "6379")),
-            "db": os.environ.get("REDIS_DB", "0"),
+            "port": 6379,
+            "db": 0,
             "password": os.environ.get("REDIS_PASSWORD"),
         },
     }
