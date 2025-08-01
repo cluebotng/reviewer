@@ -12,6 +12,7 @@
   image: tool-containers/redis:latest
   command: server
   continuous: true
+  port: 6379
 
 ## Celery worker
 - name: celery-worker

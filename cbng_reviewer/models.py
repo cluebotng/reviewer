@@ -1,5 +1,6 @@
 import logging
 
+import kombu.exceptions
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -188,9 +189,15 @@ def notify_irc_about_deleted_account(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Classification)
 def update_edit_classification_from_classification(sender, instance, **kwargs):
-    tasks.update_edit_classification.apply_async([instance.edit_id])
+    try:
+        tasks.update_edit_classification.apply_async([instance.edit_id])
+    except kombu.exceptions.OperationalError as e:
+        logger.warning(f"Failed to create update_edit_classification task: {e}")
 
 
 @receiver(post_save, sender=Edit)
 def update_edit_classification_from_edit(sender, instance, created, **kwargs):
-    tasks.update_edit_classification.apply_async([instance.id])
+    try:
+        tasks.update_edit_classification.apply_async([instance.id])
+    except kombu.exceptions.OperationalError as e:
+        logger.warning(f"Failed to create update_edit_classification task: {e}")
