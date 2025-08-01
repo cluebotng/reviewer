@@ -24,7 +24,7 @@ def users(request):
                     user.is_reviewer = True
                     user.save()
                     # Note: Don't send the user an email, assume this is a special case of discussion elsewhere
-                    IrcRelay().send_message(Messages().notify_irc_about_granted_admin_access(user))
+                    IrcRelay().send_message(Messages().notify_irc_about_granted_reviewer_access(user))
 
                     messages.add_message(request, messages.SUCCESS, "User created with reviewer rights")
                 else:
