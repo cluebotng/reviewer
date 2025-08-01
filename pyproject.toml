@@ -25,6 +25,7 @@ black = "25.1.0"
 ruff = "0.9.7"
 djlint = "1.36.4"
 bandit = "1.8.3"
+selenium = "4.34.2"
 
 [tool.ruff]
 exclude = ['*/migrations/*', 've/*', '.tox/*']
