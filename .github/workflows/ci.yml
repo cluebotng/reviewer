@@ -54,7 +54,7 @@ jobs:
         if: matrix.target == 'test'
 
       - name: Collect static
-        run: ./manage.py collectstatic
+        run: poetry run ./manage.py collectstatic
         if: matrix.target == 'test'
 
       - name: Run tox target
