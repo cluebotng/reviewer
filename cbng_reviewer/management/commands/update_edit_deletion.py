@@ -4,7 +4,7 @@ from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 
-from cbng_reviewer.libs.wikipedia import Wikipedia
+from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import Edit, Revision, TrainingData, Classification, EditGroup
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
-        self._wikipedia = Wikipedia()
+        self._wikipedia_reader = WikipediaReader()
         self._review_groups = set(EditGroup.objects.filter(group_type=1).values_list("id", flat=True))
         super(Command, self).__init__(*args, **kwargs)
 
@@ -21,7 +21,7 @@ class Command(BaseCommand):
         parser.add_argument("--workers", type=int, default=5)
 
     def _handle_edit(self, edit: Edit):
-        if not self._wikipedia.has_revision_been_deleted(edit.id):
+        if not self._wikipedia_reader.has_revision_been_deleted(edit.id):
             logger.debug(f"Edit {edit.id} has not been deleted")
             return
 

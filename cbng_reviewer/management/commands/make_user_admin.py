@@ -7,7 +7,7 @@ from social_django.models import UserSocialAuth
 
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
-from cbng_reviewer.libs.wikipedia import Wikipedia
+from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=options["username"])
         except User.DoesNotExist:
-            central_uid = Wikipedia().fetch_user_central_id(options["username"])
+            central_uid = WikipediaReader().get_central_auth_user_id(options["username"])
             if not central_uid:
                 logger.error("Could not find user on wikipedia, aborting")
                 return
