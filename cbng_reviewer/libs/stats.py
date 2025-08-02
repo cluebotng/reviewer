@@ -1,7 +1,8 @@
 import logging
 from typing import Tuple, Optional
 
-from cbng_reviewer import settings
+from django.conf import settings
+
 from cbng_reviewer.models import EditGroup, Classification
 from cbng_reviewer.models import User
 

@@ -1,11 +1,10 @@
 from functools import wraps
 from typing import Callable, Any
 
+from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
-
-from cbng_reviewer import settings
 
 
 def admin_required() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
