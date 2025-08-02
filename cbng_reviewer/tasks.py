@@ -1,6 +1,7 @@
 import logging
 
 from celery import shared_task
+from cbng_reviewer.libs.edit_set import utils
 
 logger = logging.getLogger(__name__)
 
@@ -29,4 +30,4 @@ def import_training_data(edit_id: int) -> None:
         logger.info(f"Fetching training data for {edit.id}")
         wp_edit = WikipediaTraining().build_wp_edit(edit)
         if wp_edit.has_complete_training_data:
-            import_training_data(edit, wp_edit)
+            utils.import_training_data(edit, wp_edit)
