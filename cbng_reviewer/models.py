@@ -7,8 +7,6 @@ from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
-from cbng_reviewer import tasks
-
 logger = logging.getLogger(__name__)
 
 STATUSES = (
@@ -196,6 +194,8 @@ def notify_irc_about_deleted_account(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Classification)
 def update_edit_classification_from_classification(sender, instance, **kwargs):
+    from cbng_reviewer import tasks
+
     try:
         tasks.update_edit_classification.apply_async([instance.edit_id])
     except kombu.exceptions.OperationalError as e:
@@ -209,6 +209,8 @@ def update_edit_classification_from_edit(sender, instance, created, **kwargs):
         from cbng_reviewer.libs.messages import Messages
 
         IrcRelay().send_message(Messages().notify_irc_about_edit_pending(instance))
+
+    from cbng_reviewer import tasks
 
     try:
         tasks.update_edit_classification.apply_async([instance.id])
