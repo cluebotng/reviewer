@@ -19,10 +19,6 @@
   image: '{{ target_image }}'
   command: run-celery
   continuous: true
-  filelog: true
-  mount: all
-  filelog-stdout: logs/celery-worker.stdout.log
-  filelog-stderr: logs/celery-worker.stderr.log
 
 # Scheduled jobs
 
@@ -31,86 +27,50 @@
   command: ./manage.py export_statistics
   image: '{{ target_image }}'
   schedule: '13 9 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/export-statistics.stdout.log
-  filelog-stderr: logs/export-statistics.stderr.log
 
 - name: update-edit-classifications
   command: ./manage.py update_edit_classification
   image: '{{ target_image }}'
   schedule: '30 */2 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/update-edit-classifications.stdout.log
-  filelog-stderr: logs/update-edit-classifications.stderr.log
 
 ## Seed jobs
 - name: add-reported-edits
   command: ./manage.py add_reported_edits
   image: '{{ target_image }}'
   schedule: '55 * * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/add-reported-edits.stdout.log
-  filelog-stderr: logs/add-reported-edits.stderr.log
 
 - name: add-edits-to-queue
   command: ./manage.py add_edits_to_queue
   image: '{{ target_image }}'
   schedule: '13 6 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/add-edits-to-queue.stdout.log
-  filelog-stderr: logs/add-edits-to-queue.stderr.log
 
 ## Helper jobs
 - name: add-reviews-from-report
   command: ./manage.py add_reviews_from_report
   image: '{{ target_image }}'
   schedule: '15 * * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/add-reviews-from-report.stdout.log
-  filelog-stderr: logs/add-reviews-from-report.stderr.log
 
 - name: add-reviews-from-huggle
   command: ./manage.py add_reviews_from_huggle
   image: '{{ target_image }}'
   schedule: '23 */2 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/add-reviews-from-huggle.stdout.log
-  filelog-stderr: logs/add-reviews-from-huggle.stderr.log
 
 ## Back-fill jobs
 - name: import-training-data
   command: ./manage.py import_training_data
   image: '{{ target_image }}'
   schedule: '15 2 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/import-training-data.stdout.log
-  filelog-stderr: logs/import-training-data.stderr.log
 
 - name: update-edit-deletion
   command: ./manage.py update_edit_deletion
   image: '{{ target_image }}'
   schedule: '13 4 * * 1'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/update-edit-deletion.stdout.log
-  filelog-stderr: logs/update-edit-deletion.stderr.log
 
 ## Management jobs
 - name: cleanup-user-records
   command: ./manage.py cleanup_user_records
   image: '{{ target_image }}'
   schedule: '13 1 * * *'
-  filelog: true
-  mount: all
-  filelog-stdout: logs/cleanup-user-records.stdout.log
-  filelog-stderr: logs/cleanup-user-records.stderr.log
 
 # Extra jobs we run, beyond those directly related to the interface
 
