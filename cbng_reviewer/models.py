@@ -121,8 +121,15 @@ class Edit(models.Model):
             logger.info(f"Updating {self.id} to {self.get_classification_display()} [{self.get_status_display()}]")
             self.save()
 
-        if self.status == 2 and self.status != original_status and self.classification is not None:
-            tasks.notify_irc_about_completed_edit.apply_async([self.id])
+        if self.status != original_status:
+            from cbng_reviewer.libs.irc import IrcRelay
+            from cbng_reviewer.libs.messages import Messages
+
+            if self.status == 1:
+                IrcRelay().send_message(Messages().notify_irc_about_edit_in_progress(self))
+
+            elif self.status == 2 and self.classification is not None:
+                IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
 
         return True
 
@@ -197,6 +204,12 @@ def update_edit_classification_from_classification(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Edit)
 def update_edit_classification_from_edit(sender, instance, created, **kwargs):
+    if created:
+        from cbng_reviewer.libs.irc import IrcRelay
+        from cbng_reviewer.libs.messages import Messages
+
+        IrcRelay().send_message(Messages().notify_irc_about_edit_pending(instance))
+
     try:
         tasks.update_edit_classification.apply_async([instance.id])
     except kombu.exceptions.OperationalError as e:

@@ -14,17 +14,6 @@ def update_edit_classification(edit_id: int) -> None:
 
 
 @shared_task
-def notify_irc_about_completed_edit(edit_id: int) -> None:
-    from cbng_reviewer.libs.irc import IrcRelay
-    from cbng_reviewer.libs.messages import Messages
-    from cbng_reviewer.models import Edit
-
-    edit = Edit.objects.get(id=edit_id)
-    message = Messages().notify_irc_about_edit_completion(edit)
-    IrcRelay().send_message(message)
-
-
-@shared_task
 def import_training_data(edit_id: int) -> None:
     from cbng_reviewer.models import Edit
     from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
