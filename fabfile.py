@@ -7,17 +7,18 @@ import requests
 from fabric import Connection, Config, task
 
 
-def _get_latest_release() -> str:
+def _get_latest_release(org: str, repo: str) -> str:
     """Return the latest release tag from GitHub"""
-    return "main"
-    r = requests.get("https://api.github.com/repos/cluebotng/reviewer/releases/latest")
+    r = requests.get(f"https://api.github.com/repos/{org}/{repo}/releases/latest")
     r.raise_for_status()
     return r.json()["tag_name"]
 
 
 TARGET_USER = os.environ.get("TARGET_USER", "cluebotng-review")
 TOOL_DIR = PosixPath("/data/project") / TARGET_USER
-IMAGE_NAME = f"tool-{TARGET_USER}/tool-{TARGET_USER}:latest"
+IMAGE_NAMESPACE = f"tool-{TARGET_USER}"
+IMAGE_TAG_REVIEWER = "reviewer"
+IMAGE_TAG_IRC_RELAY = "irc-relay"
 
 c = Connection(
     "login.toolforge.org",
@@ -39,52 +40,67 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
     c.sudo(f"bash -c \"base64 -d <<< '{encoded_contents}' > '{target_path}'\"")
 
 
-@task()
-def admin_mode_enable(_ctx):
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ADMIN_ONLY true")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+def _build_irc_relay():
+    """Update the IRC relay release."""
+    latest_release = _get_latest_release("cluebotng", "irc_relay")
+    print(f'Moving irc-relay to {latest_release}')
+
+    # Update the latest image to our target release
+    c.sudo(
+        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge "
+        "build start -L "
+        f"--ref {latest_release} "
+        f"-i {IMAGE_TAG_IRC_RELAY} "
+        "https://github.com/cluebotng/irc_relay.git"
+    )
 
 
-@task()
-def admin_mode_disable(_ctx):
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars delete --yes-im-sure CBNG_ADMIN_ONLY")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+def _build_reviewer():
+    """Update the reviewer release."""
+    latest_release = _get_latest_release("cluebotng", "reviewer")
+    latest_release = 'main'
+    print(f'Moving reviewer to {latest_release}')
+
+    # Build
+    c.sudo(
+        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge "
+        f"build start -L "
+        f"--ref {latest_release} "
+        f"-i {IMAGE_TAG_REVIEWER} "
+        "https://github.com/cluebotng/reviewer.git"
+    )
 
 
-@task()
-def deploy(_ctx):
-    """Deploy the current release."""
-    latest_release = _get_latest_release()
-
+def _update_jobs():
     # Get database use
     database_user = c.sudo(
         f"awk '{'{'}if($1 == \"user\") print $3{'}'}' {TOOL_DIR / 'replica.my.cnf'}", hide="stdout"
     ).stdout.strip()
 
     # Jobs config
-    _push_file_to_remote("service.template")
     _push_file_to_remote(
-        "jobs.yaml", {"target_image": IMAGE_NAME, "database_user": database_user, "tool_dir": TOOL_DIR.as_posix()}
+        "service.template",
+        {"image_namespace": IMAGE_NAMESPACE, "image_tag_reviewer": IMAGE_TAG_REVIEWER}
+    )
+    _push_file_to_remote(
+        "jobs.yaml", {"image_namespace": IMAGE_NAMESPACE,
+                      "image_tag_reviewer": IMAGE_TAG_REVIEWER,
+                      "image_tag_irc_relay": IMAGE_TAG_IRC_RELAY,
+                      "database_user": database_user,
+                      "tool_dir": TOOL_DIR.as_posix()}
     )
 
-    # Ensure logs dir exists
-    c.sudo(f'mkdir -p {TOOL_DIR / "logs"}')
+    # Ensure jobs are setup
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {TOOL_DIR / 'jobs.yaml'}")
 
-    # Build
-    c.sudo(
-        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge "
-        f"build start "
-        f"-L "
-        f"--ref {latest_release} "
-        f"https://github.com/cluebotng/reviewer.git"
-    )
 
+def _restart():
     # Migrate database
     c.sudo(
         f"XDG_CONFIG_HOME={TOOL_DIR} toolforge "
         f"jobs run "
         f"--wait "
-        f"--image {IMAGE_NAME} "
+        f"--image {IMAGE_NAMESPACE}/{IMAGE_TAG_REVIEWER}:latest "
         f'--command "./manage.py migrate" migrate-database'
     )
 
@@ -94,5 +110,39 @@ def deploy(_ctx):
     # Restart worker
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-worker")
 
-    # Ensure cron jobs are setup
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {TOOL_DIR / 'jobs.yaml'}")
+
+@task()
+def enable_admin_mode(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ADMIN_ONLY true")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def disable_admin_mode(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars delete --yes-im-sure CBNG_ADMIN_ONLY")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def restart_review(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-worker")
+
+
+@task()
+def restart_irc_relay(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart irc-relay")
+
+
+@task()
+def deploy_jobs(_ctx):
+    _update_jobs()
+
+
+@task()
+def deploy(_ctx):
+    """Deploy the current release."""
+    _build_irc_relay()
+    _build_reviewer()
+    _restart()
+    _update_jobs()

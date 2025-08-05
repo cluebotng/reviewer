@@ -51,7 +51,7 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
         },
         "irc_relay": {
             "host": os.environ.get("IRC_RELAY_HOST", "irc-relay"),
-            "port": int(os.environ.get("IRC_RELAY_PORT", "3334")),
+            "port": 3334,
             "channel": "#wikipedia-en-cbngreview",
         },
         "redis": {

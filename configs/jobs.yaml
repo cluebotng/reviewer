@@ -16,60 +16,71 @@
 
 ## Celery worker
 - name: celery-worker
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   command: run-celery
   continuous: true
+
+# Helper services
+- name: irc-relay
+  image: '{{ image_namespace }}/{{ image_tag_irc_relay }}:latest'
+  command: run-relay
+  continuous: true
+  cpu: '0.5'
+  mem: 1Gi
+  port: 3334
+  replicas: 1
+  mount: none
 
 # Scheduled jobs
 
 ## Core jobs
 - name: export-statistics
   command: ./manage.py export_statistics
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 9 * * *'
 
 - name: update-edit-classifications
   command: ./manage.py update_edit_classification
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '30 */2 * * *'
 
 ## Seed jobs
 - name: add-reported-edits
   command: ./manage.py add_reported_edits
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '55 * * * *'
 
 - name: add-edits-to-queue
   command: ./manage.py add_edits_to_queue
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 6 * * *'
 
 ## Helper jobs
 - name: add-reviews-from-report
   command: ./manage.py add_reviews_from_report
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '15 * * * *'
 
 - name: add-reviews-from-huggle
   command: ./manage.py add_reviews_from_huggle
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '23 */2 * * *'
 
 ## Back-fill jobs
 - name: import-training-data
   command: ./manage.py import_training_data
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '15 2 * * *'
 
 - name: update-edit-deletion
   command: ./manage.py update_edit_deletion
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 4 * * 1'
 
 ## Management jobs
 - name: cleanup-user-records
   command: ./manage.py cleanup_user_records
-  image: '{{ target_image }}'
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 1 * * *'
 
 # Extra jobs we run, beyond those directly related to the interface
