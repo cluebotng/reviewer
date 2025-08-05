@@ -100,23 +100,26 @@ class WikipediaTraining:
             return WpRevision(), WpRevision()
 
         current_revision, previous_revision = WpRevision(), WpRevision()
-        if text := next(iter(revisions[0]["slots"].values()), {}).get("*"):
+
+        current_text = next(iter(revisions[0]["slots"].values()), {}).get("*")
+        if current_text is not None:
             current_revision = WpRevision(
                 timestamp=datetime.fromisoformat(revisions[0]["timestamp"]),
                 user=revisions[0]["user"],
                 minor=self._is_revision_minor(revisions[0]),
                 comment=revisions[0]["comment"],
-                text=text,
+                text=current_text,
             )
 
         if len(revisions) > 1:
-            if text := next(iter(revisions[1]["slots"].values()), {}).get("*"):
+            previous_text = next(iter(revisions[1]["slots"].values()), {}).get("*")
+            if previous_text is not None:
                 previous_revision = WpRevision(
                     timestamp=datetime.fromisoformat(revisions[1]["timestamp"]),
                     user=revisions[1]["user"],
                     minor=self._is_revision_minor(revisions[1]),
                     comment=revisions[1]["comment"],
-                    text=text,
+                    text=previous_text,
                 )
 
         return current_revision, previous_revision
