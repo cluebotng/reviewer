@@ -43,7 +43,7 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
 def _build_irc_relay():
     """Update the IRC relay release."""
     latest_release = _get_latest_release("cluebotng", "irc_relay")
-    print(f'Moving irc-relay to {latest_release}')
+    print(f"Moving irc-relay to {latest_release}")
 
     # Update the latest image to our target release
     c.sudo(
@@ -58,8 +58,8 @@ def _build_irc_relay():
 def _build_reviewer():
     """Update the reviewer release."""
     latest_release = _get_latest_release("cluebotng", "reviewer")
-    latest_release = 'main'
-    print(f'Moving reviewer to {latest_release}')
+    latest_release = "main"
+    print(f"Moving reviewer to {latest_release}")
 
     # Build
     c.sudo(
@@ -79,15 +79,17 @@ def _update_jobs():
 
     # Jobs config
     _push_file_to_remote(
-        "service.template",
-        {"image_namespace": IMAGE_NAMESPACE, "image_tag_reviewer": IMAGE_TAG_REVIEWER}
+        "service.template", {"image_namespace": IMAGE_NAMESPACE, "image_tag_reviewer": IMAGE_TAG_REVIEWER}
     )
     _push_file_to_remote(
-        "jobs.yaml", {"image_namespace": IMAGE_NAMESPACE,
-                      "image_tag_reviewer": IMAGE_TAG_REVIEWER,
-                      "image_tag_irc_relay": IMAGE_TAG_IRC_RELAY,
-                      "database_user": database_user,
-                      "tool_dir": TOOL_DIR.as_posix()}
+        "jobs.yaml",
+        {
+            "image_namespace": IMAGE_NAMESPACE,
+            "image_tag_reviewer": IMAGE_TAG_REVIEWER,
+            "image_tag_irc_relay": IMAGE_TAG_IRC_RELAY,
+            "database_user": database_user,
+            "tool_dir": TOOL_DIR.as_posix(),
+        },
     )
 
     # Ensure jobs are setup
@@ -119,7 +121,31 @@ def enable_admin_mode(_ctx):
 
 @task()
 def disable_admin_mode(_ctx):
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars delete --yes-im-sure CBNG_ADMIN_ONLY")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ADMIN_ONLY false")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def enable_irc_messaging(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_IRC_MESSAGING true")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def disable_irc_messaging(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_IRC_MESSAGING true")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def enable_user_messaging(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_USER_MESSAGING true")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+
+
+@task()
+def disable_user_messaging(_ctx):
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_USER_MESSAGING false")
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
 
 
