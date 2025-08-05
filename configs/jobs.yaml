@@ -72,8 +72,8 @@
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '15 2 * * *'
 
-- name: update-edit-deletion
-  command: ./manage.py update_edit_deletion
+- name: mark-edits-as-deleted
+  command: ./manage.py mark_edits_as_deleted
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 4 * * 1'
 
