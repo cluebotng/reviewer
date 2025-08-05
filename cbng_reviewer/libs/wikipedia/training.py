@@ -307,7 +307,7 @@ class WikipediaTraining:
                 user_warns=self.get_user_warning_count(wp_edit.current.user, wp_edit.current.timestamp),
             )
 
-        if wp_edit.title and wp_edit.namespace:
+        if wp_edit.title and wp_edit.namespace and wp_edit.current:
             wp_edit = replace(
                 wp_edit,
                 num_recent_edits=self.get_page_recent_edit_count(
