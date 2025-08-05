@@ -66,7 +66,7 @@ DATABASES = {
         "PORT": CONFIG["mysql"]["default"]["port"],
         "USER": CONFIG["mysql"]["default"]["user"],
         "PASSWORD": CONFIG["mysql"]["default"]["password"],
-        "OPTIONS": {"charset": "utf8mb4"},
+        "OPTIONS": {"charset": "utf8mb4", "ssl_mode": "DISABLED"},
     },
     "replica": {
         "ENGINE": "django.db.backends.mysql",
@@ -75,7 +75,7 @@ DATABASES = {
         "PORT": CONFIG["mysql"]["replica"]["port"],
         "USER": CONFIG["mysql"]["replica"]["user"],
         "PASSWORD": CONFIG["mysql"]["replica"]["password"],
-        "OPTIONS": {"charset": "utf8mb4"},
+        "OPTIONS": {"charset": "utf8mb4", "ssl_mode": "DISABLED"},
     },
 }
 
