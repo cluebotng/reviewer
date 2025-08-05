@@ -4,7 +4,7 @@ from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 
-from cbng_reviewer.libs.edit_set.utils import import_training_data
+from cbng_reviewer.libs.edit_set.utils import import_training_data, mark_edit_as_deleted
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
 from cbng_reviewer.models import Edit
@@ -29,9 +29,8 @@ class Command(BaseCommand):
             return
 
         if self._wikipedia_reader.has_revision_been_deleted(edit.id):
-            logger.info(f"Found deleted revision, skipping training data and marking as deleted")
-            edit.deleted = True
-            edit.save()
+            logger.info("Found deleted revision, skipping training data and marking as deleted")
+            mark_edit_as_deleted(edit)
             return
 
         wp_edit = self._wikipedia_training.build_wp_edit(edit)

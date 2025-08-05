@@ -70,3 +70,13 @@ def import_wp_edit_to_edit_group(target_group: EditGroup, wp_edit: WpEdit, skip_
         else:
             logger.info(f"Missing training data for {wp_edit}")
             # Do nothing - `import_training_data` or `update_deleted_edits` will deal with this
+
+
+def mark_edit_as_deleted(edit: Edit):
+    from cbng_reviewer.libs.irc import IrcRelay
+    from cbng_reviewer.libs.messages import Messages
+
+    if not edit.deleted:
+        IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
+        edit.deleted = True
+        edit.save()

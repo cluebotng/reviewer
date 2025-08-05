@@ -210,9 +210,10 @@ def update_edit_classification_from_edit(sender, instance, created, **kwargs):
 
         IrcRelay().send_message(Messages().notify_irc_about_edit_pending(instance))
 
-    from cbng_reviewer import tasks
+    if not instance.deleted:
+        from cbng_reviewer import tasks
 
-    try:
-        tasks.update_edit_classification.apply_async([instance.id])
-    except kombu.exceptions.OperationalError as e:
-        logger.warning(f"Failed to create update_edit_classification task: {e}")
+        try:
+            tasks.update_edit_classification.apply_async([instance.id])
+        except kombu.exceptions.OperationalError as e:
+            logger.warning(f"Failed to create update_edit_classification task: {e}")

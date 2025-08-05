@@ -2,6 +2,7 @@ import logging
 
 from celery import shared_task
 from cbng_reviewer.libs.edit_set import utils
+from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,7 @@ def import_training_data(edit_id: int) -> None:
     edit = Edit.objects.get(id=edit_id)
     if WikipediaReader().has_revision_been_deleted(edit.id):
         logger.info(f"Edit has been deleted, marking as such: {edit.id}")
-        edit.deleted = True
-        edit.save()
+        mark_edit_as_deleted(edit)
 
     else:
         logger.info(f"Fetching training data for {edit.id}")

@@ -4,6 +4,7 @@ from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 
+from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import Edit, Revision, TrainingData, Classification, EditGroup
 
@@ -44,9 +45,7 @@ class Command(BaseCommand):
                 edit.delete()
 
         # Set the flag
-        if not edit.deleted:
-            edit.deleted = True
-            edit.save()
+        mark_edit_as_deleted(edit)
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Update edit classification based on user classifications."""
