@@ -76,9 +76,9 @@ class WikipediaReader:
                 "texthidden" in previous_revision,
                 "userhidden" in previous_revision,
                 "suppressed" in previous_revision,
-                "current_revision" in current_revision,
+                "texthidden" in current_revision,
                 "userhidden" in current_revision,
-                "suppressed" in previous_revision,
+                "suppressed" in current_revision,
             ]
         )
 
