@@ -47,7 +47,7 @@ class Command(BaseCommand):
 
             # If we are a deleted edit, then don't add any classifications
             # updated_deleted_edits will just remove these again
-            if edit.deleted and not edit.has_training_data:
+            if edit.is_deleted and not edit.has_training_data:
                 continue
 
             try:

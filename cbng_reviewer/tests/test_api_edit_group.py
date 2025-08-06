@@ -58,7 +58,7 @@ class ApiEditGroupTestCase(TestCase):
         edit.groups.add(edit_group)
         edit = Edit.objects.create(id=1004, status=2, classification=2)
         edit.groups.add(edit_group)
-        edit = Edit.objects.create(id=1005, deleted=True)
+        edit = Edit.objects.create(id=1005, is_deleted=True)
         edit.groups.add(edit_group)
 
         r = self.client.get(f"/api/v1/edit-groups/{edit_group.id}/dump-report-status/")

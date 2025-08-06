@@ -19,7 +19,7 @@ class EditClassificationTestCase(TestCase):
         self.assertTrue(edit.update_classification())
 
     def testDeletedWithClassificationsStatus(self):
-        edit = Edit.objects.create(id=1234, status=2, classification=0, deleted=True)
+        edit = Edit.objects.create(id=1234, status=2, classification=0, is_deleted=True)
         Classification.objects.create(edit=edit, user=User.objects.create(username="test-user"), classification=1)
         self.assertFalse(edit.update_classification())
 

@@ -57,10 +57,11 @@ class EditGroup(models.Model):
 
 class Edit(models.Model):
     groups = models.ManyToManyField(EditGroup)
-    # required = models.BooleanField()
-    deleted = models.BooleanField(default=False)
     status = models.IntegerField(choices=STATUSES, default=0)
     classification = models.IntegerField(choices=CLASSIFICATIONS, null=True)
+
+    # Internal flags
+    is_deleted = models.BooleanField(default=False)
 
     @property
     def has_training_data(self):
@@ -95,7 +96,7 @@ class Edit(models.Model):
             return False
 
         if skip_deleted_edits_with_classifications and (
-            self.status == 2 and self.deleted and self.classification is not None
+            self.status == 2 and self.is_deleted and self.classification is not None
         ):
             logger.info(f"Not touching deleted edit {self.id}, likely historical")
             return False
@@ -205,7 +206,7 @@ def update_edit_classification_from_classification(sender, instance, **kwargs):
 @receiver(post_save, sender=Edit)
 def update_edit_classification_from_edit(sender, instance, created, **kwargs):
 
-    if not instance.deleted:
+    if not instance.is_deleted:
         from cbng_reviewer import tasks
 
         try:

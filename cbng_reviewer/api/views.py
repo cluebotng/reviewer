@@ -48,14 +48,14 @@ class EditGroupViewSet(viewsets.ModelViewSet):
                 return 4
 
         edit_statuses = {}
-        for edit in edit_group.edit_set.filter(deleted=False):
+        for edit in edit_group.edit_set.filter(is_deleted=False):
             report_status = _calculate_report_status(edit)
             if report_status is not None:
                 edit_statuses[edit.id] = report_status
 
         # This is basically just to provide some feedback to the user/report interface
         # We can never use this for training as we are missing data
-        for edit in edit_group.edit_set.filter(deleted=True).exclude(status=2):
+        for edit in edit_group.edit_set.filter(is_deleted=True).exclude(status=2):
             edit_statuses[edit.id] = 5
 
         return Response(edit_statuses)
@@ -112,7 +112,7 @@ def get_next_edit_id_for_review(request):
     edits_already_classified = set(Classification.objects.filter(user=request.user).values_list("edit_id", flat=True))
     for edit_group in EditGroup.objects.filter(weight__gt=0).order_by("-weight"):
         if (
-            potential_edits := edit_group.edit_set.filter(deleted=False)
+            potential_edits := edit_group.edit_set.filter(is_deleted=False)
             .exclude(status=2)
             .exclude(id__in=edits_already_classified)
             .values_list("id", "status")

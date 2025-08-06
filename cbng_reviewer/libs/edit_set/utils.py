@@ -49,6 +49,8 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
             text=wp_edit.previous.text.encode("utf-8"),
         )
 
+    edit.update_training_data_flag(True)
+
 
 def import_wp_edit_to_edit_group(target_group: EditGroup, wp_edit: WpEdit, skip_existing: bool):
     edit, created = Edit.objects.get_or_create(id=wp_edit.edit_id)
@@ -77,7 +79,7 @@ def mark_edit_as_deleted(edit: Edit):
     from cbng_reviewer.libs.irc import IrcRelay
     from cbng_reviewer.libs.messages import Messages
 
-    if not edit.deleted:
+    if not edit.is_deleted:
         IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
-        edit.deleted = True
+        edit.is_deleted = True
         edit.save()

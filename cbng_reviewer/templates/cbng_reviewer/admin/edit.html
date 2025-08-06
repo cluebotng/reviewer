@@ -14,7 +14,7 @@
                     pending
                 {% endif %}
             </li>
-            {% if edit.deleted %}
+            {% if edit.is_deleted %}
             <li>Revision or user has been deleted</li>
             {% endif %}
             {% if edit.has_training_data %}

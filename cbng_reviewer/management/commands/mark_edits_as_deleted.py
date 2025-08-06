@@ -24,6 +24,7 @@ class Command(BaseCommand):
     def _handle_edit(self, edit: Edit):
         if not self._wikipedia_reader.has_revision_been_deleted(edit.id):
             logger.debug(f"Edit {edit.id} has not been deleted")
+
             return
 
         # If we are a completed edit and our training data exists,
@@ -52,7 +53,7 @@ class Command(BaseCommand):
         with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
             for edit in (
-                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(deleted=False)
+                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(is_deleted=False)
             ):
                 futures.append(executor.submit(self._handle_edit, edit))
 

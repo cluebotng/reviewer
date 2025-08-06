@@ -46,7 +46,7 @@ class Command(BaseCommand):
         with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
             for edit in (
-                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(deleted=False)
+                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(is_deleted=False)
             ):
                 futures.append(executor.submit(self._handle_edit, edit, options["force"]))
 

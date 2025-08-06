@@ -107,7 +107,7 @@ class WikipediaTraining:
                 timestamp=datetime.fromisoformat(revisions[0]["timestamp"]),
                 user=revisions[0]["user"],
                 minor=self._is_revision_minor(revisions[0]),
-                comment=revisions[0]["comment"],
+                comment=revisions[0].get("comment"),
                 text=current_text,
             )
 
@@ -118,7 +118,7 @@ class WikipediaTraining:
                     timestamp=datetime.fromisoformat(revisions[1]["timestamp"]),
                     user=revisions[1]["user"],
                     minor=self._is_revision_minor(revisions[1]),
-                    comment=revisions[1]["comment"],
+                    comment=revisions[1].get("comment"),
                     text=previous_text,
                 )
 
