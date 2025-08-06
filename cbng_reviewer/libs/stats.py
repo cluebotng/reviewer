@@ -3,7 +3,7 @@ from typing import Tuple, Optional
 
 from django.conf import settings
 
-from cbng_reviewer.models import EditGroup, Classification
+from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
 from cbng_reviewer.models import User
 
 logger = logging.getLogger(__name__)
@@ -73,6 +73,11 @@ class Statistics:
             "Number Of Reviewers": User.objects.filter(is_reviewer=True).count(),
             "Number Of Pending Accounts": User.objects.filter(is_reviewer=False).count(),
             "Last Review": Classification.objects.all().order_by("-created")[0].created,
+            "Number Of Edit Groups": EditGroup.objects.all().count(),
+            "Number Of Edits": Edit.objects.all().count(),
+            "Number Of Training Data Entries": TrainingData.objects.all().count(),
+            "Number Of Current Revision Entries": CurrentRevision.objects.all().count(),
+            "Number Of Previous Revision Entries": PreviousRevision.objects.all().count(),
         }
 
     def generate_wikimarkup(self) -> Optional[str]:
