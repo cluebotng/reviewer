@@ -28,7 +28,7 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         page_num_recent_reverts=wp_edit.num_recent_reversions,
     )
 
-    if wp_edit.current.has_complete_training_data:
+    if wp_edit.current and wp_edit.current.has_complete_training_data:
         CurrentRevision.objects.filter(edit=edit).delete()
         CurrentRevision.objects.create(
             edit=edit,
@@ -37,7 +37,7 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
             text=wp_edit.current.text.encode("utf-8"),
         )
 
-    if wp_edit.previous.has_complete_training_data:
+    if wp_edit.previous and wp_edit.previous.has_complete_training_data:
         PreviousRevision.objects.filter(edit=edit).delete()
         PreviousRevision.objects.create(
             edit=edit,
