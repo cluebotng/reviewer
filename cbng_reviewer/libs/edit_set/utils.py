@@ -32,7 +32,6 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         CurrentRevision.objects.filter(edit=edit).delete()
         CurrentRevision.objects.create(
             edit=edit,
-            type=0,
             minor=wp_edit.current.minor,
             timestamp=wp_edit.current.timestamp.timestamp(),
             text=wp_edit.current.text.encode("utf-8"),
@@ -42,7 +41,6 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         PreviousRevision.objects.filter(edit=edit).delete()
         PreviousRevision.objects.create(
             edit=edit,
-            type=1,
             minor=wp_edit.previous.minor,
             timestamp=wp_edit.previous.timestamp.timestamp(),
             text=wp_edit.previous.text.encode("utf-8"),

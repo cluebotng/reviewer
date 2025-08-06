@@ -23,11 +23,7 @@ class Command(BaseCommand):
         parser.add_argument("--edit-id")
         parser.add_argument("--force", action="store_true")
 
-    def _handle_edit(self, edit: Edit, force: bool):
-        if not force and edit.has_training_data:
-            logger.debug(f"Already have training data for {edit.id}")
-            return
-
+    def _handle_edit(self, edit: Edit):
         if self._wikipedia_reader.has_revision_been_deleted(edit.id):
             logger.info("Found deleted revision, skipping training data and marking as deleted")
             mark_edit_as_deleted(edit)
@@ -42,15 +38,16 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Import training data for edits."""
+        target_edits = (
+            Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(is_deleted=False)
+        )
+        if not options["force"]:
+            target_edits.filter(is_deleted=False, has_training_data=False)
 
         with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
-            for edit in (
-                Edit.objects.filter(id=options["edit_id"])
-                if options["edit_id"]
-                else Edit.objects.filter(is_deleted=False)
-            ):
-                futures.append(executor.submit(self._handle_edit, edit, options["force"]))
+            for edit in target_edits:
+                futures.append(executor.submit(self._handle_edit, edit))
 
             for future in futures:
                 try:
