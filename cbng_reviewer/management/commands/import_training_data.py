@@ -42,7 +42,7 @@ class Command(BaseCommand):
             Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(is_deleted=False)
         )
         if not options["force"]:
-            target_edits.filter(is_deleted=False, has_training_data=False)
+            target_edits = target_edits.exclude(has_training_data=True)
 
         with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
