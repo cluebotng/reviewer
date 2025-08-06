@@ -82,6 +82,11 @@
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 3 * * *'
 
+- name: add-dangling-edits-to-group
+  command: ./manage.py add_dangling_edits_to_group
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
+  schedule: '13 21 * * *'
+
 ## Management jobs
 - name: cleanup-user-records
   command: ./manage.py cleanup_user_records
