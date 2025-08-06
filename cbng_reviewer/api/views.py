@@ -64,7 +64,7 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     def dump(self, *args, **kwargs):
         edit_group = self.get_object()
         dumper = EditSetDumper()
-        target_edits = edit_group.edit_set.filter(status=2).exclude(classification=None)
+        target_edits = edit_group.edit_set.filter(status=2).filter(has_training_data=True).exclude(classification=None)
 
         def _xml_generator():
             yield "<WPEditSet>\n"
