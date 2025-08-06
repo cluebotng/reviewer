@@ -28,25 +28,26 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         page_num_recent_reverts=wp_edit.num_recent_reversions,
     )
 
-    if wp_edit.current or wp_edit.previous:
+    if wp_edit.current.has_complete_training_data or wp_edit.previous.has_complete_training_data:
         Revision.objects.filter(edit=edit).delete()
-        if wp_edit.current:
-            Revision.objects.create(
-                edit=edit,
-                type=0,
-                minor=wp_edit.current.minor,
-                timestamp=wp_edit.current.timestamp.timestamp(),
-                text=wp_edit.current.text.encode("utf-8"),
-            )
 
-        if wp_edit.previous:
-            Revision.objects.create(
-                edit=edit,
-                type=1,
-                minor=wp_edit.previous.minor,
-                timestamp=wp_edit.previous.timestamp.timestamp(),
-                text=wp_edit.previous.text.encode("utf-8"),
-            )
+    if wp_edit.current.has_complete_training_data:
+        Revision.objects.create(
+            edit=edit,
+            type=0,
+            minor=wp_edit.current.minor,
+            timestamp=wp_edit.current.timestamp.timestamp(),
+            text=wp_edit.current.text.encode("utf-8"),
+        )
+
+    if wp_edit.previous.has_complete_training_data:
+        Revision.objects.create(
+            edit=edit,
+            type=1,
+            minor=wp_edit.previous.minor,
+            timestamp=wp_edit.previous.timestamp.timestamp(),
+            text=wp_edit.previous.text.encode("utf-8"),
+        )
 
 
 def import_wp_edit_to_edit_group(target_group: EditGroup, wp_edit: WpEdit, skip_existing: bool):
