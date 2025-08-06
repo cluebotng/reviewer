@@ -59,5 +59,8 @@ class EditSetDumper:
         ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
         ET.SubElement(previous, "text").text = previous_revision.text.decode("utf-8")
 
-        ET.SubElement(wp_edit, "isVandalism").text = "true" if edit.classification == 0 else "false"
+        if edit.status == 2:
+            ET.SubElement(wp_edit, "reviewStatus").text = edit.get_status_display()
+        else:
+            ET.SubElement(wp_edit, "isVandalism").text = "true" if edit.classification == 0 else "false"
         return ET.tostring(wp_edit, encoding="unicode")
