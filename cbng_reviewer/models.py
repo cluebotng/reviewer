@@ -142,17 +142,6 @@ class Classification(models.Model):
         constraints = [models.UniqueConstraint(fields=["edit", "user"], name="one_edit_classification_per_user")]
 
 
-class Revision(models.Model):
-    edit = models.ForeignKey(Edit, on_delete=models.CASCADE)
-    type = models.IntegerField(choices=((0, "current"), (1, "previous")))
-    minor = models.BooleanField()
-    timestamp = models.IntegerField()
-    text = models.BinaryField()
-
-    class Meta:
-        constraints = [models.UniqueConstraint(fields=["edit", "type"], name="one_revision_type_per_edit")]
-
-
 class CurrentRevision(models.Model):
     edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
     minor = models.BooleanField()
