@@ -83,6 +83,11 @@
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 1 * * *'
 
+- name: grant-review-access-from-wikipedia-rights
+  command: ./manage.py grant_review_access_from_rights
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
+  schedule: '27 * * * *'
+
 # Extra jobs we run, beyond those directly related to the interface
 
 ## Backups
