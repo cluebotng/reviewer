@@ -19,6 +19,8 @@
             {% endif %}
             {% if edit.has_training_data %}
             <li>Edit has training data: <a href="https://cluebotng-review.toolforge.org/api/v1/edit/{{ edit.id }}/dump-wpedit/">View WPEdit</a></li>
+            {% else %}
+            <li>Edit has no training data, if it is not deleted then the training data should be imported eventually</li>
             {% endif %}
         </ul>
         <p>Member of:</p>
