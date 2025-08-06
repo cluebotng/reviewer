@@ -62,20 +62,23 @@ class Edit(models.Model):
 
     # Internal flags
     is_deleted = models.BooleanField(default=False)
+    has_training_data = models.BooleanField(default=False)
 
-    @property
-    def has_training_data(self):
-        # If we are a completed edit, with stored training data and stored revision data,
-        # then we can be used for training, even if the original revision has been deleted.
-        #
-        # If we do not have the training/revision data stored and the edit is not completed,
-        # then it never will be, so we can remove it as dangling.
-        return all(
+    def update_training_data_flag(self, force: bool = False):
+        if self.has_training_data and not force:
+            return
+
+        has_training_data = all(
             [
                 TrainingData.objects.filter(edit=self).exists(),
-                Revision.objects.filter(edit=self).count() in {1, 2},
+                CurrentRevision.objects.filter(edit=self).exists(),
+                PreviousRevision.objects.filter(edit=self).exists(),
             ]
         )
+        if self.has_training_data != has_training_data:
+            logger.info(f"Marking {self.id} has_training_data = {has_training_data}")
+            self.has_training_data = has_training_data
+            self.save()
 
     def update_classification(
         self,
@@ -122,6 +125,7 @@ class Edit(models.Model):
         if self.status != original_status and self.status == 2 and self.classification is not None:
             from cbng_reviewer.libs.irc import IrcRelay
             from cbng_reviewer.libs.messages import Messages
+
             IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
 
         return True
@@ -147,6 +151,20 @@ class Revision(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["edit", "type"], name="one_revision_type_per_edit")]
+
+
+class CurrentRevision(models.Model):
+    edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
+    minor = models.BooleanField()
+    timestamp = models.IntegerField()
+    text = models.BinaryField()
+
+
+class PreviousRevision(models.Model):
+    edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
+    minor = models.BooleanField()
+    timestamp = models.IntegerField()
+    text = models.BinaryField()
 
 
 class TrainingData(models.Model):

@@ -6,7 +6,14 @@ from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
-from cbng_reviewer.models import Edit, Revision, TrainingData, Classification, EditGroup
+from cbng_reviewer.models import (
+    Edit,
+    TrainingData,
+    Classification,
+    EditGroup,
+    CurrentRevision,
+    PreviousRevision,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +31,6 @@ class Command(BaseCommand):
     def _handle_edit(self, edit: Edit):
         if not self._wikipedia_reader.has_revision_been_deleted(edit.id):
             logger.debug(f"Edit {edit.id} has not been deleted")
-
             return
 
         # If we are a completed edit and our training data exists,
@@ -36,7 +42,8 @@ class Command(BaseCommand):
             # Cleanup any (partial) associated data
             Classification.objects.filter(edit=edit).delete()
             TrainingData.objects.filter(edit=edit).delete()
-            Revision.objects.filter(edit=edit).delete()
+            CurrentRevision.objects.filter(edit=edit).delete()
+            PreviousRevision.objects.filter(edit=edit).delete()
 
             # If we are in one of the review groups, then keep the 'meta' entry around for export/reporting purposes
             if set(edit.groups.values_list("id", flat=True)) & self._review_groups:
@@ -49,11 +56,13 @@ class Command(BaseCommand):
         mark_edit_as_deleted(edit)
 
     def handle(self, *args: Any, **options: Any) -> None:
-        """Update edit classification based on user classifications."""
+        """Update edit deletion flag."""
         with ThreadPoolExecutor(max_workers=options["workers"]) as executor:
             futures = []
             for edit in (
-                Edit.objects.filter(id=options["edit_id"]) if options["edit_id"] else Edit.objects.filter(is_deleted=False)
+                Edit.objects.filter(id=options["edit_id"])
+                if options["edit_id"]
+                else Edit.objects.filter(is_deleted=False)
             ):
                 futures.append(executor.submit(self._handle_edit, edit))
 

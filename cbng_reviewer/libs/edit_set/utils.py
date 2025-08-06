@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from cbng_reviewer.libs.models.edit_set import WpEdit
-from cbng_reviewer.models import EditGroup, Edit, TrainingData, Revision
+from cbng_reviewer.models import EditGroup, Edit, TrainingData, PreviousRevision, CurrentRevision
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +28,9 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         page_num_recent_reverts=wp_edit.num_recent_reversions,
     )
 
-    if wp_edit.current.has_complete_training_data or wp_edit.previous.has_complete_training_data:
-        Revision.objects.filter(edit=edit).delete()
-
     if wp_edit.current.has_complete_training_data:
-        Revision.objects.create(
+        CurrentRevision.objects.filter(edit=edit).delete()
+        CurrentRevision.objects.create(
             edit=edit,
             type=0,
             minor=wp_edit.current.minor,
@@ -41,7 +39,8 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         )
 
     if wp_edit.previous.has_complete_training_data:
-        Revision.objects.create(
+        PreviousRevision.objects.filter(edit=edit).delete()
+        PreviousRevision.objects.create(
             edit=edit,
             type=1,
             minor=wp_edit.previous.minor,

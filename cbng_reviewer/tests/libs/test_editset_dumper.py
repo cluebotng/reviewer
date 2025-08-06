@@ -1,14 +1,14 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
-from cbng_reviewer.models import Edit, Revision, TrainingData
+from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision
 
 
 class EditSetReaderTestCase(TestCase):
     def testNoExportOnMissingTrainingData(self):
         edit = Edit.objects.create(id=1234)
-        Revision.objects.create(edit=edit, type=0, text="current".encode("utf-8"), minor=False, timestamp=1234)
-        Revision.objects.create(edit=edit, type=1, text="previous".encode("utf-8"), minor=False, timestamp=1230)
+        CurrentRevision.objects.create(edit=edit, text="current".encode("utf-8"), minor=False, timestamp=1234)
+        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), minor=False, timestamp=1230)
         self.assertIsNone(EditSetDumper().generate_wp_edit(edit))
 
     def testNoExportOnMissingCurrentRevision(self):
@@ -29,7 +29,7 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        Revision.objects.create(edit=edit, type=1, text="previous".encode("utf-8"), minor=False, timestamp=1230)
+        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), minor=False, timestamp=1230)
         self.assertIsNone(EditSetDumper().generate_wp_edit(edit))
 
     def testValidExport(self):
@@ -51,8 +51,8 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        Revision.objects.create(edit=edit, type=0, text="current".encode("utf-8"), minor=False, timestamp=1234)
-        Revision.objects.create(edit=edit, type=1, text="previous".encode("utf-8"), minor=False, timestamp=1230)
+        CurrentRevision.objects.create(edit=edit, text="current".encode("utf-8"), minor=False, timestamp=1234)
+        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), minor=False, timestamp=1230)
 
         wp_edit_xml = EditSetDumper().generate_wp_edit(edit)
         self.assertIsNotNone(wp_edit_xml)

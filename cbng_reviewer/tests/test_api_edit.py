@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
-from cbng_reviewer.models import Edit, Revision, TrainingData
+from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision
 
 
 class ApiEditTestCase(TestCase):
@@ -30,7 +30,7 @@ class ApiEditTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=0,
         )
-        Revision.objects.create(edit=edit, type=0, timestamp=1753826150, minor=False, text=b"Current Text")
+        CurrentRevision.objects.create(edit=edit, timestamp=1753826150, minor=False, text=b"Current Text")
 
         r = self.client.get(f"/api/v1/edit/{edit.id}/dump-wpedit/")
         self.assertEqual(r.status_code, 404)
@@ -38,8 +38,8 @@ class ApiEditTestCase(TestCase):
     def testMissingTrainingData(self):
         edit = Edit.objects.create(id=1234, status=2, classification=1)
 
-        Revision.objects.create(edit=edit, type=0, timestamp=1753826150, minor=False, text=b"Current Text")
-        Revision.objects.create(edit=edit, type=1, timestamp=1753826000, minor=True, text=b"Previous Text")
+        CurrentRevision.objects.create(edit=edit, timestamp=1753826150, minor=False, text=b"Current Text")
+        PreviousRevision.objects.create(edit=edit, timestamp=1753826000, minor=True, text=b"Previous Text")
 
         r = self.client.get(f"/api/v1/edit/{edit.id}/dump-wpedit/")
         self.assertEqual(r.status_code, 404)
@@ -64,8 +64,8 @@ class ApiEditTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=0,
         )
-        Revision.objects.create(edit=edit, type=0, timestamp=1753826150, minor=False, text=b"Current Text")
-        Revision.objects.create(edit=edit, type=1, timestamp=1753826000, minor=True, text=b"Previous Text")
+        CurrentRevision.objects.create(edit=edit, timestamp=1753826150, minor=False, text=b"Current Text")
+        PreviousRevision.objects.create(edit=edit, timestamp=1753826000, minor=True, text=b"Previous Text")
 
         wp_edit = EditSetDumper().generate_wp_edit(edit)
 

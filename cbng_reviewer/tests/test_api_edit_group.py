@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
-from cbng_reviewer.models import Edit, EditGroup, Revision, TrainingData
+from cbng_reviewer.models import Edit, EditGroup, TrainingData, CurrentRevision, PreviousRevision
 
 
 class ApiEditGroupTestCase(TestCase):
@@ -107,8 +107,8 @@ class ApiEditGroupTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=0,
         )
-        Revision.objects.create(edit=edit, type=0, timestamp=1753826150, minor=False, text=b"Current Text")
-        Revision.objects.create(edit=edit, type=1, timestamp=1753826000, minor=True, text=b"Previous Text")
+        CurrentRevision.objects.create(edit=edit, timestamp=1753826150, minor=False, text=b"Current Text")
+        PreviousRevision.objects.create(edit=edit, timestamp=1753826000, minor=True, text=b"Previous Text")
 
         wp_edit = EditSetDumper().generate_wp_edit(edit)
 

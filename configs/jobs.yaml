@@ -75,7 +75,12 @@
 - name: mark-edits-as-deleted
   command: ./manage.py mark_edits_as_deleted
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
-  schedule: '13 4 * * 1'
+  schedule: '13 4 * * *'
+
+- name: mark-edits-as-having-data
+  command: ./manage.py mark_edits_with_training_data
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
+  schedule: '13 3 * * *'
 
 ## Management jobs
 - name: cleanup-user-records

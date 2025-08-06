@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandParser
 
 from cbng_reviewer import tasks
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
@@ -13,8 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--edit-id")
+
     def handle(self, *args: Any, **options: Any) -> None:
         """Add sampled edits for review."""
+        if options["edit_id"]:
+            edit, created = Edit.objects.get_or_create(id=options["edit_id"])
+            logger.info(f"Created entry for {edit.id}")
+            return
+
         wikipedia_reader = WikipediaReader()
 
         edit_group, created = EditGroup.objects.get_or_create(name=settings.CBNG_SAMPLED_EDITS_EDIT_SET)

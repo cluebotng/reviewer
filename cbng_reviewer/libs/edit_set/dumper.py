@@ -4,7 +4,7 @@ from typing import Optional
 
 from django.conf import settings
 
-from cbng_reviewer.models import Edit, TrainingData, Revision
+from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +18,14 @@ class EditSetDumper:
             return None
 
         try:
-            current_revision = Revision.objects.get(edit=edit, type=0)
-        except Revision.DoesNotExist:
+            current_revision = CurrentRevision.objects.get(edit=edit)
+        except CurrentRevision.DoesNotExist:
             logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no current revision")
             return None
 
         try:
-            previous_revision = Revision.objects.get(edit=edit, type=1)
-        except Revision.DoesNotExist:
+            previous_revision = PreviousRevision.objects.get(edit=edit)
+        except PreviousRevision.DoesNotExist:
             logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no previous revision")
             return None
 
