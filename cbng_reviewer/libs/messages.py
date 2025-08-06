@@ -52,11 +52,5 @@ class Messages:
             body=f"\x0314[[\x036 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]"
         )
 
-    def notify_irc_about_edit_pending(self, edit: Edit) -> Message:
-        return Message(body=f"\x0314[[\x032 New Edit Pending Review \x0314]]\x0301 {edit.id}")
-
-    def notify_irc_about_edit_in_progress(self, edit: Edit) -> Message:
-        return Message(body=f"\x0314[[\x032 Edit Review In Progress \x0314]]\x0301 {edit.id}")
-
     def notify_irc_about_edit_deletion(self, edit: Edit) -> Message:
         return Message(body=f"\x0314[[\x035 Edit Has Been Deleted \x0314]]\x0301 {edit.id}")
