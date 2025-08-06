@@ -58,7 +58,8 @@ class Command(BaseCommand):
 
                 # If the user has a central uid map it to our internal user,
                 # so when they authenticate with OAuth things just work
-                if central_uid := wikipedia_reader.get_central_auth_user_id(username):
+                central_uid, _ = wikipedia_reader.get_user(username)
+                if central_uid:
                     UserSocialAuth.objects.create(provider="mediawiki", uid=central_uid, user_id=user.id)
                 else:
                     logger.warning(f"Not creating mapping for {username} due to no central auth id")

@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from django.template import loader
 from django.utils.html import escape
@@ -28,8 +29,11 @@ class Messages:
     def notify_irc_about_deleted_account(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0313 Removed User Account \x0314]]\x0301 {escape(user.username)}")
 
-    def notify_irc_about_granted_reviewer_access(self, user: User) -> Message:
-        return Message(body=f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}")
+    def notify_irc_about_granted_reviewer_access(self, user: User, reason: Optional[str] = None) -> Message:
+        body = f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}"
+        if reason:
+            body += f" ({reason})"
+        return Message(body=body)
 
     def notify_irc_about_granted_admin_access(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0313 Admin Access Granted \x0314]]\x0301 {escape(user.username)}")

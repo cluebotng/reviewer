@@ -71,7 +71,6 @@ class Edit(models.Model):
         # then it never will be, so we can remove it as dangling.
         return all(
             [
-                self.status == 2,
                 TrainingData.objects.filter(edit=self).exists(),
                 Revision.objects.filter(edit=self).count() in {1, 2},
             ]
@@ -178,10 +177,16 @@ class TrainingData(models.Model):
 @receiver(post_save, sender=User)
 def notify_irc_about_pending_account(sender, instance, created, **kwargs):
     if created:
+        from cbng_reviewer import tasks
         from cbng_reviewer.libs.irc import IrcRelay
         from cbng_reviewer.libs.messages import Messages
 
         IrcRelay().send_message(Messages().notify_irc_about_pending_account(instance))
+
+        try:
+            tasks.update_user_access_from_rights.apply_async([instance.id])
+        except kombu.exceptions.OperationalError as e:
+            logger.warning(f"Failed to create update_edit_classification task: {e}")
 
 
 @receiver(pre_delete, sender=User)

@@ -21,11 +21,11 @@ class WikipediaReaderTestCase(TestCase):
 
     def testCentralAuthUserLookup(self):
         wikipedia_reader = WikipediaReader()
-        self.assertEqual(wikipedia_reader.get_central_auth_user_id("DamianZaremba"), 8219921)
+        self.assertEqual(wikipedia_reader.get_user("DamianZaremba")[0], 8219921)
 
     def testCentralAuthUserMissing(self):
         wikipedia_reader = WikipediaReader()
-        self.assertIsNone(wikipedia_reader.get_central_auth_user_id(uuid.uuid4().hex))
+        self.assertIsNone(wikipedia_reader.get_user(uuid.uuid4().hex)[0])
 
     def testSampledEdits(self):
         load_sql_to_replica(["enwiki_p", "sampled_revisions"])

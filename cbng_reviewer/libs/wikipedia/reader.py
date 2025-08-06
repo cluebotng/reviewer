@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Tuple, List
 
 import requests
 from django.db import connections
@@ -82,7 +82,7 @@ class WikipediaReader:
             ]
         )
 
-    def get_central_auth_user_id(self, username: str) -> Optional[int]:
+    def get_user(self, username: str) -> Tuple[Optional[int], List[str]]:
         r = requests.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -93,7 +93,7 @@ class WikipediaReader:
                 "format": "json",
                 "action": "query",
                 "list": "users",
-                "usprop": "centralids",
+                "usprop": "centralids|rights",
                 "ususers": username,
             },
         )
@@ -101,9 +101,9 @@ class WikipediaReader:
         data = r.json()
 
         if user_data := next(iter(data.get("query", {}).get("users", [])), None):
-            return user_data.get("centralids", {}).get("CentralAuth")
+            return user_data.get("centralids", {}).get("CentralAuth"), user_data.get("rights", [])
 
-        return None
+        return None, []
 
     def get_sampled_edits(self, namespace_id: int, start: datetime, end: datetime, quantity: int):
         with connections["replica"].cursor() as cursor:
