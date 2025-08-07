@@ -14,6 +14,7 @@ def _get_latest_release(org: str, repo: str) -> str:
     return r.json()["tag_name"]
 
 
+EMIT_LOG_MESSAGES = os.environ.get("EMIT_LOG_MESSAGES", "true") == "true"
 TARGET_RELEASE = os.environ.get("TARGET_RELEASE")
 TARGET_USER = os.environ.get("TARGET_USER", "cluebotng-review")
 TOOL_DIR = PosixPath("/data/project") / TARGET_USER
@@ -41,6 +42,11 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
     c.sudo(f"bash -c \"base64 -d <<< '{encoded_contents}' > '{target_path}'\"")
 
 
+def _do_log_message(message: str):
+    """Emit a log message (from the tool account)."""
+    c.sudo(f"{'' if EMIT_LOG_MESSAGES else 'echo '}dologmsg '{message}'")
+
+
 def _build_irc_relay():
     """Update the IRC relay release."""
     latest_release = TARGET_RELEASE or _get_latest_release("cluebotng", "irc_relay")
@@ -54,12 +60,12 @@ def _build_irc_relay():
         f"-i {IMAGE_TAG_IRC_RELAY} "
         "https://github.com/cluebotng/irc_relay.git"
     )
+    return latest_release
 
 
 def _build_reviewer():
     """Update the reviewer release."""
     latest_release = TARGET_RELEASE or _get_latest_release("cluebotng", "reviewer")
-    latest_release = "main"
     print(f"Moving reviewer to {latest_release}")
 
     # Build
@@ -70,6 +76,7 @@ def _build_reviewer():
         f"-i {IMAGE_TAG_REVIEWER} "
         "https://github.com/cluebotng/reviewer.git"
     )
+    return latest_release
 
 
 def _update_jobs():
@@ -169,8 +176,9 @@ def deploy_jobs(_ctx):
 @task()
 def deploy_reviewer(_ctx):
     """Deploy the reviewer app."""
-    _build_reviewer()
+    target_release = _build_reviewer()
     _restart()
+    _do_log_message(f"reviewer deployed @ {target_release}")
 
 
 @task()
