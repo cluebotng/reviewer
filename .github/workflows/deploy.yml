@@ -1,5 +1,5 @@
 name: Deploy
-on: { push: { tags: [ 'v*' ], branches: [ main ] } }
+on: { push: { tags: [ 'v*' ] } }
 jobs:
   deploy:
     runs-on: ubuntu-latest
