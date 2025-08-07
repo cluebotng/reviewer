@@ -14,6 +14,7 @@ def _get_latest_release(org: str, repo: str) -> str:
     return r.json()["tag_name"]
 
 
+TARGET_RELEASE = os.environ.get("TARGET_RELEASE")
 TARGET_USER = os.environ.get("TARGET_USER", "cluebotng-review")
 TOOL_DIR = PosixPath("/data/project") / TARGET_USER
 IMAGE_NAMESPACE = f"tool-{TARGET_USER}"
@@ -42,7 +43,7 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
 
 def _build_irc_relay():
     """Update the IRC relay release."""
-    latest_release = _get_latest_release("cluebotng", "irc_relay")
+    latest_release = TARGET_RELEASE or _get_latest_release("cluebotng", "irc_relay")
     print(f"Moving irc-relay to {latest_release}")
 
     # Update the latest image to our target release
@@ -57,7 +58,7 @@ def _build_irc_relay():
 
 def _build_reviewer():
     """Update the reviewer release."""
-    latest_release = _get_latest_release("cluebotng", "reviewer")
+    latest_release = TARGET_RELEASE or _get_latest_release("cluebotng", "reviewer")
     latest_release = "main"
     print(f"Moving reviewer to {latest_release}")
 
@@ -163,6 +164,13 @@ def restart_irc_relay(_ctx):
 @task()
 def deploy_jobs(_ctx):
     _update_jobs()
+
+
+@task()
+def deploy_reviewer(_ctx):
+    """Deploy the reviewer app."""
+    _build_reviewer()
+    _restart()
 
 
 @task()
