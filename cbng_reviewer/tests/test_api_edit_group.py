@@ -87,7 +87,7 @@ class ApiEditGroupTestCase(TestCase):
     def testEditSet(self):
         edit_group = EditGroup.objects.create(name="Report Interface Import", group_type=1)
 
-        edit = Edit.objects.create(id=1234, status=2, classification=1)
+        edit = Edit.objects.create(id=1234, status=2, classification=1, has_training_data=True)
         edit.groups.add(edit_group)
 
         TrainingData.objects.create(
