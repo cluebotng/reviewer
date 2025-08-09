@@ -243,7 +243,7 @@ class WikipediaTraining:
                     `comment_text` LIKE 'General note: Nonconstructive%%'
                 )
                 """,
-                [username, edit_time.strftime("%Y%m%d%H%M%S")],
+                [self._clean_page_title(username), edit_time.strftime("%Y%m%d%H%M%S")],
             )
             if row := cursor.fetchone():
                 return row[0]

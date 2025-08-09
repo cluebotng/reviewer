@@ -40,8 +40,7 @@ CREATE TABLE revision_userindex (
     rev_id INT UNSIGNED,
     rev_page INT UNSIGNED,
     rev_actor INT UNSIGNED,
-    rev_timestamp INT UNSIGNED,
-    PRIMARY KEY(rev_actor)
+    rev_timestamp BINARY(14) NOT NULL
 );
 
 DROP TABLE IF EXISTS revision;
@@ -63,4 +62,14 @@ CREATE TABLE revision (
         rev_page, rev_actor, rev_timestamp
     ),
     PRIMARY KEY(rev_id)
+);
+
+DROP TABLE IF EXISTS comment;
+CREATE TABLE comment (
+    comment_id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL,
+    comment_hash INT NOT NULL,
+    comment_text BLOB NOT NULL,
+    comment_data BLOB DEFAULT NULL,
+    INDEX comment_hash (comment_hash),
+    PRIMARY KEY(comment_id)
 );

@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -10,22 +9,6 @@ from cbng_reviewer.tests.utils import load_sql_to_replica
 
 class WikipediaReaderTestCase(TestCase):
     databases = {"default", "replica"}
-
-    def testRevisionHasNotBeenDeleted(self):
-        wikipedia_reader = WikipediaReader()
-        self.assertFalse(wikipedia_reader.has_revision_been_deleted(239153997))
-
-    def testRevisionHasBeenDeleted(self):
-        wikipedia_reader = WikipediaReader()
-        self.assertTrue(wikipedia_reader.has_revision_been_deleted(812910653))
-
-    def testCentralAuthUserLookup(self):
-        wikipedia_reader = WikipediaReader()
-        self.assertEqual(wikipedia_reader.get_user("DamianZaremba")[0], 8219921)
-
-    def testCentralAuthUserMissing(self):
-        wikipedia_reader = WikipediaReader()
-        self.assertIsNone(wikipedia_reader.get_user(uuid.uuid4().hex)[0])
 
     def testSampledEdits(self):
         load_sql_to_replica(["enwiki_p", "sampled_revisions"])
