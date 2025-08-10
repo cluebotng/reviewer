@@ -111,7 +111,7 @@ def _restart():
         f"jobs run "
         f"--wait "
         f"--image {IMAGE_NAMESPACE}/{IMAGE_TAG_REVIEWER}:latest "
-        f'--command "./manage.py migrate" migrate-database'
+        f'--command "launcher ./manage.py migrate" migrate-database'
     )
 
     # Restart web service
