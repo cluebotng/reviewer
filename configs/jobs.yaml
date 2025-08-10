@@ -35,66 +35,66 @@
 
 ## Core jobs
 - name: export-statistics
-  command: ./manage.py export_statistics
+  command: launcher ./manage.py export_statistics
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 9 * * *'
 
 - name: update-edit-classifications
-  command: ./manage.py update_edit_classification
+  command: launcher ./manage.py update_edit_classification
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '30 */2 * * *'
 
 ## Seed jobs
 - name: add-reported-edits
-  command: ./manage.py add_reported_edits
+  command: launcher ./manage.py add_reported_edits
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '55 * * * *'
 
 - name: add-edits-to-queue
-  command: ./manage.py add_edits_to_queue
+  command: launcher ./manage.py add_edits_to_queue
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 6 * * *'
 
 ## Helper jobs
 - name: add-reviews-from-report
-  command: ./manage.py add_reviews_from_report
+  command: launcher ./manage.py add_reviews_from_report
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '15 * * * *'
 
 - name: add-reviews-from-huggle
-  command: ./manage.py add_reviews_from_huggle
+  command: launcher ./manage.py add_reviews_from_huggle
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '23 */2 * * *'
 
 ## Back-fill jobs
 - name: import-training-data
-  command: ./manage.py import_training_data
+  command: launcher ./manage.py import_training_data
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '15 2 * * *'
 
 - name: mark-edits-as-deleted
-  command: ./manage.py mark_edits_as_deleted
+  command: launcher ./manage.py mark_edits_as_deleted
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 4 * * *'
 
 - name: mark-edits-as-having-data
-  command: ./manage.py mark_edits_with_training_data
+  command: launcher ./manage.py mark_edits_with_training_data
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 3 * * *'
 
 - name: add-dangling-edits-to-group
-  command: ./manage.py add_dangling_edits_to_group
+  command: launcher ./manage.py add_dangling_edits_to_group
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 21 * * *'
 
 ## Management jobs
 - name: cleanup-user-records
-  command: ./manage.py cleanup_user_records
+  command: launcher ./manage.py cleanup_user_records
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '13 1 * * *'
 
 - name: grant-review-access-from-wikipedia-rights
-  command: ./manage.py grant_review_access_from_rights
+  command: launcher ./manage.py grant_review_access_from_rights
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   schedule: '27 * * * *'
 
