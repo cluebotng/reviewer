@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: limit-access-irc-relay
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: irc-relay
+  ingress:
+  - from:
+    # Allow anything in our namespace - numerous scheduled jobs as well as the interface and worker send messages
+    - namespaceSelector:
+        matchLabels:
+          name: tool-cluebotng-review
