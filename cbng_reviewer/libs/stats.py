@@ -1,6 +1,7 @@
 import logging
 from typing import Tuple, Optional
 
+import requests
 from django.conf import settings
 
 from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
@@ -82,6 +83,19 @@ class Statistics:
             ("Number Of Previous Revision Entries", PreviousRevision.objects.all().count()),
         ]
 
+    def get_external_statistics(self):
+        r = requests.get(
+            "https://cluebotng.toolforge.org/api/",
+            params={
+                "action": "reports.list",
+                "status": 0,
+            },
+        )
+        r.raise_for_status()
+        return [
+            ("Number Of Reports Pending", len(r.json().keys())),
+        ]
+
     def generate_wikimarkup(self) -> Optional[str]:
         users = self.get_user_statistics(True)
         edit_groups = self.get_edit_group_statistics()
@@ -115,7 +129,7 @@ class Statistics:
         markup += "{{/UserFooter}}\n"
 
         markup += "{{/InternalHeader}}\n"
-        for key, value in self.get_internal_statistics():
+        for key, value in self.get_internal_statistics() + self.get_external_statistics():
             markup += "{{/Internal\n"
             markup += f"|key={key}\n"
             markup += f"|value={value}\n"
