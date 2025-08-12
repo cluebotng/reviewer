@@ -22,11 +22,11 @@ def load_config(base_dir: Path) -> Dict[str, Any]:
         },
         "mysql": {
             "default": {
-                "schema": os.environ.get("TOOL_TOOLSDB_SCHEMA", "cbng_reviewer"),
-                "host": os.environ.get("TOOL_TOOLSDB_HOST", "tools-db"),
+                "schema": os.environ.get("TOOL_DB_SCHEMA", "cbng_reviewer"),
+                "host": os.environ.get("TOOL_DB_HOST", "localhost"),
                 "port": 3306,
-                "user": os.environ.get("TOOL_TOOLSDB_USER", ""),
-                "password": os.environ.get("TOOL_TOOLSDB_PASSWORD", ""),
+                "user": os.environ.get("TOOL_DB_USER", "root"),
+                "password": os.environ.get("TOOL_DB_PASSWORD", ""),
             },
             "replica": {
                 "schema": os.environ.get("TOOL_REPLICA_SCHEMA", "enwiki_p"),
