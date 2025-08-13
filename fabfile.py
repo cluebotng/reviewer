@@ -126,7 +126,7 @@ def _update_jobs():
     )
 
     # Ensure jobs are setup
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} echo toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
 
 
 def _restart():
