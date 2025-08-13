@@ -266,6 +266,7 @@ def deploy_reviewer(_ctx):
 def deploy(_ctx):
     """Deploy the current release."""
     _build_irc_relay()
+    _build_grafana_alloy()
     _build_reviewer()
     _restart()
     _update_jobs()
