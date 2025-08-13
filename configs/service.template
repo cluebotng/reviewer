@@ -2,5 +2,3 @@
 # Note: We don't require PHP, just need an image that runs Lighttpd
 #       x-ref: https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web/Lighttpd
 type: php8.4
-# Note: This is proxied through to the backend. Returning static responses in Lighttpd is convoluted.
-health-check-path: /internal/health/
