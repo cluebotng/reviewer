@@ -12,7 +12,7 @@
   continuous: true
   port: 8000
   health-check-http: /internal/health/
-  replica: 4
+  replica: 2
 
 # Async support
 
