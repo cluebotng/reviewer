@@ -22,6 +22,7 @@ TOOL_DIR = PosixPath("/data/project") / TARGET_USER
 IMAGE_NAMESPACE = f"tool-{TARGET_USER}"
 IMAGE_TAG_REVIEWER = "reviewer"
 IMAGE_TAG_IRC_RELAY = "irc-relay"
+IMAGE_TAG_GRAFANA_ALLOY = "grafana-alloy"
 
 c = Connection(
     "login.toolforge.org",
@@ -70,6 +71,21 @@ def _build_irc_relay():
     return latest_release
 
 
+def _build_grafana_alloy():
+    """Update the Grafana Alloy release."""
+    target_release = _get_latest_release("cluebotng", "external-grafana-alloy")
+    print(f"Moving grafana-alloy to {target_release}")
+
+    # Update the latest image to our target release
+    c.sudo(
+        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge "
+        "build start -L "
+        f"--ref {target_release} "
+        f"-i {IMAGE_TAG_GRAFANA_ALLOY} "
+        "https://github.com/cluebotng/external-grafana-alloy.git"
+    )
+
+
 def _build_reviewer():
     """Update the reviewer release."""
     latest_release = TARGET_RELEASE or _get_latest_release("cluebotng", "reviewer")
@@ -103,6 +119,7 @@ def _update_jobs():
             "image_namespace": IMAGE_NAMESPACE,
             "image_tag_reviewer": IMAGE_TAG_REVIEWER,
             "image_tag_irc_relay": IMAGE_TAG_IRC_RELAY,
+            "image_tag_grafana_alloy": IMAGE_TAG_GRAFANA_ALLOY,
             "database_user": database_user,
             "tool_dir": TOOL_DIR.as_posix(),
         },
