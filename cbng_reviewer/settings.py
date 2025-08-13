@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import prometheus_client
+
 from cbng_reviewer.utils.config import load_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,6 +21,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django_prometheus",
     "social_django",
     "rest_framework",
     "django_bootstrap5",
@@ -26,6 +29,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -35,6 +39,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "cbng_reviewer.urls"
@@ -214,3 +219,9 @@ CBNG_REPORT_EDIT_SET = "Report Interface Import"
 CBNG_ADMIN_ONLY = CONFIG["cbng"]["admin_only"]
 CBNG_ENABLE_IRC_MESSAGING = CONFIG["cbng"]["enable_irc_messaging"]
 CBNG_ENABLE_USER_MESSAGING = CONFIG["cbng"]["enable_user_messaging"]
+
+# No default metrics
+PROMETHEUS_METRIC_NAMESPACE = "cbng_reviewer"
+prometheus_client.REGISTRY.unregister(prometheus_client.GC_COLLECTOR)
+prometheus_client.REGISTRY.unregister(prometheus_client.PLATFORM_COLLECTOR)
+prometheus_client.REGISTRY.unregister(prometheus_client.PROCESS_COLLECTOR)

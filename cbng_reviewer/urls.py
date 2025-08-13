@@ -8,6 +8,7 @@ urlpatterns = [
     # For developers
     path("internal/admin/", admin.site.urls),
     path("internal/health/", lambda r: HttpResponse("OK")),
+    path("internal/metrics/", views.metrics),
     # Authentication
     path("oauth/", include("social_django.urls", namespace="social")),
     path("logout/", views.logout, name="logout"),

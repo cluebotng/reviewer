@@ -13,6 +13,8 @@ dependencies = [
     "gunicorn",
     "whitenoise",
     "celery[redis]",
+    "prometheus-client",
+    "django-prometheus",
 ]
 
 [tool.poetry]

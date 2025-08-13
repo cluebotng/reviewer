@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib import auth
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from cbng_reviewer.libs.django import reviewer_required
 from cbng_reviewer.libs.stats import Statistics
@@ -30,6 +32,10 @@ def home(request):
 def logout(request):
     auth.logout(request)
     return redirect("/")
+
+
+def metrics(request):
+    return HttpResponse(content=generate_latest(), content_type=CONTENT_TYPE_LATEST)
 
 
 @reviewer_required()
