@@ -141,6 +141,8 @@ def _restart():
 
     # Restart worker
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-worker")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-flower")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart grafana-alloy")
 
 
 # Temp
@@ -156,13 +158,9 @@ def _hack_irc_relay():
         .strip('"')
     )
 
-    service["spec"]["ports"] = [
-        port | {"protocol": "UDP"} for port in service["spec"]["ports"]
-    ]
+    service["spec"]["ports"] = [port | {"protocol": "UDP"} for port in service["spec"]["ports"]]
 
-    encoded_contents = base64.b64encode(json.dumps(service).encode("utf-8")).decode(
-        "utf-8"
-    )
+    encoded_contents = base64.b64encode(json.dumps(service).encode("utf-8")).decode("utf-8")
     c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"')
 
     deployment = json.loads(
@@ -176,16 +174,13 @@ def _hack_irc_relay():
     )
 
     deployment["spec"]["template"]["spec"]["containers"][0]["ports"] = [
-        port | {"protocol": "UDP"}
-        for port in deployment["spec"]["template"]["spec"]["containers"][0]["ports"]
+        port | {"protocol": "UDP"} for port in deployment["spec"]["template"]["spec"]["containers"][0]["ports"]
     ]
 
     deployment["spec"]["template"]["spec"]["containers"][0]["livenessProbe"] = None
     deployment["spec"]["template"]["spec"]["containers"][0]["startupProbe"] = None
 
-    encoded_contents = base64.b64encode(json.dumps(deployment).encode("utf-8")).decode(
-        "utf-8"
-    )
+    encoded_contents = base64.b64encode(json.dumps(deployment).encode("utf-8")).decode("utf-8")
     c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"')
 
 

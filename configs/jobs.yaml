@@ -31,6 +31,13 @@
   replicas: 1
   mount: none
 
+- name: celery-flower
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
+  command: run-flower
+  port: 5001
+  health-check-http: /healthcheck
+  continuous: true
+
 - name: grafana-alloy
   image: '{{ image_namespace }}/{{ image_tag_grafana_alloy }}:latest'
   command: run-alloy
@@ -39,7 +46,7 @@
   mem: 1Gi
   port: 8118
   health-check-http: /health
-  mount: none
+  mount: all
 
 # Scheduled jobs
 

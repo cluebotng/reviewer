@@ -15,6 +15,7 @@ dependencies = [
     "celery[redis]",
     "prometheus-client",
     "django-prometheus",
+    "flower",
 ]
 
 [tool.poetry]
