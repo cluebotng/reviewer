@@ -5,6 +5,15 @@
 # Here are the "backend" jobs, both scheduled (aka cron jobs) and worker (celery).
 #
 
+# Core
+- name: cluebotng-reviewer
+  image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
+  command: web
+  continuous: true
+  port: 8000
+  health-check-http: /internal/health/
+  replica: 4
+
 # Async support
 
 ## Redis instance
@@ -28,7 +37,6 @@
   cpu: '0.5'
   mem: 1Gi
   port: 3334
-  replicas: 1
   mount: none
 
 # Scheduled jobs

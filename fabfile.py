@@ -30,6 +30,8 @@ c = Connection(
 
 
 def _get_file_contents(file_name: str) -> str:
+    if file_name.startswith("."):
+        file_name = file_name.lstrip(".")
     with (PosixPath(__file__).parent / "configs" / file_name).open("r") as fh:
         return fh.read()
 
@@ -87,13 +89,14 @@ def _build_reviewer():
 def _update_jobs():
     # Get database use
     database_user = c.sudo(
-        f"awk '{'{'}if($1 == \"user\") print $3{'}'}' {TOOL_DIR / 'replica.my.cnf'}", hide="stdout"
+        f"awk '{'{'}if($1 == \"user\") print $3{'}'}' {(TOOL_DIR / 'replica.my.cnf').as_posix()}", hide="stdout"
     ).stdout.strip()
 
+    # Webservice config
+    _push_file_to_remote("service.template")
+    _push_file_to_remote(".lighttpd.conf")
+
     # Jobs config
-    _push_file_to_remote(
-        "service.template", {"image_namespace": IMAGE_NAMESPACE, "image_tag_reviewer": IMAGE_TAG_REVIEWER}
-    )
     _push_file_to_remote(
         "jobs.yaml",
         {
@@ -106,7 +109,7 @@ def _update_jobs():
     )
 
     # Ensure jobs are setup
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {TOOL_DIR / 'jobs.yaml'}")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} echo toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
 
 
 def _restart():
@@ -119,8 +122,8 @@ def _restart():
         f'--command "launcher ./manage.py migrate" migrate-database'
     )
 
-    # Restart web service
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart -r 4")
+    # Ensure web service is running
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice start")
 
     # Restart worker
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart celery-worker")
