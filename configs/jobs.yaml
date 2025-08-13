@@ -34,7 +34,7 @@
 - name: celery-flower
   image: '{{ image_namespace }}/{{ image_tag_reviewer }}:latest'
   command: run-flower
-  port: 5001
+  port: 5555
   health-check-http: /healthcheck
   continuous: true
 
