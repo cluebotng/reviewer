@@ -1,7 +1,21 @@
 name: Deploy
 on: { push: { tags: [ 'v*' ] } }
 jobs:
-  deploy:
+  deploy-components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: cluebotng/utilities
+          ref: main
+
+      - uses: cluebotng/ci-update-component-ref@main
+        with:
+          tool: cluebotng-review
+          repository: https://github.com/cluebotng/reviewer.git
+          gh_app_key: ${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}
+
+  deploy-extras:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
