@@ -105,7 +105,7 @@ class Edit(models.Model):
             return False
 
         self.status = 0 if total_classifications == 0 else 1
-        if total_classifications >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
+        if max(constructive, max(vandalism, skipped)) >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
             if 2 * skipped > vandalism + constructive + skipped:
                 self.classification = 2
                 self.status = 2
