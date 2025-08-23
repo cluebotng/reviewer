@@ -86,6 +86,7 @@ class Statistics:
     def get_external_statistics(self):
         r = requests.get(
             "https://cluebotng.toolforge.org/api/",
+            timeout=10,
             params={
                 "action": "reports.list",
                 "status": 0,
