@@ -295,7 +295,7 @@ class WikipediaTraining:
             if current_revision.has_complete_training_data:
                 wp_edit = replace(wp_edit, current=current_revision)
             if previous_revision.has_complete_training_data:
-                wp_edit = replace(wp_edit, previous=previous_revision)
+                wp_edit = replace(wp_edit, previous=previous_revision, prev_user=previous_revision.user)
 
         if wp_edit.current:
             wp_edit = replace(
