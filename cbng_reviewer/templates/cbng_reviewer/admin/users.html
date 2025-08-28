@@ -14,7 +14,11 @@
                     </tr>
                     {% for user in registered_users %}
                         <tr>
-                            <td>{{ user.username }}</td>
+                            <td>
+                                {{ user.username }}
+                                <a href="https://en.wikipedia.org/wiki/User:{{ user.username }}">u</a>
+                                <a href="https://en.wikipedia.org/wiki/Special:Contributions/{{ user.username }}">c</a>
+                            </td>
                             <td>
                                 <form action="{% url 'admin-change-user-flags' user.id %}" method="post">
                                     {% csrf_token %}
