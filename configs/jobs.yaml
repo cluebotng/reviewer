@@ -4,8 +4,8 @@
   image: tool-cluebotng-review/irc-relay:latest
   command: run-relay
   continuous: true
-  cpu: '0.5'
-  mem: 1Gi
+  cpu: '0.25'
+  mem: 0.5Gi
   port: 3334/udp
   replicas: 1
   mount: none

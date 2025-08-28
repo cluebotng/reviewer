@@ -20,8 +20,6 @@ c = Connection(
 
 
 def _get_file_contents(file_name: str) -> str:
-    if file_name.startswith("."):
-        file_name = file_name.lstrip(".")
     with (PosixPath(__file__).parent / "configs" / file_name).open("r") as fh:
         return fh.read()
 
@@ -39,6 +37,13 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
     c.sudo(f"bash -c \"base64 -d <<< '{encoded_contents}' > '{target_path}'\"")
 
 
+def _build_haproxy():
+    c.sudo(
+        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge build start "
+        "-L -i haproxy https://github.com/cluebotng/external-haproxy.git"
+    )
+
+
 def _update_jobs():
     _push_file_to_remote("jobs.yaml", {"tool_dir": TOOL_DIR.as_posix()},)
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
@@ -46,46 +51,46 @@ def _update_jobs():
 
 def _hack_kubernetes_objects():
     """Deal with direct kubernetes objects [T400940]."""
-    irc_relay_network_policy = _get_file_contents("network-policy.yaml")
+    network_policy = _get_file_contents("network-policy.yaml")
 
-    encoded_contents = base64.b64encode(irc_relay_network_policy.encode("utf-8")).decode("utf-8")
+    encoded_contents = base64.b64encode(network_policy.encode("utf-8")).decode("utf-8")
     c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"')
 
 
 @task()
 def enable_admin_mode(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ADMIN_ONLY true")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
 def disable_admin_mode(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ADMIN_ONLY false")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
 def enable_irc_messaging(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_IRC_MESSAGING true")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
 def disable_irc_messaging(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_IRC_MESSAGING true")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
 def enable_user_messaging(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_USER_MESSAGING true")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
 def disable_user_messaging(_ctx):
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge envvars create CBNG_ENABLE_USER_MESSAGING false")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs restart cluebotng-reviewer")
 
 
 @task()
@@ -97,5 +102,4 @@ def deploy_jobs(_ctx):
 @task()
 def deploy_webservice(_ctx):
     _push_file_to_remote("service.template")
-    _push_file_to_remote(".lighttpd.conf")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice restart")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
