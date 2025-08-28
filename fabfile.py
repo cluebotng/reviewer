@@ -98,4 +98,4 @@ def deploy_jobs(_ctx):
 def deploy_webservice(_ctx):
     _push_file_to_remote("service.template")
     _push_file_to_remote(".lighttpd.conf")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice start")
+    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice restart")
