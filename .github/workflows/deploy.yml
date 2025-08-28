@@ -4,9 +4,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: cluebotng/ci-update-component-ref@main
+        with:
+          tool: 'cluebotng-review'
+          component: 'cluebotng-reviewer'
+          ref: '${{ github.ref }}'
+          gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
+
+  webservice:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
       - uses: cluebotng/ci-execute-fabric@main
         with:
-          task: deploy-reviewer
-          release: ${{ github.ref }}
+          task: deploy-webservice
           ssh_key: ${{ secrets.CI_SSH_KEY }}
