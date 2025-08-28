@@ -12,6 +12,7 @@ SECRET_KEY = CONFIG["django"]["secret_key"]
 DEBUG = CONFIG["django"]["debug"]
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["https://cluebotng-review.toolforge.org"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
