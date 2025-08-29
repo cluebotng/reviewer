@@ -101,5 +101,6 @@ def deploy_jobs(_ctx):
 
 @task()
 def deploy_webservice(_ctx):
+    _build_haproxy()
     _push_file_to_remote("service.template")
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
