@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from cbng_reviewer.libs.django import reviewer_required
+from cbng_reviewer.libs.metrics import MetricsExporter
 from cbng_reviewer.libs.stats import Statistics
 from cbng_reviewer.models import User
 
@@ -35,6 +36,7 @@ def logout(request):
 
 
 def metrics(request):
+    MetricsExporter().update_metrics()
     return HttpResponse(content=generate_latest(), content_type=CONTENT_TYPE_LATEST)
 
 
