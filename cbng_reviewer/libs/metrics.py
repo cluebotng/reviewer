@@ -77,7 +77,7 @@ class MetricsExporter:
 
     def _edit_group_by_classification_count(self):
         for edit_group in EditGroup.objects.all():
-            for db_id, label in STATUSES:
+            for db_id, label in CLASSIFICATIONS:
                 edit_group_by_classification_count.labels(group=edit_group.contextual_name, classification=label).set(
                     edit_group.edit_set.filter(classification=db_id).count()
                 )
