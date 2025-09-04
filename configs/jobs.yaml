@@ -12,7 +12,7 @@
 
 # Extra jobs we run, beyond those directly related to the interface
 - name: backup-database
-  command: bash -c 'mkdir -p {{ tool_dir }}/mysql_backups/ && mysqldump -h $TOOL_DB_HOST -u $TOOL_DB_USER -p$TOOL_DB_PASSWORD $TOOL_DB_SCHEMA | gzip -9 > {{ tool_dir }}/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
+  command: bash -c 'mkdir -p {{ tool_dir }}/mysql_backups/ && mysqldump --disable-ssl -h $TOOL_DB_HOST -u $TOOL_DB_USER -p$TOOL_DB_PASSWORD $TOOL_DB_SCHEMA | gzip -9 > {{ tool_dir }}/mysql_backups/$(date +"%Y%m%dT%H%M%S").sql.gz'
   image: mariadb
   schedule: '45 */2 * * *'
   no-filelog: true
