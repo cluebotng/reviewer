@@ -1,11 +1,9 @@
 import logging
 
-import kombu.exceptions
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
-from django.dispatch import receiver
 
 from cbng_reviewer.hooks import (
     notify_irc_about_deleted_account,
@@ -184,7 +182,8 @@ class TrainingData(models.Model):
     page_num_recent_reverts = models.IntegerField()
 
 
-pre_delete.connect(notify_irc_about_deleted_account, sender=User)
-post_save.connect(notify_irc_about_pending_account, sender=User)
-post_save.connect(update_edit_classification_from_classification, sender=Classification)
-post_save.connect(import_training_data_for_edit, sender=Edit)
+if not settings.IN_TEST:
+    pre_delete.connect(notify_irc_about_deleted_account, sender=User)
+    post_save.connect(notify_irc_about_pending_account, sender=User)
+    post_save.connect(update_edit_classification_from_classification, sender=Classification)
+    post_save.connect(import_training_data_for_edit, sender=Edit)
