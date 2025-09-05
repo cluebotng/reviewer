@@ -16,21 +16,25 @@ def update_edit_classification(edit_id: int) -> None:
 
 
 @shared_task
-def import_training_data(edit_id: int) -> None:
+def import_training_data(edit_id: int, force: bool = False) -> None:
     from cbng_reviewer.models import Edit
     from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
     from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
 
     edit = Edit.objects.get(id=edit_id)
+    if edit.has_training_data and not force:
+        logger.info(f"Edit already has training data: {edit.id}")
+        return
+
     if WikipediaReader().has_revision_been_deleted(edit.id):
         logger.info(f"Edit has been deleted, marking as such: {edit.id}")
         mark_edit_as_deleted(edit)
+        return
 
-    else:
-        logger.info(f"Fetching training data for {edit.id}")
-        wp_edit = WikipediaTraining().build_wp_edit(edit)
-        if wp_edit.has_complete_training_data:
-            utils.import_training_data(edit, wp_edit)
+    logger.info(f"Fetching training data for {edit.id}")
+    wp_edit = WikipediaTraining().build_wp_edit(edit)
+    if wp_edit.has_complete_training_data:
+        utils.import_training_data(edit, wp_edit)
 
 
 @shared_task
