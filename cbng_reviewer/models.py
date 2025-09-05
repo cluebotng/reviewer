@@ -7,6 +7,13 @@ from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
+from cbng_reviewer.hooks import (
+    notify_irc_about_deleted_account,
+    notify_irc_about_pending_account,
+    update_edit_classification_from_classification,
+    import_training_data_for_edit,
+)
+
 logger = logging.getLogger(__name__)
 
 STATUSES = (
@@ -177,46 +184,7 @@ class TrainingData(models.Model):
     page_num_recent_reverts = models.IntegerField()
 
 
-@receiver(post_save, sender=User)
-def notify_irc_about_pending_account(sender, instance, created, **kwargs):
-    if created:
-        from cbng_reviewer import tasks
-        from cbng_reviewer.libs.irc import IrcRelay
-        from cbng_reviewer.libs.messages import Messages
-
-        IrcRelay().send_message(Messages().notify_irc_about_pending_account(instance))
-
-        try:
-            tasks.update_user_access_from_rights.apply_async([instance.id])
-        except kombu.exceptions.OperationalError as e:
-            logger.warning(f"Failed to create update_edit_classification task: {e}")
-
-
-@receiver(pre_delete, sender=User)
-def notify_irc_about_deleted_account(sender, instance, **kwargs):
-    from cbng_reviewer.libs.irc import IrcRelay
-    from cbng_reviewer.libs.messages import Messages
-
-    IrcRelay().send_message(Messages().notify_irc_about_deleted_account(instance))
-
-
-@receiver(post_save, sender=Classification)
-def update_edit_classification_from_classification(sender, instance, **kwargs):
-    from cbng_reviewer import tasks
-
-    try:
-        tasks.update_edit_classification.apply_async([instance.edit_id])
-    except kombu.exceptions.OperationalError as e:
-        logger.warning(f"Failed to create update_edit_classification task: {e}")
-
-
-@receiver(post_save, sender=Edit)
-def update_edit_classification_from_edit(sender, instance, created, **kwargs):
-
-    if not instance.is_deleted:
-        from cbng_reviewer import tasks
-
-        try:
-            tasks.update_edit_classification.apply_async([instance.id])
-        except kombu.exceptions.OperationalError as e:
-            logger.warning(f"Failed to create update_edit_classification task: {e}")
+pre_delete.connect(notify_irc_about_deleted_account, sender=User)
+post_save.connect(notify_irc_about_pending_account, sender=User)
+post_save.connect(update_edit_classification_from_classification, sender=Classification)
+post_save.connect(import_training_data_for_edit, sender=Edit)
