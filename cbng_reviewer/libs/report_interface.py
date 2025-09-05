@@ -28,12 +28,10 @@ class ReportInterface:
         for edit_id in self.fetch_edit_ids_requiring_review(include_in_progress):
             edit, created = Edit.objects.get_or_create(id=edit_id)
             edit.classification = 1
-            edit.save()
 
             if created:
                 logger.info(f"Created edit {edit.id}, adding to {edit_group.name}")
                 edit.groups.add(edit_group)
-                tasks.import_training_data.apply_async([edit.id])
 
             elif not edit.groups.filter(pk=edit_group.pk).exists():
                 logger.info(f"Adding edit {edit.id} to {edit_group.name}")
@@ -41,3 +39,5 @@ class ReportInterface:
 
             else:
                 logger.debug(f"Edit {edit.id} already exists if target group")
+
+            edit.save()
