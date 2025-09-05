@@ -24,7 +24,7 @@ class ReportInterface:
         return set(r.json())
 
     def create_entries_for_reported_edits(self, include_in_progress: bool = False):
-        edit_group = EditGroup.objects.get(name=settings.CBNG_REPORT_EDIT_SET)
+        edit_group, _ = EditGroup.objects.get_or_create(name=settings.CBNG_REPORT_EDIT_SET)
         for edit_id in self.fetch_edit_ids_requiring_review(include_in_progress):
             edit, created = Edit.objects.get_or_create(id=edit_id)
             edit.classification = 1
