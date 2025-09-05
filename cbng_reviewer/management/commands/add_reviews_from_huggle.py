@@ -4,6 +4,7 @@ from typing import Any
 import requests
 from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
+from django.db.models import Q
 
 from cbng_reviewer.models import User, Edit, Classification, TrainingData
 
@@ -36,14 +37,14 @@ class Command(BaseCommand):
         trusted_users = self._get_trusted_users()
         our_classified_edits = Classification.objects.filter(user=user).values_list("edit__id", flat=True)
 
-        for edit in (
-            Edit.objects.filter(id=options["edit_id"])
-            if options["edit_id"]
-            else Edit.objects.exclude(status=2)
-            .exclude(pk__in=our_classified_edits)
-            .exclude(is_deleted=True)
-            .exclude(has_training_data=False)
-        ):
+        if options["edit_id"]:
+            edits = Edit.objects.filter(id=options["edit_id"])
+        else:
+            edits = Edit.objects.filter(
+                ~Q(status=2) & ~Q(pk__in=our_classified_edits) & ~Q(is_deleted=True) & ~Q(has_training_data=False)
+            )
+
+        for edit in edits:
             if edit.id in our_classified_edits:
                 logger.info(f"We have already processed {edit.id}")  # make --edit-id more friendly
                 continue

@@ -4,7 +4,6 @@ from typing import Set
 import requests
 from django.conf import settings
 
-from cbng_reviewer import tasks
 from cbng_reviewer.models import EditGroup, Edit
 
 logger = logging.getLogger(__name__)

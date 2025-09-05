@@ -5,7 +5,6 @@ from typing import Any
 from django.conf import settings
 from django.core.management import BaseCommand, CommandParser
 
-from cbng_reviewer import tasks
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import EditGroup, Edit
 
