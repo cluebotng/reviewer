@@ -1,23 +1,14 @@
 import logging
-from typing import Tuple, Optional
 
-import requests
 from django.conf import settings
-from django.db.models import Count, Case, When, Value
-from django.forms import CharField
 from prometheus_client import Gauge
 
 from cbng_reviewer.models import (
     EditGroup,
-    Classification,
     Edit,
-    TrainingData,
-    CurrentRevision,
-    PreviousRevision,
     STATUSES,
     CLASSIFICATIONS,
 )
-from cbng_reviewer.models import User
 
 logger = logging.getLogger(__name__)
 

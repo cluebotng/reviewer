@@ -4,6 +4,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core.management import BaseCommand
+from django.db.models import Q
 
 from cbng_reviewer.models import User, Classification
 
@@ -14,13 +15,11 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         """Cleanup user records for those with no rights."""
         cutoff_limit = datetime.now(tz=UTC) - timedelta(days=settings.CBNG_CLEANUP_USER_DAYS)
-        for user in (
-            User.objects.filter(date_joined__lte=cutoff_limit)
-            .exclude(is_admin=1)
-            .exclude(
-                is_reviewer=1,
-            )
-            .exclude(historical_edit_count__gt=0)
+        for user in User.objects.filter(
+            Q(date_joined__lte=cutoff_limit)
+            & ~Q(is_admin=True)
+            & ~Q(is_reviewer=True)
+            & ~Q(historical_edit_count__gt=0)
         ):
             if Classification.objects.filter(user=user).count() > 0:
                 logger.debug(f"Skipping removal of {user.username} due to contributions")

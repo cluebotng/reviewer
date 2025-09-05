@@ -1,6 +1,7 @@
 import logging
 
 from celery import shared_task
+
 from cbng_reviewer.libs.edit_set import utils
 from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 

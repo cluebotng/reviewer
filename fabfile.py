@@ -1,12 +1,9 @@
 import base64
-import json
 import os
 from pathlib import PosixPath
 from typing import Optional, Dict, Any
 
-import requests
 from fabric import Connection, Config, task
-
 
 TARGET_USER = os.environ.get("TARGET_USER", "cluebotng-review")
 TOOL_DIR = PosixPath("/data/project") / TARGET_USER
@@ -45,7 +42,10 @@ def _build_haproxy():
 
 
 def _update_jobs():
-    _push_file_to_remote("jobs.yaml", {"tool_dir": TOOL_DIR.as_posix()},)
+    _push_file_to_remote(
+        "jobs.yaml",
+        {"tool_dir": TOOL_DIR.as_posix()},
+    )
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
 
 
