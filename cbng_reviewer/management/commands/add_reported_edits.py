@@ -15,5 +15,4 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         """Import edits from the report interface."""
         logger.info("Fetching reported edits")
-        report_interface = ReportInterface()
-        report_interface.create_entries_for_reported_edits(options["include_in_progress"])
+        ReportInterface().create_entries_for_reported_edits(options["include_in_progress"])
