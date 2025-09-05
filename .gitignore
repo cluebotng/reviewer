@@ -4,6 +4,9 @@ config.yaml
 # Byte compiled files
 *.py[cod]
 
+# Collected files
+/static/
+
 # Development tooling
 ve/
 .tox/
