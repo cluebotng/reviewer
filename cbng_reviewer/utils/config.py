@@ -66,7 +66,7 @@ def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
         # Testing defaults
         cfg["mysql"]["default"] |= {"host": "127.0.0.1", "port": 3306}
         cfg["mysql"]["replica"] |= {"host": "127.0.0.1", "port": 3306}
-        cfg["redis"] |= {"host": "localhost", "port": 6379}
+        cfg["redis"] |= {"host": "127.0.0.1", "port": 6379}
         cfg["cbng"] |= {"enable_irc_messaging": False, "enable_user_messaging": False}
 
     else:
