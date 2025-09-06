@@ -27,7 +27,10 @@ class EditSetDumper:
             previous_revision = PreviousRevision.objects.get(edit=edit)
         except PreviousRevision.DoesNotExist:
             logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no previous revision")
-            return None
+            if not current_revision.is_creation:
+                logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no previous revision")
+                return None
+            previous_revision = None
 
         wp_edit = ET.Element("WPEdit")
 
@@ -50,14 +53,15 @@ class EditSetDumper:
         ET.SubElement(common, "num_recent_reversions").text = str(training_data.page_num_recent_reverts)
 
         current = ET.SubElement(wp_edit, "current")
-        ET.SubElement(current, "minor").text = "true" if current_revision.minor else "false"
+        ET.SubElement(current, "minor").text = "true" if current_revision.is_minor else "false"
         ET.SubElement(current, "timestamp").text = str(current_revision.timestamp)
         ET.SubElement(current, "text").text = current_revision.text.decode("utf-8")
 
         previous = ET.SubElement(wp_edit, "previous")
-        ET.SubElement(previous, "minor").text = "true" if previous_revision.minor else "false"
-        ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
-        ET.SubElement(previous, "text").text = previous_revision.text.decode("utf-8")
+        if previous_revision:
+            ET.SubElement(previous, "minor").text = "true" if previous_revision.is_minor else "false"
+            ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
+            ET.SubElement(previous, "text").text = previous_revision.text.decode("utf-8")
 
         if edit.status != 2:
             ET.SubElement(wp_edit, "reviewStatus").text = edit.get_status_display()

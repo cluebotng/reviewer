@@ -76,8 +76,17 @@ class Edit(models.Model):
         has_training_data = all(
             [
                 TrainingData.objects.filter(edit=self).exists(),
-                CurrentRevision.objects.filter(edit=self).exists(),
-                PreviousRevision.objects.filter(edit=self).exists(),
+                any(
+                    [
+                        all(
+                            [
+                                CurrentRevision.objects.filter(edit=self).exists(),
+                                PreviousRevision.objects.filter(edit=self).exists(),
+                            ]
+                        ),
+                        CurrentRevision.objects.filter(edit=self, is_creation=True).exists(),
+                    ]
+                ),
             ]
         )
         if self.has_training_data != has_training_data:
@@ -149,14 +158,15 @@ class Classification(models.Model):
 
 class CurrentRevision(models.Model):
     edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
-    minor = models.BooleanField()
+    is_minor = models.BooleanField()
+    is_creation = models.BooleanField()
     timestamp = models.IntegerField()
     text = models.BinaryField()
 
 
 class PreviousRevision(models.Model):
     edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
-    minor = models.BooleanField()
+    is_minor = models.BooleanField()
     timestamp = models.IntegerField()
     text = models.BinaryField()
 

@@ -70,11 +70,11 @@ class EditSetParserTestCase(TestCase):
         self.assertEqual(edit.num_recent_reversions, 3)
         self.assertEqual(edit.is_vandalism, False)
 
-        self.assertEqual(edit.current.minor, True)
+        self.assertEqual(edit.current.is_minor, True)
         self.assertEqual(edit.current.text, "current")
         self.assertEqual(edit.current.timestamp, datetime(1970, 1, 1, 0, 20, 34))
 
-        self.assertEqual(edit.previous.minor, False)
+        self.assertEqual(edit.previous.is_minor, False)
         self.assertEqual(edit.previous.text, "previous")
         self.assertEqual(edit.previous.timestamp, datetime(1970, 1, 1, 0, 20, 30))
 

@@ -19,7 +19,7 @@ def replica_test_sql_file(file_name):
 
 
 class WikipediaReplicaTransactionTestCase(TransactionTestCase):
-    databases = {"default", "replica"}
+    databases = {"replica"}
 
     def setUp(self):
         super().setUp()

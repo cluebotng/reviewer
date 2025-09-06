@@ -12,14 +12,16 @@ class WpRevision:
     user: Optional[str] = None
     comment: Optional[str] = None
     text: Optional[str] = None
-    minor: bool = False
+    is_minor: bool = False
+    is_creation: bool = False
+    revision_id: Optional[int] = None
 
     @property
     def has_complete_training_data(self) -> bool:
         return self.timestamp is not None and self.text is not None
 
     def __str__(self) -> str:
-        return f"WpRevision<{self.edit_id}>"
+        return f"WpRevision<{self.revision_id}>"
 
     @staticmethod
     def from_xml(data: Dict[str, Any]) -> Optional["WpRevision"]:
@@ -27,7 +29,7 @@ class WpRevision:
             return None
         return WpRevision(
             timestamp=datetime.fromtimestamp(int(data["timestamp"])),
-            minor=data.get("minor") == "true",
+            is_minor=data.get("minor") == "true",
             text=data.get("text"),
         )
 
