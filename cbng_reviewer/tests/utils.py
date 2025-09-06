@@ -1,6 +1,4 @@
-import hashlib
 import logging
-import uuid
 from typing import Optional
 
 from django.conf import settings
@@ -10,7 +8,7 @@ from django.test import TransactionTestCase
 logger = logging.getLogger(__name__)
 
 
-def replica_test_sql_file(file_name):
+def load_replica_sql(file_name):
     def decorator(func):
         setattr(func, "_test_sql_file_name", file_name)
         return func
@@ -19,21 +17,22 @@ def replica_test_sql_file(file_name):
 
 
 class WikipediaReplicaTransactionTestCase(TransactionTestCase):
-    databases = {"replica"}
+    databases = {"default", "replica"}
 
     def setUp(self):
         super().setUp()
 
+        # Ensure we have a clean database
         conn = connections["replica"]
 
-        # Note: The database already has a `test_` prefix,
-        #       set the name explicitly, to avoid a double prefix.
-        #       Apply a random suffix to avoid conflicts if we run paralell tests
-        instance = hashlib.sha256(uuid.uuid4().bytes).hexdigest()[-6:]
-        conn.settings_dict["TEST"] |= {"NAME": f'{conn.settings_dict["NAME"]}_{instance}'}
+        # The `test_` prefix has already been added to the name,
+        # explicitly set the test name to avoid a double prefix
+        conn.settings_dict["TEST"]["NAME"] = conn.settings_dict["NAME"]
 
-        conn.creation.create_test_db(verbosity=0, autoclobber=True, keepdb=False)
+        # Create an empty test db
+        conn.creation.create_test_db(autoclobber=True)
 
+        # Load the base schema and requested data into the test db
         self._load_sql_to_test_database()
 
     def _get_test_sql_file_name(self) -> Optional[str]:

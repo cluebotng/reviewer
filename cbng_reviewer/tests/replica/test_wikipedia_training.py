@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
-from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, replica_test_sql_file
+from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, load_replica_sql
 
 
 class WikipediaTrainingTestCase(WikipediaReplicaTransactionTestCase):
 
-    @replica_test_sql_file("page_creation_metadata")
+    @load_replica_sql("page_creation_metadata")
     # Database based
     def testGetPageCreationMetadata(self):
         wikipedia_training = WikipediaTraining()
@@ -20,7 +20,7 @@ class WikipediaTrainingTestCase(WikipediaReplicaTransactionTestCase):
         self.assertIsNone(created_at)
         self.assertIsNone(created_by)
 
-    @replica_test_sql_file("page_recent_edit_count")
+    @load_replica_sql("page_recent_edit_count")
     def testGetPageRecentEditCount(self):
         wikipedia_training = WikipediaTraining()
         recent_edit_count = wikipedia_training.get_page_recent_edit_count(
@@ -28,7 +28,7 @@ class WikipediaTrainingTestCase(WikipediaReplicaTransactionTestCase):
         )
         self.assertEqual(recent_edit_count, 5)
 
-    @replica_test_sql_file("page_recent_revert_count")
+    @load_replica_sql("page_recent_revert_count")
     def testGetPageRecentRevertCount(self):
         wikipedia_training = WikipediaTraining()
         recent_edit_count = wikipedia_training.get_page_recent_revert_count(
@@ -36,13 +36,13 @@ class WikipediaTrainingTestCase(WikipediaReplicaTransactionTestCase):
         )
         self.assertEqual(recent_edit_count, 1)
 
-    @replica_test_sql_file("user_edit_count")
+    @load_replica_sql("user_edit_count")
     def testGetUserEditCount(self):
         wikipedia_training = WikipediaTraining()
         recent_edit_count = wikipedia_training.get_user_edit_count("Example User", datetime(2021, 4, 3))
         self.assertEqual(recent_edit_count, 6)
 
-    @replica_test_sql_file("user_warning_count")
+    @load_replica_sql("user_warning_count")
     def testGetUserWarningCount(self):
         wikipedia_training = WikipediaTraining()
         recent_warning_count = wikipedia_training.get_user_warning_count("Example User", datetime(2025, 7, 15))

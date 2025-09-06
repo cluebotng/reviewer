@@ -8,22 +8,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ "ruff", "djlint", "bandit", "test", "black" ]
+        target:
+          - ruff
+          - djlint
+          - bandit
+          - black
+          - test-unit
+          - test-replica
+          - test-integration
+          - test-interactive
     runs-on: ubuntu-latest
     continue-on-error: true
 
     services:
       selenium:
-        image: ${{ matrix.target == 'test' && 'selenium/standalone-chrome' || '' }}
+        image: ${{ matrix.target == 'test-interactive' && 'selenium/standalone-chrome' || '' }}
         options: --shm-size=2gb
 
       mysql:
-        image: ${{ matrix.target == 'test' && 'mariadb' || '' }}
+        image: ${{ startswith(matrix.target, 'test-') && 'mariadb' || '' }}
         env: { "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD": "1" }
         ports: [3306:3306]
 
       redis:
-        image: ${{ matrix.target == 'test' && 'redis' || '' }}
+        image: ${{ startswith(matrix.target, 'test-') && 'redis' || '' }}
         ports: [6379:6379]
 
     steps:
@@ -33,7 +41,7 @@ jobs:
           do
             sleep 1
           done
-        if: matrix.target == 'test'
+        if: startswith(matrix.target, 'test-')
 
       - name: Setup database access
         run: |
@@ -47,7 +55,7 @@ jobs:
           # Parallel / custom pattern
           mysql -h 127.0.0.1 -u root -e 'GRANT ALL PRIVILEGES ON `test_cbng_reviewer_%`.* TO `cbng_reviewer`@`%`'
           mysql -h 127.0.0.1 -u root -e 'GRANT ALL PRIVILEGES ON `test_enwiki_p_%`.* TO `cbng_reviewer`@`%`'
-        if: matrix.target == 'test'
+        if: startswith(matrix.target, 'test-')
 
       - uses: actions/checkout@v4
 
@@ -63,15 +71,8 @@ jobs:
       - name: Install python dependencies
         run: poetry install --with test
 
-      - name: Run Django tests
-        run: |
-          poetry run ./manage.py collectstatic
-          poetry run ./manage.py test
-        if: matrix.target == 'test'
-
       - name: Run tox target
         run: poetry run tox --current-env -e ${{ matrix.target }}
-        if: matrix.target != 'test'
 
   container:
     runs-on: ubuntu-latest

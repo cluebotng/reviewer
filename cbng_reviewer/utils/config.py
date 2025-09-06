@@ -1,9 +1,20 @@
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any
 
 import yaml
 from deepmerge import always_merger
+
+
+def detect_if_running_in_test() -> bool:
+    if len(sys.argv) >= 2 and sys.argv[0].endswith("manage.py") and sys.argv[1] == "test":
+        return True
+
+    if "PYTEST_VERSION" in os.environ:
+        return True
+
+    return False
 
 
 def _load_yaml(path: Path) -> Dict[str, Any]:

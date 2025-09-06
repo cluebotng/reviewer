@@ -7,15 +7,32 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Package the source
-        run: |
-          tar -cvf reviewer.tar.gz *
-
-      - name: Crease a release
-        uses: ncipollo/release-action@v1
+      - name: Create GitHub release
+        uses: actions/github-script@v8
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          artifacts: "reviewer.tar.gz"
+          script: |
+            try {
+              const release = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: tag
+              });
+
+              console.log(`Release already exists for tag: ${release.data.name}`);
+              return
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Release ${{ needs.release.outputs.version }}',
+              tag_name: '${{ needs.release.outputs.version }}',
+              draft: false,
+              prerelease: false,
+              generate_release_notes: true,
+            });
+            console.log(`Created release for tag: ${release.data.name}`);

@@ -3,11 +3,11 @@ from datetime import datetime, timedelta
 from django.conf import settings
 
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
-from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, replica_test_sql_file
+from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, load_replica_sql
 
 
 class WikipediaReaderTestCase(WikipediaReplicaTransactionTestCase):
-    @replica_test_sql_file("sampled_revisions")
+    @load_replica_sql("sampled_revisions")
     def testSampledEdits(self):
         current_time = datetime.now()
         sampled_edits = WikipediaReader().get_sampled_edits(
