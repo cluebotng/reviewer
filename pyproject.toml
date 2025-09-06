@@ -29,6 +29,9 @@ ruff = "*"
 djlint = "*"
 bandit = "*"
 selenium = "*"
+pytest-django = "*"
+pytest = "*"
+pytest-xdist = "*"
 
 [tool.ruff]
 exclude = ['*/migrations/*', 've/*', '.tox/*']
@@ -48,6 +51,16 @@ extend-exclude = '''
   ^.*/migrations/.*
 )
 '''
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "cbng_reviewer.settings"
+addopts = "--strict-markers"
+markers = [
+    "unmarked",
+    "replica",
+    "integration",
+    "interactive",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

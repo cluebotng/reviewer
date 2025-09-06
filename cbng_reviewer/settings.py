@@ -3,10 +3,10 @@ from pathlib import Path
 
 import prometheus_client
 
-from cbng_reviewer.utils.config import load_config
+from cbng_reviewer.utils.config import load_config, detect_if_running_in_test
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-IN_TEST = (sys.argv[0].endswith("manage.py") and sys.argv[1] == "test") if len(sys.argv) >= 2 else False
+IN_TEST = detect_if_running_in_test()
 CONFIG = load_config(BASE_DIR, IN_TEST)
 
 SECRET_KEY = CONFIG["django"]["secret_key"]
