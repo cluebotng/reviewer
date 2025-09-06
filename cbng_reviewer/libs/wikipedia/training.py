@@ -79,7 +79,7 @@ class WikipediaTraining:
                 "rvstartid": revision_id,
                 "rvlimit": 2,
                 "rvslots": "*",
-                "rvprop": "user|content|flags|timestamp|comment",
+                "rvprop": "ids|user|content|flags|timestamp|comment",
             },
         )
         r.raise_for_status()
@@ -106,9 +106,10 @@ class WikipediaTraining:
             current_revision = WpRevision(
                 timestamp=datetime.fromisoformat(revisions[0]["timestamp"]),
                 user=revisions[0]["user"],
-                minor=self._is_revision_minor(revisions[0]),
+                is_minor=self._is_revision_minor(revisions[0]),
                 comment=revisions[0].get("comment"),
                 text=current_text,
+                revision_id=revisions[0].get("revid"),
             )
 
         if len(revisions) > 1:
@@ -117,12 +118,39 @@ class WikipediaTraining:
                 previous_revision = WpRevision(
                     timestamp=datetime.fromisoformat(revisions[1]["timestamp"]),
                     user=revisions[1]["user"],
-                    minor=self._is_revision_minor(revisions[1]),
+                    is_minor=self._is_revision_minor(revisions[1]),
                     comment=revisions[1].get("comment"),
                     text=previous_text,
+                    revision_id=revisions[0].get("revid"),
                 )
 
         return current_revision, previous_revision
+
+    def get_page_first_revision_id(self, page_title: str) -> Optional[int]:
+        r = requests.get(
+            "https://en.wikipedia.org/w/api.php",
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Page Revisions",
+            },
+            timeout=10,
+            params={
+                "format": "json",
+                "action": "query",
+                "prop": "revisions",
+                "titles": page_title,
+                "rvlimit": 1,
+                "rvdir": "newer",
+                "rvprop": "ids",
+            },
+        )
+        r.raise_for_status()
+        data = r.json()
+
+        if page_data := next(iter(data.get("query", {}).get("pages", {}).values()), None):
+            if revision := next(iter(page_data.get("revisions", [])), []):
+                return revision.get("revid")
+
+        return None
 
     def get_page_creation_metadata(self, page_title: str, namespace: str) -> Tuple[Optional[datetime], Optional[str]]:
         with connections["replica"].cursor() as cursor:
@@ -296,6 +324,11 @@ class WikipediaTraining:
                 wp_edit = replace(wp_edit, current=current_revision)
             if previous_revision.has_complete_training_data:
                 wp_edit = replace(wp_edit, previous=previous_revision, prev_user=previous_revision.user)
+
+        if wp_edit.previous is None and wp_edit.current is not None:
+            if revision_id := self.get_page_first_revision_id(page_title=wp_edit.title):
+                if revision_id == wp_edit.current.revision_id:
+                    wp_edit = replace(wp_edit, current=replace(wp_edit.current, is_creation=True))
 
         if wp_edit.current:
             wp_edit = replace(

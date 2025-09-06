@@ -107,8 +107,10 @@ class ApiEditGroupTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=0,
         )
-        CurrentRevision.objects.create(edit=edit, timestamp=1753826150, minor=False, text=b"Current Text")
-        PreviousRevision.objects.create(edit=edit, timestamp=1753826000, minor=True, text=b"Previous Text")
+        CurrentRevision.objects.create(
+            edit=edit, timestamp=1753826150, is_minor=False, is_creation=False, text=b"Current Text"
+        )
+        PreviousRevision.objects.create(edit=edit, timestamp=1753826000, is_minor=True, text=b"Previous Text")
 
         wp_edit = EditSetDumper().generate_wp_edit(edit)
 
