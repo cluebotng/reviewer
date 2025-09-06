@@ -67,7 +67,7 @@ WSGI_APPLICATION = "cbng_reviewer.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "django_prometheus.db.backends.mysql",
         "NAME": CONFIG["mysql"]["default"]["schema"],
         "HOST": CONFIG["mysql"]["default"]["host"],
         "PORT": CONFIG["mysql"]["default"]["port"],
@@ -76,7 +76,7 @@ DATABASES = {
         "OPTIONS": {"charset": "utf8mb4", "ssl_mode": "DISABLED"},
     },
     "replica": {
-        "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "django_prometheus.db.backends.mysql",
         "NAME": CONFIG["mysql"]["replica"]["schema"],
         "HOST": CONFIG["mysql"]["replica"]["host"],
         "PORT": CONFIG["mysql"]["replica"]["port"],
