@@ -22,13 +22,13 @@ dependencies = [
 package-mode = false
 
 [tool.poetry.group.test.dependencies]
-tox = "4.24.1"
-tox-current-env = "0.0.14"
-black = "25.1.0"
-ruff = "0.9.7"
-djlint = "1.36.4"
-bandit = "1.8.3"
-selenium = "4.34.2"
+tox = "*"
+tox-current-env = "*"
+black = "*"
+ruff = "*"
+djlint = "*"
+bandit = "*"
+selenium = "*"
 
 [tool.ruff]
 exclude = ['*/migrations/*', 've/*', '.tox/*']
