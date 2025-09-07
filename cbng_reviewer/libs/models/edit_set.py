@@ -53,6 +53,9 @@ class WpEdit:
     is_vandalism: bool = None
     current: WpRevision = None
     previous: Optional[WpRevision] = None
+    editdb_source: Optional[str] = None
+    reviewers: Optional[int] = None
+    reviewers_agreeing: Optional[int] = None
 
     def __str__(self) -> str:
         return f"WpEdit<{self.edit_id}>"
@@ -93,7 +96,7 @@ class WpEdit:
             return None
 
         def handle_optional_str(data: Dict[str, Any], key: str) -> Optional[int]:
-            if key in data and len(data[key].strip()) > 0:
+            if key in data and data[key] is not None and len(data[key].strip()) > 0:
                 return data[key]
             return None
 
@@ -112,10 +115,13 @@ class WpEdit:
             # WpRevision instances
             current=WpRevision.from_xml(data["current"]),
             previous=WpRevision.from_xml(data["previous"]),
+            # Review interface data
+            reviewers=handle_optional_int(data, "reviewers"),
+            reviewers_agreeing=handle_optional_int(data, "reviewers_agreeing"),
             # Left over strings
             **{
                 k: handle_optional_str(data, k)
                 for k, v in data.items()
-                if k in {"title", "comment", "user", "creator", "prev_user"}
+                if k in {"title", "comment", "user", "creator", "prev_user", "editdb_source"}
             },
         )
