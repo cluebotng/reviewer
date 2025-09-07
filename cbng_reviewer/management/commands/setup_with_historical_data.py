@@ -118,6 +118,7 @@ class Command(BaseCommand):
                 import_wp_edit_to_edit_group,
                 target_group=target_group,
                 skip_existing=skip_existing,
+                force_status=True,
             )
 
             if local_path:
