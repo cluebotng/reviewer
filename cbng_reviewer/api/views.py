@@ -64,12 +64,16 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     @action(detail=True, url_path="dump-editset")
     def dump(self, *args, **kwargs):
         edit_group = self.get_object()
+
+        all_groups = [edit_group]
+        if self.request.query_params.get("expand") == "1":
+            all_groups = EditGroup.objects.filter(Q(id=edit_group.id) | Q(related_to=edit_group))
+
         dumper = EditSetDumper()
-        target_edits = edit_group.edit_set.filter(Q(status=2) & Q(has_training_data=True))
 
         def _xml_generator():
             yield "<WPEditSet>\n"
-            for edit in target_edits:
+            for edit in Edit.objects.filter(Q(groups__in=all_groups) & Q(status=2) & Q(has_training_data=True)):
                 if wp_edit := dumper.generate_wp_edit(edit, edit_group, True):
                     yield f"{wp_edit}\n"
             yield "</WPEditSet>\n"
