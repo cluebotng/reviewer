@@ -91,7 +91,7 @@ class WpEdit:
     @staticmethod
     def from_xml(data: Dict[str, Any]) -> "WpEdit":
         def handle_optional_int(data: Dict[str, Any], key: str) -> Optional[int]:
-            if key in data:
+            if key in data and data[key]:
                 return int(data[key])
             return None
 
