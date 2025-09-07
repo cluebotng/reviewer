@@ -112,11 +112,11 @@ class ApiEditGroupTestCase(TestCase):
         )
         PreviousRevision.objects.create(edit=edit, timestamp=1753826000, is_minor=True, text=b"Previous Text")
 
-        wp_edit = EditSetDumper().generate_wp_edit(edit)
+        wp_edit = EditSetDumper().generate_wp_edit(edit, edit_group, True)
 
         r = self.client.get(f"/api/v1/edit-groups/{edit_group.id}/dump-editset/")
         self.assertEqual(r.status_code, 200)
 
         # StreamingHttpResponse - iter over map()
         xml = "".join([part.decode("utf-8") for part in r.streaming_content])
-        self.assertEqual(xml, f"<WPEditSet>\n{wp_edit}\n</WPEditSet>\n")
+        assert xml == f"<WPEditSet>\n{wp_edit}\n</WPEditSet>\n"  # nosec:B101

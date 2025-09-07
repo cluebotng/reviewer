@@ -50,18 +50,35 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
     edit.update_training_data_flag(True)
 
 
-def import_wp_edit_to_edit_group(target_group: EditGroup, wp_edit: WpEdit, skip_existing: bool):
+def import_wp_edit_to_edit_group(
+    target_group: EditGroup,
+    wp_edit: WpEdit,
+    skip_existing: bool,
+    dynamic_group_from_source: bool = False,
+    force_status: bool = False,
+):
     edit, created = Edit.objects.get_or_create(id=wp_edit.edit_id)
-    if created:
+    if created or force_status:
         # If we are a new entry, then set that status to what we know
         edit.classification = 0 if wp_edit.is_vandalism else 1
         edit.status = 2
+
+        if wp_edit.reviewers is not None:
+            edit.number_of_reviewers = wp_edit.reviewers
+        if wp_edit.reviewers_agreeing is not None:
+            edit.number_of_agreeing_reviewers = wp_edit.reviewers_agreeing
+
         edit.save()
 
+    group = target_group
+    if dynamic_group_from_source and wp_edit.editdb_source:
+        group, _ = EditGroup.objects.get_or_create(name=wp_edit.editdb_source, related_to=target_group)
+
     # Ensure we exist in the correct group - also for existing edits
-    if not edit.groups.filter(pk=target_group.pk).exists():
-        logger.info(f"Adding {edit.id} to {target_group.name}")
-        edit.groups.add(target_group)
+    if not edit.groups.filter(pk=group.pk).exists():
+        logger.info(f"Adding {edit.id} to {group.name}")
+        edit.groups.add(group)
+        edit.save()
 
     # Add training data as required
     if not (skip_existing and edit.has_training_data):

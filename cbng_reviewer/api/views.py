@@ -1,6 +1,7 @@
 import random
 from typing import Optional
 
+from django.db.models import Q
 from django.http import StreamingHttpResponse, Http404, HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
@@ -64,12 +65,12 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     def dump(self, *args, **kwargs):
         edit_group = self.get_object()
         dumper = EditSetDumper()
-        target_edits = edit_group.edit_set.filter(status=2).filter(has_training_data=True).exclude(classification=None)
+        target_edits = edit_group.edit_set.filter(Q(status=2) & Q(has_training_data=True))
 
         def _xml_generator():
             yield "<WPEditSet>\n"
             for edit in target_edits:
-                if wp_edit := dumper.generate_wp_edit(edit):
+                if wp_edit := dumper.generate_wp_edit(edit, edit_group, True):
                     yield f"{wp_edit}\n"
             yield "</WPEditSet>\n"
 

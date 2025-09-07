@@ -33,9 +33,17 @@ class EditSetParser:
             "num_recent_reversions",
         ]
         self._revision_fields = ["minor", "timestamp", "text"]
+        self._review_interface_fields = ["reviewers", "reviewers_agreeing"]
 
     def _new_processing_context(self, in_edit: bool = False) -> Dict[str, Any]:
-        return {"edit": {"current": {}, "previous": {}}, "in_edit": in_edit, "in_current": False, "in_previous": False}
+        return {
+            "edit": {"current": {}, "previous": {}},
+            "in_edit": in_edit,
+            "in_current": False,
+            "in_previous": False,
+            "in_editdb": False,
+            "in_reviewinterface": False,
+        }
 
     def _process_element(
         self, ctx: Dict[str, Any], context: str, elem: ET.Element
@@ -59,12 +67,12 @@ class EditSetParser:
             return ctx, None
 
         # Handle changing in / out of the <current> / <previous> blocks
-        if elem.tag in {"current", "previous"}:
+        if elem.tag in {"current", "previous", "EditDB", "ReviewInterface"}:
             match context:
                 case "start":
-                    ctx[f"in_{elem.tag}"] = True
+                    ctx[f"in_{elem.tag.lower()}"] = True
                 case "end":
-                    ctx[f"in_{elem.tag}"] = False
+                    ctx[f"in_{elem.tag.lower()}"] = False
             return ctx, None
 
         # We are in the context of the current edit - touch the current data fields
@@ -77,6 +85,18 @@ class EditSetParser:
         if ctx["in_previous"]:
             if context == "end" and elem.tag in self._revision_fields:
                 ctx["edit"]["previous"][elem.tag] = elem.text
+            return ctx, None
+
+        # We are in the context of the editdb - grab the source
+        if ctx["in_editdb"]:
+            if context == "start" and elem.tag == "source":
+                ctx["edit"]["editdb_source"] = elem.text
+            return ctx, None
+
+        # We are in the context of the review interface - grab the stats
+        if ctx["in_reviewinterface"]:
+            if context == "end" and elem.tag in self._review_interface_fields:
+                ctx["edit"][elem.tag] = elem.text
             return ctx, None
 
         # We are in the context of the edit generally - touch the edit data fields

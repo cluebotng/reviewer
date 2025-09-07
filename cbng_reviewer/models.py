@@ -69,6 +69,11 @@ class Edit(models.Model):
     is_deleted = models.BooleanField(default=False)
     has_training_data = models.BooleanField(default=False)
 
+    # Internal metadata
+    last_updated = models.DateTimeField(auto_now_add=True)
+    number_of_reviewers = models.IntegerField(default=0)
+    number_of_agreeing_reviewers = models.IntegerField(default=0)
+
     def update_training_data_flag(self, force: bool = False):
         if self.has_training_data and not force:
             return
@@ -132,9 +137,25 @@ class Edit(models.Model):
                 self.classification = 0
                 self.status = 2
 
+        if self.status == 2:
+            original_number_of_reviewers = self.number_of_reviewers
+            self.number_of_reviewers = Classification.objects.filter(edit=self).count()
+
+            original_number_of_agreeing_reviewers = self.number_of_agreeing_reviewers
+            self.number_of_agreeing_reviewers = Classification.objects.filter(
+                edit=self, classification=self.classification
+            ).count()
+
+            if (
+                self.number_of_reviewers != original_number_of_reviewers
+                or self.number_of_agreeing_reviewers != original_number_of_agreeing_reviewers
+            ):
+                logger.info(
+                    f"Updating {self.id} reviewers to {self.number_of_reviewers} / {self.number_of_agreeing_reviewers}"
+                )
+
         if self.status != original_status or self.classification != original_classification:
             logger.info(f"Updating {self.id} to {self.get_classification_display()} [{self.get_status_display()}]")
-            self.save()
 
         if self.status != original_status and self.status == 2 and self.classification is not None:
             from cbng_reviewer.libs.irc import IrcRelay
@@ -142,6 +163,7 @@ class Edit(models.Model):
 
             IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
 
+        self.save()
         return True
 
 

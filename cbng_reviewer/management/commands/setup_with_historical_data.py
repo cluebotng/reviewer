@@ -17,25 +17,25 @@ from cbng_reviewer.models import User, EditGroup, Edit
 
 logger = logging.getLogger(__name__)
 KNOWN_EDIT_SETS = {
-    "Original Training Set - C - Train": "C/train.xml",
-    "Original Training Set - C - Trail": "C/trial.xml",
-    "Original Training Set - D - Train": "D/train.xml",
-    "Original Training Set - D - Trail": "D/trial.xml",
-    "Original Training Set - D - Bays Train": "D/bayestrain.xml",
-    "Original Training Set - D - All": "D/all.xml",
-    "Original Testing Training Set - Auto - Train": "Auto/train.xml",
-    "Original Testing Training Set - Auto - Trail": "Auto/trial.xml",
-    "Original Testing Training Set - Old Triplet - Train": "OldTriplet/train.xml",
-    "Original Testing Training Set - Old Triplet - Trail": "OldTriplet/trial.xml",
-    "Original Testing Training Set - Old Triplet - Bays Train": "OldTriplet/bayestrain.xml",
-    "Original Testing Training Set - Old Triplet - All": "OldTriplet/all.xml",
-    "Original Testing Training Set - Random Edits 50/50 - Train": "RandomEdits50-50/train.xml",
-    "Original Testing Training Set - Random Edits 50/50 - Trail": "RandomEdits50-50/trial.xml",
-    "Original Testing Training Set - Random Edits 50/50 - All": "RandomEdits50-50/all.xml",
-    "Original Testing Training Set - Very Large - Train": "VeryLarge/train.xml",
-    "Original Testing Training Set - Very Large - Trail": "VeryLarge/trial.xml",
-    "Original Testing Training Set - Very Large - Bays Train": "VeryLarge/bayestrain.xml",
-    "Original Testing Training Set - Very Large - All": "VeryLarge/all.xml",
+    ("Original Training Set - C", "Train"): "C/train.xml",
+    ("Original Training Set - C", "Trail"): "C/trial.xml",
+    ("Original Training Set - D", "Train"): "D/train.xml",
+    ("Original Training Set - D", "Trail"): "D/trial.xml",
+    ("Original Training Set - D", "Bayes Train"): "D/bayestrain.xml",
+    ("Original Training Set - D", "All"): "D/all.xml",
+    ("Original Testing Training Set - Auto", "Train"): "Auto/train.xml",
+    ("Original Testing Training Set - Auto", "Trail"): "Auto/trial.xml",
+    ("Original Testing Training Set - Old Triplet", "Train"): "OldTriplet/train.xml",
+    ("Original Testing Training Set - Old Triplet", "Trail"): "OldTriplet/trial.xml",
+    ("Original Testing Training Set - Old Triplet", "Bays Train"): "OldTriplet/bayestrain.xml",
+    ("Original Testing Training Set - Old Triplet", "All"): "OldTriplet/all.xml",
+    ("Original Testing Training Set - Random Edits 50/50", "Train"): "RandomEdits50-50/train.xml",
+    ("Original Testing Training Set - Random Edits 50/50", "Trail"): "RandomEdits50-50/trial.xml",
+    ("Original Testing Training Set - Random Edits 50/50", "All"): "RandomEdits50-50/all.xml",
+    ("Original Testing Training Set - Very Large", "Train"): "VeryLarge/train.xml",
+    ("Original Testing Training Set - Very Large", "Trail"): "VeryLarge/trial.xml",
+    ("Original Testing Training Set - Very Large", "Bays Train"): "VeryLarge/bayestrain.xml",
+    ("Original Testing Training Set - Very Large", "All"): "VeryLarge/all.xml",
 }
 
 
@@ -44,6 +44,10 @@ class Command(BaseCommand):
         parser.add_argument("--editset-dir")
         parser.add_argument("--editset-name")
         parser.add_argument("--editset-skip-existing", action="store_true", default=False)
+
+        parser.add_argument("--editdb-dir")
+        parser.add_argument("--editdb-name")
+        parser.add_argument("--editdb-skip-existing", action="store_true", default=False)
 
     def _load_file(self, path: str) -> Any:
         with (settings.BASE_DIR / "data" / path).open("r") as fh:
@@ -102,12 +106,13 @@ class Command(BaseCommand):
     ):
         # These come from the 'edit set' files
         editset_parser = EditSetParser()
-        for group_name, path in KNOWN_EDIT_SETS.items():
-            if name and group_name != name:
+        for (parent_group_name, group_name), path in KNOWN_EDIT_SETS.items():
+            if name and f"{parent_group_name} - {group_name}" != name:
                 continue
 
             logger.info(f"Ensuring editset {path}")
-            target_group = EditGroup.objects.get(name=group_name)
+            target_parent_group, _ = EditGroup.objects.get_or_create(name=parent_group_name)
+            target_group, _ = EditGroup.objects.get_or_create(name=group_name, related_to=target_parent_group)
 
             callback_func = functools.partial(
                 import_wp_edit_to_edit_group,
@@ -121,17 +126,51 @@ class Command(BaseCommand):
                     editset_parser.read_file(source_file, callback_func)
             else:
                 with tempfile.NamedTemporaryFile() as file:
-                    source_url = f"https://cluebotng-editsets.toolforge.org/{path}"
+                    source_url = f"https://cluebotng-editsets.toolforge.org/editdb/{path}"
                     target_file = PosixPath(file)
                     logger.info(f"Downloading {source_url} to {target_file.as_posix()}")
                     download_file(target_file, source_url)
                     editset_parser.read_file(target_file, callback_func)
 
+    def _ensure_edit_db_data(
+        self, local_path: Optional[str] = None, name: Optional[str] = None, skip_existing: bool = False
+    ):
+        logger.info(f"Ensuring editdb entries from {name}")
+        target_parent_group, _ = EditGroup.objects.get_or_create(name="Edit DB")
+        editset_parser = EditSetParser()
+
+        callback_func = functools.partial(
+            import_wp_edit_to_edit_group,
+            target_group=target_parent_group,
+            skip_existing=skip_existing,
+            dynamic_group_from_source=True,
+            force_status=True,
+        )
+
+        if local_path:
+            source_file = PosixPath(local_path) / name
+            if source_file.exists():
+                editset_parser.read_file(source_file, callback_func)
+        else:
+            with tempfile.NamedTemporaryFile() as file:
+                source_url = f"https://cluebotng-editsets.toolforge.org/editdb/{name}"
+                target_file = PosixPath(file)
+                logger.info(f"Downloading {source_url} to {target_file.as_posix()}")
+                download_file(target_file, source_url)
+                editset_parser.read_file(target_file, callback_func)
+
     def handle(self, *args: Any, **options: Any) -> None:
-        if not options["editset_name"]:
+        if not options["editset_name"] and not options["editdb_name"]:
             self._ensure_existing_user_accounts_exist()
             self._ensure_existing_access_exists()
             self._ensure_existing_edit_groups_exists()
             self._ensure_historical_statistics()
             self._ensure_historical_report_data()
-        self._ensure_edit_set_data(options["editset_dir"], options["editset_name"], options["editset_skip_existing"])
+
+        if options["editset_name"]:
+            self._ensure_edit_set_data(
+                options["editset_dir"], options["editset_name"], options["editset_skip_existing"]
+            )
+
+        if options["editdb_name"]:
+            self._ensure_edit_db_data(options["editdb_dir"], options["editdb_name"], options["editdb_skip_existing"])

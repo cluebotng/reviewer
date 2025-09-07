@@ -32,6 +32,7 @@ selenium = "*"
 pytest-django = "*"
 pytest = "*"
 pytest-xdist = "*"
+freezegun = "*"
 
 [tool.ruff]
 exclude = ['*/migrations/*', 've/*', '.tox/*']
