@@ -155,7 +155,7 @@ class Command(BaseCommand):
         else:
             with tempfile.NamedTemporaryFile() as file:
                 source_url = f"https://cluebotng-editsets.toolforge.org/editdb/{name}"
-                target_file = PosixPath(file)
+                target_file = PosixPath(file.name)
                 logger.info(f"Downloading {source_url} to {target_file.as_posix()}")
                 download_file(target_file, source_url)
                 editset_parser.read_file(target_file, callback_func)
