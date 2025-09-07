@@ -78,13 +78,13 @@ class EditSetParser:
         # We are in the context of the current edit - touch the current data fields
         if ctx["in_current"]:
             if context == "end" and elem.tag in self._revision_fields:
-                ctx["edit"]["current"][elem.tag] = elem.text
+                ctx["edit"]["current"][elem.tag] = (elem.text or "") if elem.tag == "text" else elem.text
             return ctx, None
 
         # We are in the context of the current edit - touch the previous data fields
         if ctx["in_previous"]:
             if context == "end" and elem.tag in self._revision_fields:
-                ctx["edit"]["previous"][elem.tag] = elem.text
+                ctx["edit"]["previous"][elem.tag] = (elem.text or "") if elem.tag == "text" else elem.text
             return ctx, None
 
         # We are in the context of the editdb - grab the source
