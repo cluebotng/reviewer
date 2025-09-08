@@ -97,7 +97,7 @@ class Edit(models.Model):
         if self.has_training_data != has_training_data:
             logger.info(f"Marking {self.id} has_training_data = {has_training_data}")
             self.has_training_data = has_training_data
-            self.save()
+            self.save(update_fields=["has_training_data"])
 
     def update_classification(
         self,

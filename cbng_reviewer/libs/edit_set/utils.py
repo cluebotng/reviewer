@@ -97,4 +97,4 @@ def mark_edit_as_deleted(edit: Edit):
     if not edit.is_deleted:
         IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
         edit.is_deleted = True
-        edit.save()
+        edit.save(update_fields=["is_deleted"])
