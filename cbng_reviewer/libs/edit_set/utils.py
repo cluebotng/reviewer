@@ -57,7 +57,16 @@ def import_wp_edit_to_edit_group(
     dynamic_group_from_source: bool = False,
     force_status: bool = False,
 ):
-    edit, created = Edit.objects.get_or_create(id=wp_edit.edit_id)
+    try:
+        edit = Edit.objects.get(id=wp_edit.edit_id)
+        created = False
+    except Edit.DoesNotExist:
+        # Avoid triggering the model signals - we manage the whole import process
+        # Otherwise we will try and run `import_training_data` potentially before creating the training data,
+        # resulting in something that might not be what was in the source file
+        edit = Edit.objects.bulk_create([Edit(id=wp_edit.edit_id)])[0]
+        created = True
+
     if created or force_status:
         # If we are a new entry, then set that status to what we know
         edit.classification = 0 if wp_edit.is_vandalism else 1
