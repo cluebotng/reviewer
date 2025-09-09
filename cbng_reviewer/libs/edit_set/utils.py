@@ -85,7 +85,7 @@ def import_wp_edit_to_edit_group(
 
     # Ensure we exist in the correct group - also for existing edits
     if not edit.groups.filter(pk=group.pk).exists():
-        logger.info(f"Adding {edit.id} to {group.name}")
+        logger.info(f"Adding {edit.id} to {group.contextual_name}")
         edit.groups.add(group)
         edit.save()
 
