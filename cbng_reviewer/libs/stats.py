@@ -3,6 +3,7 @@ from typing import Tuple, Optional
 
 import requests
 from django.conf import settings
+from django.db.models import Count
 
 from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
 from cbng_reviewer.models import User
@@ -15,6 +16,11 @@ class Statistics:
         return {
             edit_group.contextual_name: {
                 "weight": edit_group.weight,
+                "unique": (
+                    Edit.objects.annotate(group_count=Count("groups", distinct=True))
+                    .filter(groups=edit_group, group_count=1)
+                    .count()
+                ),
                 "pending": edit_group.edit_set.filter(status=0).count(),
                 "partial": edit_group.edit_set.filter(status=1).count(),
                 "done": edit_group.edit_set.filter(status=2).count(),
@@ -69,11 +75,12 @@ class Statistics:
         return {username: stats for username, stats in user_statistics.items() if stats["total_classifications"] > 0}
 
     def get_internal_statistics(self):
+        latest_classification = next(iter(Classification.objects.all().order_by("-created")), None)
         return [
             ("Number Of Administrators", User.objects.filter(is_admin=True).count()),
             ("Number Of Reviewers", User.objects.filter(is_reviewer=True).count()),
             ("Number Of Pending Accounts", User.objects.filter(is_reviewer=False).count()),
-            ("Last Review", Classification.objects.all().order_by("-created")[0].created),
+            ("Last Review", latest_classification.created if latest_classification else ""),
             ("Number Of Edit Groups", EditGroup.objects.all().count()),
             ("Number Of Edits", Edit.objects.all().count()),
             ("Number Of Edits Marked As Deleted", Edit.objects.filter(is_deleted=True).count()),
@@ -109,6 +116,7 @@ class Statistics:
         for name, stats in sorted(edit_groups.items(), key=lambda s: s[0]):
             markup += "{{/EditGroup\n"
             markup += f"|name={name}\n"
+            markup += f"|unique={stats['unique']}\n"
             markup += f"|weight={stats['weight']}\n"
             markup += f"|notdone={stats['pending']}\n"
             markup += f"|partial={stats['partial']}\n"
