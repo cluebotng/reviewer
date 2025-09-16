@@ -14,14 +14,19 @@
                     pending
                 {% endif %}
             </li>
-            <li><a href="https://en.wikipedia.org/w/index.php?diff={{ edit.id }}">View Diff</a></li>
             {% if edit.is_deleted %}
             <li>Revision or user has been deleted</li>
+            {% else %}
+            <li><a href="https://en.wikipedia.org/w/index.php?diff={{ edit.id }}">View Diff</a></li>
             {% endif %}
             {% if edit.has_training_data %}
             <li>Edit has training data: <a href="https://cluebotng-review.toolforge.org/api/v1/edit/{{ edit.id }}/dump-wpedit/">View WPEdit</a></li>
             {% else %}
-            <li>Edit has no training data, if it is not deleted then the training data should be imported eventually</li>
+            {% if edit.is_deleted %}
+            <li>Impossibly to complete edit has been preserved for historical purposes</li>
+            {% else %}
+            <li>Edit has no training data, the data should be imported within 24 hours</li>
+            {% endif %}
             {% endif %}
         </ul>
         <p>Member of:</p>

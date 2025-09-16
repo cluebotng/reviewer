@@ -100,10 +100,10 @@ def import_wp_edit_to_edit_group(
 
 
 def mark_edit_as_deleted(edit: Edit):
-    from cbng_reviewer.libs.irc import IrcRelay
-    from cbng_reviewer.libs.messages import Messages
-
     if not edit.is_deleted:
+        from cbng_reviewer.libs.irc import IrcRelay
+        from cbng_reviewer.libs.messages import Messages
+
         IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
         edit.is_deleted = True
         edit.save(update_fields=["is_deleted"])
