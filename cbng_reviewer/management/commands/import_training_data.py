@@ -25,8 +25,7 @@ class Command(BaseCommand):
 
     def _handle_edit(self, edit: Edit):
         if self._wikipedia_reader.has_revision_been_deleted(edit.id):
-            logger.info("Found deleted revision, skipping training data and marking as deleted")
-            mark_edit_as_deleted(edit)
+            logger.info("Found deleted revision, skipping training data import")
             return
 
         wp_edit = self._wikipedia_training.build_wp_edit(edit)

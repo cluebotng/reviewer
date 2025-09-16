@@ -53,4 +53,4 @@ class Messages:
         )
 
     def notify_irc_about_edit_deletion(self, edit: Edit) -> Message:
-        return Message(body=f"\x0314[[\x035 Edit Has Been Deleted \x0314]]\x0301 {edit.id}")
+        return Message(body=f"\x0314[[\x035 Edit Has Been Marked As Deleted \x0314]]\x0301 {edit.id}")

@@ -37,23 +37,24 @@ class Command(BaseCommand):
         # then keep the data around - it can be used for training
         if edit.status == 2 and edit.has_training_data:
             logger.info(f"Keeping edit {edit.id} with local data")
-        else:
-            # We are an incomplete edit without training data, we can never be used for training.
-            # Cleanup any (partial) associated data
-            Classification.objects.filter(edit=edit).delete()
-            TrainingData.objects.filter(edit=edit).delete()
-            CurrentRevision.objects.filter(edit=edit).delete()
-            PreviousRevision.objects.filter(edit=edit).delete()
+            mark_edit_as_deleted(edit)
+            return
 
-            # If we are in one of the review groups, then keep the 'meta' entry around for export/reporting purposes
-            if set(edit.groups.values_list("id", flat=True)) & self._review_groups:
-                logger.info(f"Keeping dangling edit {edit.id}")
-            else:
-                logger.info(f"Removing dangling edit {edit.id}")
-                edit.delete()
+        # We are an incomplete edit without training data, we can never be used for training.
+        # Cleanup any (partial) associated data
+        Classification.objects.filter(edit=edit).delete()
+        TrainingData.objects.filter(edit=edit).delete()
+        CurrentRevision.objects.filter(edit=edit).delete()
+        PreviousRevision.objects.filter(edit=edit).delete()
 
-        # Set the flag
-        mark_edit_as_deleted(edit)
+        # If we are in one of the review groups, then keep the 'meta' entry around for export/reporting purposes
+        if set(edit.groups.values_list("id", flat=True)) & self._review_groups:
+            logger.info(f"Keeping dangling edit {edit.id}")
+            mark_edit_as_deleted(edit)
+            return
+
+        logger.info(f"Removing dangling edit {edit.id}")
+        edit.delete()
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Update edit deletion flag."""
