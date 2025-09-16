@@ -28,8 +28,7 @@ def import_training_data(edit_id: int, force: bool = False) -> None:
         return
 
     if WikipediaReader().has_revision_been_deleted(edit.id):
-        logger.info(f"Edit has been deleted, marking as such: {edit.id}")
-        mark_edit_as_deleted(edit)
+        logger.info(f"Found deleted revision for {edit.id}, skipping training data import")
         return
 
     logger.info(f"Fetching training data for {edit.id}")
