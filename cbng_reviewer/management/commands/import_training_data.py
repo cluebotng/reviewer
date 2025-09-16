@@ -4,7 +4,7 @@ from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 
-from cbng_reviewer.libs.edit_set.utils import import_training_data, mark_edit_as_deleted
+from cbng_reviewer.libs.edit_set.utils import import_training_data
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
 from cbng_reviewer.models import Edit
