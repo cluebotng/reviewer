@@ -144,7 +144,7 @@ class Statistics:
 
         markup += "{{/UserHeader}}\n"
 
-        for username, stats in sorted(users.items(), key=lambda s: s[1]["total_classifications"]):
+        for username, stats in sorted(users.items(), key=lambda s: s[1]["total_classifications"], reverse=True):
             markup += "{{/User\n"
             markup += f"|nick={username}\n"
             markup += f"|admin={'true' if stats['is_admin'] else 'false'}\n"
@@ -153,7 +153,7 @@ class Statistics:
             markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
             markup += "}}\n"
 
-        for username, edit_count in sorted(historical_users, key=lambda s: s[1]):
+        for username, edit_count in sorted(historical_users, key=lambda s: s[1], reverse=True):
             markup += "{{/User\n"
             markup += f"|nick={username}\n"
             markup += "|legacy=true\n"
