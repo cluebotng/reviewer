@@ -27,6 +27,7 @@ class WikipediaReader:
         return revision_id in bad_revision_ids
 
     def get_user(self, username: str) -> Tuple[Optional[int], List[str]]:
+        # Note: We ask enwiki specifically as we want the wiki rights
         r = requests.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -48,6 +49,25 @@ class WikipediaReader:
             return user_data.get("centralids", {}).get("CentralAuth"), user_data.get("rights", [])
 
         return None, []
+
+    def get_username(self, user_id: int) -> Optional[str]:
+        # Note: We ask meta wiki as it 'owns' central auth
+        r = requests.get(
+            "https://meta.wikipedia.org/w/api.php",
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Central Auth User Username",
+            },
+            timeout=10,
+            params={
+                "format": "json",
+                "action": "query",
+                "meta": "globaluserinfo",
+                "guiid": user_id,
+            },
+        )
+        r.raise_for_status()
+        data = r.json()
+        return data.get("query", {}).get("globaluserinfo", {}).get("name")
 
     def get_sampled_edits(self, namespace_id: int, start: datetime, end: datetime, quantity: int):
         with connections["replica"].cursor() as cursor:
