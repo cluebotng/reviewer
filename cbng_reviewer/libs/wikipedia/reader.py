@@ -10,11 +10,6 @@ logger = logging.getLogger(__name__)
 
 class WikipediaReader:
     def has_revision_been_deleted(self, revision_id: int) -> bool:
-        # This is similar to get_page_revisions & get_edit_metadata but,
-        # we explicitly check for the removal keys.
-        # If this returns true we will start trashing data, so it is quite specific
-
-        # First get the page title
         r = requests.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -24,63 +19,12 @@ class WikipediaReader:
             params={
                 "format": "json",
                 "action": "query",
-                "rawcontinue": 1,
-                "prop": "revisions",
-                "rvslots": "*",
                 "revids": revision_id,
             },
         )
         r.raise_for_status()
-        page_data = r.json()
-
-        if "badrevids" in page_data.get("query", {}).keys():
-            return True
-
-        page_title = next(iter(page_data.get("query", {}).get("pages", {}).values()), {}).get("title")
-        if not page_title:
-            return True
-
-        # Now get the revision data
-        r = requests.get(
-            "https://en.wikipedia.org/w/api.php",
-            headers={
-                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Check For Revision Deletion",
-            },
-            timeout=10,
-            params={
-                "format": "json",
-                "action": "query",
-                "prop": "revisions",
-                "titles": page_title,
-                "rvstartid": revision_id,
-                "rvlimit": 2,
-                "rvslots": "*",
-                "rvprop": "user|content",
-            },
-        )
-        r.raise_for_status()
-        data = r.json()
-
-        if "badrevids" in data.get("query", {}).keys():
-            return True
-
-        revisions = next(iter(data.get("query", {}).get("pages", {}).values()), {}).get("revisions", [])
-
-        current_revision = next(iter(revisions[0]["slots"].values()), {})
-        previous_revision = {}
-        if len(revisions) > 1:
-            previous_revision = next(iter(revisions[1]["slots"].values()), {})
-
-        return any(
-            [
-                "texthidden" in previous_revision,
-                "userhidden" in previous_revision,
-                "suppressed" in previous_revision,
-                "texthidden" in current_revision,
-                "userhidden" in current_revision,
-                "suppressed" in current_revision,
-            ]
-        )
+        bad_revision_ids = {entry["revid"] for entry in r.json()["query"].get("badrevids", {}).values()}
+        return revision_id in bad_revision_ids
 
     def get_user(self, username: str) -> Tuple[Optional[int], List[str]]:
         r = requests.get(
