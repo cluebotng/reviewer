@@ -72,7 +72,7 @@ class Statistics:
                     "accuracy_classifications": accuracy_classifications,
                 }
 
-        return {username: stats for username, stats in user_statistics.items() if stats["total_classifications"] > 0}
+        return user_statistics
 
     def get_internal_statistics(self):
         latest_classification = next(iter(Classification.objects.all().order_by("-created")), None)

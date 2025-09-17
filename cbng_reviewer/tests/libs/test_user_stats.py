@@ -7,12 +7,6 @@ from cbng_reviewer.models import User, Edit, Classification
 
 
 class UserStatsTestCase(TestCase):
-    def testFilteringNoEdits(self):
-        User.objects.create(username="test-1", is_reviewer=True)
-        User.objects.create(username="test-2", is_reviewer=True)
-        user_stats = Statistics().get_user_statistics()
-        self.assertEqual(user_stats, {})
-
     def testFilteringReviewers(self):
         User.objects.create(username="test-1")
         User.objects.create(username="test-2", is_reviewer=True)
