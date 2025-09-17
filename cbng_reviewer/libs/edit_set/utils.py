@@ -105,5 +105,4 @@ def mark_edit_as_deleted(edit: Edit):
         from cbng_reviewer.libs.messages import Messages
 
         IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
-        edit.is_deleted = True
-        edit.save(update_fields=["is_deleted"])
+        Edit.objects.filter(id=edit.id).update(is_deleted=True)
