@@ -131,7 +131,7 @@ class Statistics:
             return None
 
         markup = "{{/EditGroupHeader}}\n"
-        for name, stats in sorted(edit_groups.items(), key=lambda s: (s[1]['unique'], s[0])):
+        for name, stats in sorted(edit_groups.items(), key=lambda s: (s[1]["unique"], s[0])):
             markup += "{{/EditGroup\n"
             markup += f"|name={name}\n"
             markup += f"|unique={stats['unique']}\n"
@@ -147,7 +147,8 @@ class Statistics:
         for username, stats in sorted(users.items(), key=lambda s: s[1]["total_classifications"], reverse=True):
             markup += "{{/User\n"
             markup += f"|nick={username}\n"
-            markup += f"|admin={'true' if stats['is_admin'] else 'false'}\n"
+            if stats["is_admin"]:
+                markup += "|admin=true\n"
             markup += f"|count={stats['total_classifications']}\n"
             markup += f"|accuracy={stats['accuracy'] if stats['accuracy'] else 'NaN'}\n"
             markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
