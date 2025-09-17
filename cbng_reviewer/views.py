@@ -11,6 +11,7 @@ from cbng_reviewer.models import User
 
 
 def home(request):
+    statistics = Statistics()
     return render(
         request,
         "cbng_reviewer/home.html",
@@ -18,8 +19,9 @@ def home(request):
             "user_statistics": sorted(
                 [
                     (username, stats["total_classifications"])
-                    for username, stats in Statistics().get_user_statistics().items()
-                ],
+                    for username, stats in statistics.get_user_statistics().items()
+                ]
+                + [(username, edit_count) for username, edit_count in statistics.get_historical_user_statistics()],
                 key=lambda x: x[1],
                 reverse=True,
             ),

@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 import requests
 from django.conf import settings
@@ -90,6 +90,23 @@ class Statistics:
             ("Number Of Previous Revision Entries", PreviousRevision.objects.all().count()),
         ]
 
+    def get_historical_user_statistics(self) -> List[Tuple[str, int]]:
+        return [
+            ("tonyb", 15),
+            ("Dvyjones2", 40),
+            ("woz2", 156),
+            ("Mentifisto", 5),
+            ("Cit Helper", 305),
+            ("Logan-old", 55),
+            ("Matthewrbowker", 16),
+            ("Zachlipton", 54),
+            ("BlastOButter42", 8),
+            ("Dvyjones3", 5),
+            ("Helder.wiki", 26),
+            ("Harsh_2580", 21),
+            ("AddWittyUserName", 9),
+        ]
+
     def get_external_statistics(self):
         r = requests.get(
             "https://cluebotng.toolforge.org/api/",
@@ -106,6 +123,7 @@ class Statistics:
 
     def generate_wikimarkup(self) -> Optional[str]:
         users = self.get_user_statistics(True)
+        historical_users = self.get_historical_user_statistics()
         edit_groups = self.get_edit_group_statistics()
 
         # We expect data - don't wipe the current page if we didn't find some
@@ -133,6 +151,13 @@ class Statistics:
             markup += f"|count={stats['total_classifications']}\n"
             markup += f"|accuracy={stats['accuracy'] if stats['accuracy'] else 'NaN'}\n"
             markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
+            markup += "}}\n"
+
+        for username, edit_count in sorted(historical_users, key=lambda s: s[1]):
+            markup += "{{/User\n"
+            markup += f"|nick={username}\n"
+            markup += "|legacy=true\n"
+            markup += f"|count={edit_count}\n"
             markup += "}}\n"
 
         markup += "{{/UserFooter}}\n"
