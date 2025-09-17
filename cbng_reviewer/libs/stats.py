@@ -131,7 +131,7 @@ class Statistics:
             return None
 
         markup = "{{/EditGroupHeader}}\n"
-        for name, stats in sorted(edit_groups.items(), key=lambda s: s[0]):
+        for name, stats in sorted(edit_groups.items(), key=lambda s: (s[1]['unique'], s[0])):
             markup += "{{/EditGroup\n"
             markup += f"|name={name}\n"
             markup += f"|unique={stats['unique']}\n"
