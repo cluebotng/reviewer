@@ -1,7 +1,7 @@
 name: Deploy
 on: { push: { tags: [ 'v*' ] } }
 jobs:
-  deploy:
+  update-components:
     runs-on: ubuntu-latest
     steps:
       - uses: cluebotng/ci-update-component-ref@main
@@ -11,7 +11,7 @@ jobs:
           ref: '${{ github.ref }}'
           gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
 
-  webservice:
+  deploy-webservice:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
