@@ -4,20 +4,34 @@ concurrency:
   group: ${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      tox_envs: ${{ steps.list_envs.outputs.tox_envs }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
+          cache: 'pip'
+      - name: Install tox
+        run: pip install tox
+      - id: list_envs
+        run: |
+          tox_envs=$(
+            tox --listenvs | \
+            jq -Rnc '[inputs | sub("\\.yml$"; "")]'
+          )
+          echo "tox_envs=${tox_envs}" >> $GITHUB_OUTPUT
+
   tox:
+    runs-on: ubuntu-latest
+    needs: [setup]
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - ruff
-          - djlint
-          - bandit
-          - black
-          - test-unit
-          - test-replica
-          - test-integration
-          - test-interactive
-    runs-on: ubuntu-latest
+        target: ${{ fromJson(needs.setup.outputs.tox_envs) }}
     continue-on-error: true
 
     services:
