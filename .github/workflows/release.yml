@@ -4,7 +4,7 @@ permissions:
   deployments: write
   contents: write
 jobs:
-  release:
+  create-release:
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub release
