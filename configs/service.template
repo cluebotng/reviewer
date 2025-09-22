@@ -1,3 +1,0 @@
-buildservice-image: tool-cluebotng-review/haproxy:latest
-mount: none
-health-check-path: /_/health

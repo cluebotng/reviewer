@@ -10,12 +10,3 @@ jobs:
           component: 'cluebotng-reviewer'
           ref: '${{ github.ref }}'
           gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
-
-  deploy-webservice:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cluebotng/ci-execute-fabric@main
-        with:
-          task: deploy-webservice
-          ssh_key: ${{ secrets.CI_SSH_KEY }}

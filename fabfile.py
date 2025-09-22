@@ -34,27 +34,12 @@ def _push_file_to_remote(file_name: str, replace_vars: Optional[Dict[str, Any]] 
     c.sudo(f"bash -c \"base64 -d <<< '{encoded_contents}' > '{target_path}'\"")
 
 
-def _build_haproxy():
-    c.sudo(
-        f"XDG_CONFIG_HOME={TOOL_DIR} toolforge build start "
-        "-L -i haproxy https://github.com/cluebotng/external-haproxy.git"
-    )
-
-
 def _update_jobs():
     _push_file_to_remote(
         "jobs.yaml",
         {"tool_dir": TOOL_DIR.as_posix()},
     )
     c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge jobs load {(TOOL_DIR / 'jobs.yaml').as_posix()}")
-
-
-def _hack_kubernetes_objects():
-    """Deal with direct kubernetes objects [T400940]."""
-    network_policy = _get_file_contents("network-policy.yaml")
-
-    encoded_contents = base64.b64encode(network_policy.encode("utf-8")).decode("utf-8")
-    c.sudo(f'bash -c "base64 -d <<<{encoded_contents} | kubectl apply -f-"')
 
 
 @task()
@@ -96,11 +81,3 @@ def disable_user_messaging(_ctx):
 @task()
 def deploy_jobs(_ctx):
     _update_jobs()
-    _hack_kubernetes_objects()
-
-
-@task()
-def deploy_webservice(_ctx):
-    _build_haproxy()
-    _push_file_to_remote("service.template")
-    c.sudo(f"XDG_CONFIG_HOME={TOOL_DIR} toolforge webservice buildservice restart")
