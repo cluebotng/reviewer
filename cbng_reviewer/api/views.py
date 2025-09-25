@@ -22,6 +22,12 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     queryset = EditGroup.objects.all()
     serializer_class = EditGroupSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.query_params.get("exclude_empty_editsets") == "1":
+            return queryset.filter(edit__status=2, edit__has_training_data=True).distinct()
+        return queryset
+
     @action(detail=True, url_path="dump-report-status")
     def report_status(self, *args, **kwargs):
         edit_group = self.get_object()
@@ -113,7 +119,7 @@ def store_edit_classification(request):
 @reviewer_required()
 @api_view()
 def get_next_edit_id_for_review(request):
-    # Check each edit group (highest weight first)
+    # Check each edit group (the highest weight first)
     edits_already_classified = set(Classification.objects.filter(user=request.user).values_list("edit_id", flat=True))
     for edit_group in EditGroup.objects.filter(weight__gt=0).order_by("-weight"):
         if (
