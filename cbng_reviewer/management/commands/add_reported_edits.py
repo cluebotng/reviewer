@@ -1,14 +1,15 @@
 import logging
 from typing import Any
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 
 from cbng_reviewer.libs.report_interface import ReportInterface
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--include-in-progress", action="store_true")
 

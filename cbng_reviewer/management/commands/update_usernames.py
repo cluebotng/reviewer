@@ -1,16 +1,16 @@
 import logging
 from typing import Any
 
-from django.core.management import BaseCommand
 from social_django.models import UserSocialAuth
 
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def handle(self, *args: Any, **options: Any) -> None:
         """Update user username's to match CentralAuth."""
         wikipedia_reader = WikipediaReader()

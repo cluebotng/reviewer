@@ -1,15 +1,14 @@
 import logging
 from typing import Any
 
-from django.core.management import BaseCommand
-
 from cbng_reviewer.libs.stats import Statistics
 from cbng_reviewer.libs.wikipedia.management import WikipediaManagement
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def handle(self, *args: Any, **options: Any) -> None:
         """Export stats to wikipedia."""
         statistics = Statistics()

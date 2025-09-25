@@ -2,7 +2,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 
 from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
@@ -14,11 +14,12 @@ from cbng_reviewer.models import (
     CurrentRevision,
     PreviousRevision,
 )
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def __init__(self, *args, **kwargs):
         self._wikipedia_reader = WikipediaReader()
         self._review_groups = set(EditGroup.objects.filter(group_type=1).values_list("id", flat=True))

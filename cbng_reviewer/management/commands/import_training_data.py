@@ -2,17 +2,18 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 
 from cbng_reviewer.libs.edit_set.utils import import_training_data
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
 from cbng_reviewer.models import Edit
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def __init__(self, *args, **kwargs):
         self._wikipedia_reader = WikipediaReader()
         self._wikipedia_training = WikipediaTraining()
