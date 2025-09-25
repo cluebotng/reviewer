@@ -1,15 +1,15 @@
 import logging
 from typing import Any
 
-from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 
 from cbng_reviewer.libs.utils import notify_user_review_rights_granted, create_user_with_central_auth_mapping
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("username")
 

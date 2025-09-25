@@ -1,14 +1,13 @@
 import logging
 from typing import Any
 
-from django.core.management import BaseCommand
-
 from cbng_reviewer.models import EditGroup, Edit
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def handle(self, *args: Any, **options: Any) -> None:
         """Add dangling edits to group."""
         dangling_edits = []

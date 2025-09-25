@@ -2,15 +2,15 @@ import logging
 from typing import Any, Dict, List
 
 import requests
-from django.core.management import BaseCommand
 from django.core.management.base import CommandParser
 
 from cbng_reviewer.models import User, Edit, Classification
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
 

@@ -3,15 +3,16 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from django.conf import settings
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import EditGroup, Edit
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
 

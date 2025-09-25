@@ -3,15 +3,15 @@ from datetime import datetime, timedelta, UTC
 from typing import Any
 
 from django.conf import settings
-from django.core.management import BaseCommand
 from django.db.models import Q
 
 from cbng_reviewer.models import User, Classification
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def handle(self, *args: Any, **options: Any) -> None:
         """Cleanup user records for those with no rights."""
         cutoff_limit = datetime.now(tz=UTC) - timedelta(days=settings.CBNG_CLEANUP_USER_DAYS)

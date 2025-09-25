@@ -6,7 +6,7 @@ from pathlib import PosixPath
 from typing import Any, Optional
 
 from django.conf import settings
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 from social_django.models import UserSocialAuth
 
 from cbng_reviewer.libs.edit_set.parser import EditSetParser
@@ -14,6 +14,7 @@ from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
 from cbng_reviewer.libs.utils import download_file
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User, EditGroup, Edit
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 KNOWN_EDIT_SETS = {
@@ -39,7 +40,7 @@ KNOWN_EDIT_SETS = {
 }
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--editset-dir")
         parser.add_argument("--editset-name")

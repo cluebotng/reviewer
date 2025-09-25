@@ -2,14 +2,15 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import CommandParser
 
 from cbng_reviewer.models import Edit
+from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
         parser.add_argument("--workers", type=int, default=5)
