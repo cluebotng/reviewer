@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db import transaction
 
 from cbng_reviewer.libs.models.edit_set import WpEdit
 from cbng_reviewer.models import EditGroup, Edit, TrainingData, PreviousRevision, CurrentRevision
@@ -103,6 +104,6 @@ def mark_edit_as_deleted(edit: Edit):
     if not edit.is_deleted:
         from cbng_reviewer.libs.irc import IrcRelay
         from cbng_reviewer.libs.messages import Messages
-
+        with transaction.atomic():
+            Edit.objects.filter(id=edit.id).update(is_deleted=True)
         IrcRelay().send_message(Messages().notify_irc_about_edit_deletion(edit))
-        Edit.objects.filter(id=edit.id).update(is_deleted=True)
