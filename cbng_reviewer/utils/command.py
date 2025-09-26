@@ -37,10 +37,10 @@ def send_metrics_to_pushgateway(command: str):
             timeout=2,
         )
     except Exception as e:
-        logger.warning(f"Exception occurred while sending metrics to pushgateway: {e}")
+        logger.debug(f"Exception occurred while sending metrics to pushgateway: {e}")
     else:
         if r.status_code != 200:
-            logger.warning(f"Failed to send metrics to pushgateway: {r.status_code} / {r.text}")
+            logger.debug(f"Failed to send metrics to pushgateway: {r.status_code} / {r.text}")
 
 
 class CommandWithMetrics(BaseCommand, ABC):
