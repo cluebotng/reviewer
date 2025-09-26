@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 @dataclass
@@ -28,6 +28,13 @@ class WikipediaPage:
 
 
 @dataclass
-class CentralUser:
+class CentralWikiUser:
     id: int
     username: str
+
+
+@dataclass
+class LocalWikiUser:
+    username: str
+    rights: List[str]
+    groups: List[str]

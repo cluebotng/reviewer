@@ -56,10 +56,12 @@ class User(AbstractUser):
             logger.info(f"Creating social-auth mapping for {self.username} ({self.id}) to {central_id}")
             UserSocialAuth.objects.create(provider=settings.SOCIAL_AUTH_BACKEND_NAME, user_id=self.id, uid=central_id)
         else:
-            if f'{social_auth_obj.uid}' == f'{central_id}':
+            if f"{social_auth_obj.uid}" == f"{central_id}":
                 logger.debug(f"social-auth mapping for {self.username} ({self.id}) to {central_id} already exists")
             else:
-                logger.info(f"Updating social-auth mapping for {self.username} ({self.id}) to {central_id} from {social_auth_obj.uid}")
+                logger.info(
+                    f"Updating social-auth mapping for {self.username} ({self.id}) to {central_id} from {social_auth_obj.uid}"
+                )
                 social_auth_obj.uid = central_id
                 social_auth_obj.save()
 
