@@ -21,3 +21,12 @@ class WikipediaReaderTestCase(TestCase):
     def testCentralAuthUserMissing(self):
         wikipedia_reader = WikipediaReader()
         self.assertIsNone(wikipedia_reader.get_central_user(uuid.uuid4().hex))
+
+    def testLocalUserLookup(self):
+        wikipedia_reader = WikipediaReader()
+        self.assertIn("rollback", wikipedia_reader.get_local_user("DamianZaremba").rights),
+        self.assertIn("rollbacker", wikipedia_reader.get_local_user("DamianZaremba").groups),
+
+    def testLocalUserMissing(self):
+        wikipedia_reader = WikipediaReader()
+        self.assertIsNone(wikipedia_reader.get_local_user(uuid.uuid4().hex))
