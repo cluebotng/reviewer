@@ -7,12 +7,10 @@ from typing import Any, Optional
 
 from django.conf import settings
 from django.core.management import CommandParser
-from social_django.models import UserSocialAuth
 
 from cbng_reviewer.libs.edit_set.parser import EditSetParser
 from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
-from cbng_reviewer.libs.utils import download_file
-from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
+from cbng_reviewer.libs.utils import download_file, create_user
 from cbng_reviewer.models import User, EditGroup, Edit
 from cbng_reviewer.utils.command import CommandWithMetrics
 
@@ -55,19 +53,9 @@ class Command(CommandWithMetrics):
             return json.loads(fh.read())
 
     def _ensure_existing_user_accounts_exist(self):
-        wikipedia_reader = WikipediaReader()
         logger.info("Ensuring user accounts")
         for username in self._load_file("user_accounts.json"):
-            if not User.objects.filter(username=username).exists():
-                user = User.objects.create(username=username)
-
-                # If the user has a central uid map it to our internal user,
-                # so when they authenticate with OAuth things just work
-                central_uid, _ = wikipedia_reader.get_user(username)
-                if central_uid:
-                    UserSocialAuth.objects.create(provider="mediawiki", uid=central_uid, user_id=user.id)
-                else:
-                    logger.warning(f"Not creating mapping for {username} due to no central auth id")
+            create_user(username, require_central_id=False, auto_grant_rights=False)
 
     def _ensure_existing_access_exists(self):
         logger.info("Ensuring user access")

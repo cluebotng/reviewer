@@ -1,9 +1,11 @@
 import logging
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
+from social_django.models import UserSocialAuth
 
 from cbng_reviewer.hooks import (
     notify_irc_about_deleted_account,
@@ -38,6 +40,30 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     is_bot = models.BooleanField(default=False)
     historical_edit_count = models.IntegerField(default=0)
+
+    @property
+    def central_user_id(self) -> Optional[int]:
+        try:
+            return UserSocialAuth.objects.get(provider=settings.SOCIAL_AUTH_BACKEND_NAME, user_id=self.id).uid
+        except UserSocialAuth.DoesNotExist:
+            return None
+
+    @central_user_id.setter
+    def central_user_id(self, central_id: int):
+        try:
+            social_auth_obj = UserSocialAuth.objects.get(provider=settings.SOCIAL_AUTH_BACKEND_NAME, user_id=self.id)
+        except UserSocialAuth.DoesNotExist:
+            logger.info(f"Creating social-auth mapping for {self.username} ({self.id}) to {central_id}")
+            UserSocialAuth.objects.create(provider=settings.SOCIAL_AUTH_BACKEND_NAME, user_id=self.id, uid=central_id)
+        else:
+            if social_auth_obj.central_id == central_id:
+                logger.info(f"social-auth mapping for {self.username} ({self.id}) to {central_id} already exists")
+            else:
+                logger.info(
+                    f"Updating social-auth mapping for {self.username} ({self.id}) to {central_id} from {social_auth_obj.central_id}"
+                )
+                social_auth_obj.central_id = central_id
+                social_auth_obj.save()
 
 
 class EditGroup(models.Model):

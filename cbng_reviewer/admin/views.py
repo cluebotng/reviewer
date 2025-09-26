@@ -5,7 +5,7 @@ from cbng_reviewer.admin.forms import EditGroupForm, AddUserForm
 from cbng_reviewer.libs.django import admin_required
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
-from cbng_reviewer.libs.utils import create_user_with_central_auth_mapping
+from cbng_reviewer.libs.utils import create_user
 from cbng_reviewer.models import User, EditGroup, Edit, Classification
 
 
@@ -19,16 +19,8 @@ def users(request):
     if request.method == "POST":
         form = AddUserForm(request.POST)
         if form.is_valid():
-            if user := create_user_with_central_auth_mapping(form.cleaned_data["username"]):
-                if not user.is_reviewer:
-                    user.is_reviewer = True
-                    user.save()
-                    # Note: Don't send the user an email, assume this is a special case of discussion elsewhere
-                    IrcRelay().send_message(Messages().notify_irc_about_granted_reviewer_access(user))
-
-                    messages.add_message(request, messages.SUCCESS, "User created with reviewer rights")
-                else:
-                    messages.add_message(request, messages.SUCCESS, "User is already reviewer")
+            if user := create_user(form.cleaned_data["username"], grant_reviewer_rights=True):
+                messages.add_message(request, messages.SUCCESS, f"{user.username} has access with reviewer rights")
             else:
                 messages.add_message(
                     request, messages.ERROR, "The specified username could not be found in the central auth database"

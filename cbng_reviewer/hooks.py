@@ -7,16 +7,10 @@ logger = logging.getLogger(__name__)
 
 def notify_irc_about_pending_account(instance, created, **kwargs):
     if created:
-        from cbng_reviewer import tasks
         from cbng_reviewer.libs.irc import IrcRelay
         from cbng_reviewer.libs.messages import Messages
 
         IrcRelay().send_message(Messages().notify_irc_about_pending_account(instance))
-
-        try:
-            tasks.update_user_access_from_rights.apply_async([instance.id])
-        except kombu.exceptions.OperationalError as e:
-            logger.error(f"Failed to create update_edit_classification task: {e}")
 
 
 def notify_irc_about_deleted_account(instance, **kwargs):

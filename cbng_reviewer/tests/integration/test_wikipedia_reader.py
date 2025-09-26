@@ -16,8 +16,8 @@ class WikipediaReaderTestCase(TestCase):
 
     def testCentralAuthUserLookup(self):
         wikipedia_reader = WikipediaReader()
-        self.assertEqual(wikipedia_reader.get_user("DamianZaremba")[0], 8219921)
+        self.assertEqual(wikipedia_reader.get_central_user("DamianZaremba").id, 8219921)
 
     def testCentralAuthUserMissing(self):
         wikipedia_reader = WikipediaReader()
-        self.assertIsNone(wikipedia_reader.get_user(uuid.uuid4().hex)[0])
+        self.assertIsNone(wikipedia_reader.get_central_user(uuid.uuid4().hex))

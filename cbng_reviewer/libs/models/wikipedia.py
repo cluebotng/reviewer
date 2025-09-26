@@ -25,3 +25,9 @@ class WikipediaRevision:
 class WikipediaPage:
     creation_user: str
     creation_time: datetime
+
+
+@dataclass
+class CentralUser:
+    id: int
+    username: str
