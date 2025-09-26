@@ -8,9 +8,10 @@ from typing import Any, Optional
 from django.conf import settings
 from django.core.management import CommandParser
 
+from cbng_reviewer.libs.auth.utils import create_user
 from cbng_reviewer.libs.edit_set.parser import EditSetParser
 from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
-from cbng_reviewer.libs.utils import download_file, create_user
+from cbng_reviewer.libs.utils import download_file
 from cbng_reviewer.models import User, EditGroup, Edit
 from cbng_reviewer.utils.command import CommandWithMetrics
 

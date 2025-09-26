@@ -2,6 +2,7 @@ import functools
 import logging
 from typing import Tuple, Optional
 
+from cbng_reviewer.libs.auth.notifications import notify_user_review_rights_granted
 from cbng_reviewer.libs.models.wikipedia import LocalWikiUser
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User
@@ -83,8 +84,4 @@ class AutoReviewerRightsChecker:
             logger.info(f"Marking {user.username} as a reviewer: {reason}")
             user.is_reviewer = True
             user.save()
-
-            # Note: IRC, but not via Mail
-            from cbng_reviewer.libs.utils import notify_user_review_rights_granted
-
             notify_user_review_rights_granted(user, notify_user=notify_user, reason=reason)
