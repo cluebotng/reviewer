@@ -1,10 +1,10 @@
 import logging
 from pathlib import PosixPath
-from typing import Optional, List
+from typing import Optional
 
 import requests
-from social_django.models import UserSocialAuth
 
+from cbng_reviewer.libs.auth.rights import AutoReviewerRightsChecker
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
 from cbng_reviewer.libs.wikipedia.management import WikipediaManagement
@@ -21,27 +21,23 @@ def notify_user_review_rights_granted(user: User, notify_user: bool = True, reas
         WikipediaManagement().send_user_message(user.username, messages.notify_user_about_reviewer_access(user))
 
 
-def update_access_from_rights(user: User, user_rights: List[str]) -> None:
-    for right in ["rollback", "block", "deleterevision", "editprotected"]:
-        if right in user_rights and not user.is_reviewer:
-            logger.info(f"Marking {user.username} as a reviewer based on {right} right")
-            user.is_reviewer = True
-            user.save()
-            notify_user_review_rights_granted(user, notify_user=False, reason=f"user has '{right}' rights")
+def create_user(
+    username: str, require_central_id: bool = True, grant_reviewer_rights: bool = False, auto_grant_rights: bool = True
+) -> Optional[User]:
+    central_user = WikipediaReader().get_central_user(username=username)
+    if not central_user and require_central_id:
+        return None
 
+    user, _ = User.objects.get_or_create(username=username)
+    if central_user:
+        user.central_user_id = central_user.id
 
-def create_user_with_central_auth_mapping(username: str) -> Optional[User]:
-    central_uid, user_rights = WikipediaReader().get_user(username)
-    if central_uid:
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            user = User.objects.create(username=username)
-            UserSocialAuth.objects.create(provider="mediawiki", uid=central_uid, user_id=user.id)
-
-        update_access_from_rights(user, user_rights)
-        return user
-    return None
+    if grant_reviewer_rights:
+        user.is_reviewer = True
+        user.save()
+    elif auto_grant_rights:
+        AutoReviewerRightsChecker().execute(user)
+    return user
 
 
 def download_file(

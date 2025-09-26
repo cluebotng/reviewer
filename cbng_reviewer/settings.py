@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import prometheus_client
+from social_core.pipeline import DEFAULT_AUTH_PIPELINE
 
 from cbng_reviewer.utils.config import load_config, detect_if_running_in_test
 
@@ -107,12 +108,13 @@ SOCIAL_AUTH_MEDIAWIKI_KEY = CONFIG["oauth"]["key"]
 SOCIAL_AUTH_MEDIAWIKI_SECRET = CONFIG["oauth"]["secret"]
 SOCIAL_AUTH_MEDIAWIKI_URL = "https://meta.wikimedia.org/w/index.php"
 SOCIAL_AUTH_MEDIAWIKI_CALLBACK = "oob"
+SOCIAL_AUTH_PIPELINE = DEFAULT_AUTH_PIPELINE + ("cbng_reviewer.libs.auth.pipeline.check_for_auto_reviewer_rights",)
 
-AUTHENTICATION_BACKENDS = [
-    "social_core.backends.mediawiki.MediaWiki",
-]
+SOCIAL_AUTH_BACKEND_NAME = "mediawiki"
+AUTHENTICATION_BACKENDS = ["social_core.backends.mediawiki.MediaWiki"]
+
 AUTH_USER_MODEL = "cbng_reviewer.User"
-LOGIN_URL = "/oauth/login/mediawiki/"
+LOGIN_URL = f"/oauth/login/{SOCIAL_AUTH_BACKEND_NAME}/"
 LOGIN_REDIRECT_URL = "/"
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ["groups"]
 

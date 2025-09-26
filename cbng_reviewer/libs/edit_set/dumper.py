@@ -1,6 +1,6 @@
 import logging
-from xml.etree import ElementTree as ET  # nosec: B405
 from typing import Optional
+from xml.etree import ElementTree as ET  # nosec: B405
 
 from django.conf import settings
 

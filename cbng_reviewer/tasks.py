@@ -34,15 +34,3 @@ def import_training_data(edit_id: int, force: bool = False) -> None:
     wp_edit = WikipediaTraining().build_wp_edit(edit)
     if wp_edit.has_complete_training_data:
         utils.import_training_data(edit, wp_edit)
-
-
-@shared_task
-def update_user_access_from_rights(user_id: int) -> None:
-    from cbng_reviewer.models import User
-    from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
-    from cbng_reviewer.libs.utils import update_access_from_rights
-
-    user = User.objects.get(id=user_id)
-    central_uid, user_rights = WikipediaReader().get_user(user.username)
-    if central_uid:
-        update_access_from_rights(user, user_rights)

@@ -5,7 +5,7 @@ from django.core.management.base import CommandParser
 
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
-from cbng_reviewer.libs.utils import create_user_with_central_auth_mapping
+from cbng_reviewer.libs.utils import create_user
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class Command(CommandWithMetrics):
         messages = Messages()
         irc_relay = IrcRelay()
 
-        if user := create_user_with_central_auth_mapping(options["username"]):
+        if user := create_user(options["username"], auto_grant_rights=False):
             if user.is_admin:
                 logger.info(f"{user.username} is already an admin")
             else:
