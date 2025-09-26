@@ -3,7 +3,8 @@ from typing import Any
 
 from django.core.management.base import CommandParser
 
-from cbng_reviewer.libs.utils import notify_user_review_rights_granted, create_user
+from cbng_reviewer.libs.auth.notifications import notify_user_review_rights_granted
+from cbng_reviewer.libs.auth.utils import create_user
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
