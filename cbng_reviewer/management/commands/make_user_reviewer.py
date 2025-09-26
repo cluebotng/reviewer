@@ -24,4 +24,4 @@ class Command(CommandWithMetrics):
                 user.is_reviewer = True
                 user.save()
 
-                notify_user_review_rights_granted(user)
+                notify_user_review_rights_granted(user, notify_user=True)
