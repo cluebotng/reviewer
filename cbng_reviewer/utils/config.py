@@ -63,7 +63,10 @@ def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
         "irc_relay": {
             "host": os.environ.get("IRC_RELAY_HOST", "irc-relay"),
             "port": 3334,
-            "channel": "#wikipedia-en-cbngreview",
+            "channel": {
+                "admin": "#wikipedia-en-cbngreview",
+                "feed": "#wikipedia-en-cbngreview-feed",
+            },
         },
         "redis": {
             "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng-review.svc.tools.local"),

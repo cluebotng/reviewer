@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class IrcRelay:
     def send_message(self, message: Message, channel: Optional[str] = None) -> bool:
-        target_channel = channel if channel else settings.IRC_RELAY_CHANNEL
+        target_channel = channel if channel else message.channel
         text = message.body.strip() if message.body else None
 
         if not target_channel or not text:

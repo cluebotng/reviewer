@@ -37,3 +37,11 @@ def import_training_data_for_edit(instance, created, **kwargs):
             tasks.import_training_data.apply_async([instance.id])
         except kombu.exceptions.OperationalError as e:
             logger.error(f"Failed to create import_training_data task: {e}")
+
+
+def notify_irc_about_pending_edit(instance, created, **kwargs):
+    if created:
+        from cbng_reviewer.libs.irc import IrcRelay
+        from cbng_reviewer.libs.messages import Messages
+
+        IrcRelay().send_message(Messages().notify_irc_about_edit_pending(instance))

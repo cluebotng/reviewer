@@ -12,6 +12,7 @@ from cbng_reviewer.hooks import (
     notify_irc_about_pending_account,
     update_edit_classification_from_classification,
     import_training_data_for_edit,
+    notify_irc_about_pending_edit,
 )
 
 logger = logging.getLogger(__name__)
@@ -187,7 +188,10 @@ class Edit(models.Model):
             from cbng_reviewer.libs.irc import IrcRelay
             from cbng_reviewer.libs.messages import Messages
 
-            IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
+            if self.status == 1:
+                IrcRelay().send_message(Messages().notify_irc_about_edit_in_progress(self))
+            elif self.status == 2:
+                IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
 
         self.save()
         return True
@@ -245,3 +249,4 @@ if not settings.IN_TEST:
     post_save.connect(notify_irc_about_pending_account, sender=User)
     post_save.connect(update_edit_classification_from_classification, sender=Classification)
     post_save.connect(import_training_data_for_edit, sender=Edit)
+    post_save.connect(notify_irc_about_pending_edit, sender=Edit)

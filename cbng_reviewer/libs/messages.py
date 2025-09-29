@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from django.conf import settings
 from django.template import loader
 from django.utils.html import escape
 
@@ -49,8 +50,24 @@ class Messages:
 
     def notify_irc_about_edit_completion(self, edit: Edit) -> Message:
         return Message(
-            body=f"\x0314[[\x036 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]"
+            body=f"\x0314[[\x036 Review Completed \x0314]]\x0301 {edit.id} classified as {edit.get_classification_display()} [{edit.get_status_display()}]",
+            channel=settings.IRC_RELAY_CHANNEL_FEED,
         )
 
     def notify_irc_about_edit_deletion(self, edit: Edit) -> Message:
-        return Message(body=f"\x0314[[\x035 Edit Has Been Marked As Deleted \x0314]]\x0301 {edit.id}")
+        return Message(
+            body=f"\x0314[[\x035 Edit Has Been Marked As Deleted \x0314]]\x0301 {edit.id}",
+            channel=settings.IRC_RELAY_CHANNEL_FEED,
+        )
+
+    def notify_irc_about_edit_pending(self, edit: Edit) -> Message:
+        return Message(
+            body=f"\x0314[[\x032 New Edit Pending Review \x0314]]\x0301 {edit.id}",
+            channel=settings.IRC_RELAY_CHANNEL_FEED,
+        )
+
+    def notify_irc_about_edit_in_progress(self, edit: Edit) -> Message:
+        return Message(
+            body=f"\x0314[[\x032 Edit Review In Progress \x0314]]\x0301 {edit.id}",
+            channel=settings.IRC_RELAY_CHANNEL_FEED,
+        )
