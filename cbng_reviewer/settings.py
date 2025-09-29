@@ -197,7 +197,7 @@ WIKIPEDIA_NAMESPACE_ID_TO_NAME = {v: k for k, v in WIKIPEDIA_NAMESPACE_NAME_TO_I
 
 IRC_RELAY_HOST = CONFIG["irc_relay"]["host"]
 IRC_RELAY_PORT = CONFIG["irc_relay"]["port"]
-IRC_RELAY_SYNC = CONFIG["irc_relay"]["sync"]
+IRC_RELAY_USE_HTTP = CONFIG["irc_relay"]["use_http"]
 IRC_RELAY_CHANNEL_ADMIN = CONFIG["irc_relay"]["channel"]["admin"]
 IRC_RELAY_CHANNEL_FEED = CONFIG["irc_relay"]["channel"]["feed"]
 

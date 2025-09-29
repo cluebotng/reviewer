@@ -62,8 +62,8 @@ def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
         },
         "irc_relay": {
             "host": os.environ.get("IRC_RELAY_HOST", "irc-relay"),
-            "port": 3334,
-            "sync": True,
+            "port": 9334,
+            "use_http": True,
             "channel": {
                 "admin": "#wikipedia-en-cbngreview",
                 "feed": "#wikipedia-en-cbngreview-feed",
