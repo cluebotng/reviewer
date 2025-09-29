@@ -1,7 +1,7 @@
 ---
 # Until `port_protocol` is supported in components (T401994)
 - name: irc-relay
-  image: tool-cluebotng-review/irc-relay:latest
+  image: tool-cluebotng-review/irc-relay-placeholder:latest
   command: run-relay
   continuous: true
   port: 3334/udp
