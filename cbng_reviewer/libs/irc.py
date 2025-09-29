@@ -26,8 +26,16 @@ class IrcRelay:
         logger.info(f"Sending to IRC Relay: {payload}")
 
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-                sock.sendto(payload, (settings.IRC_RELAY_HOST, settings.IRC_RELAY_PORT))
+            if settings.IRC_RELAY_SYNC:
+                # TCP
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                    sock.settimeout(1)
+                    sock.connect((settings.IRC_RELAY_HOST, settings.IRC_RELAY_PORT))
+                    sock.send(payload)
+            else:
+                # UDP
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                    sock.sendto(payload, (settings.IRC_RELAY_HOST, settings.IRC_RELAY_PORT))
         except socket.gaierror as e:
             if e.errno == 8:
                 logger.debug(f"Could not connect to IRC Relay {payload}: {e}")
