@@ -1190,22 +1190,22 @@ tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pyproject-api"
-version = "1.9.1"
+version = "1.10.0"
 description = "API to interact with the python pyproject.toml based projects"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "pyproject_api-1.9.1-py3-none-any.whl", hash = "sha256:7d6238d92f8962773dd75b5f0c4a6a27cce092a14b623b811dba656f3b628948"},
-    {file = "pyproject_api-1.9.1.tar.gz", hash = "sha256:43c9918f49daab37e302038fc1aed54a8c7a91a9fa935d00b9a485f37e0f5335"},
+    {file = "pyproject_api-1.10.0-py3-none-any.whl", hash = "sha256:8757c41a79c0f4ab71b99abed52b97ecf66bd20b04fa59da43b5840bac105a09"},
+    {file = "pyproject_api-1.10.0.tar.gz", hash = "sha256:40c6f2d82eebdc4afee61c773ed208c04c19db4c4a60d97f8d7be3ebc0bbb330"},
 ]
 
 [package.dependencies]
 packaging = ">=25"
 
 [package.extras]
-docs = ["furo (>=2024.8.6)", "sphinx-autodoc-typehints (>=3.2)"]
-testing = ["covdefaults (>=2.3)", "pytest (>=8.3.5)", "pytest-cov (>=6.1.1)", "pytest-mock (>=3.14)", "setuptools (>=80.3.1)"]
+docs = ["furo (>=2025.9.25)", "sphinx-autodoc-typehints (>=3.5.1)"]
+testing = ["covdefaults (>=2.3)", "pytest (>=8.4.2)", "pytest-cov (>=7)", "pytest-mock (>=3.15.1)", "setuptools (>=80.9)"]
 
 [[package]]
 name = "pysocks"
@@ -1610,14 +1610,14 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rich"
-version = "14.1.0"
+version = "14.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.8.0"
 groups = ["test"]
 files = [
-    {file = "rich-14.1.0-py3-none-any.whl", hash = "sha256:536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f"},
-    {file = "rich-14.1.0.tar.gz", hash = "sha256:e497a48b844b0320d45007cdebfeaeed8db2a4f4bcf49f15e455cfc4af11eaa8"},
+    {file = "rich-14.2.0-py3-none-any.whl", hash = "sha256:76bc51fe2e57d2b1be1f96c524b890b816e334ab4c1e45888799bfaab0021edd"},
+    {file = "rich-14.2.0.tar.gz", hash = "sha256:73ff50c7c0c1c77c8243079283f4edb376f0f6442433aecb8ce7e6d0b92d1fe4"},
 ]
 
 [package.dependencies]
@@ -1702,14 +1702,14 @@ files = [
 
 [[package]]
 name = "social-auth-app-django"
-version = "5.5.1"
+version = "5.6.0"
 description = "Python Social Authentication, Django integration."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "social_auth_app_django-5.5.1-py3-none-any.whl", hash = "sha256:7a6aac52686b9703af57ad1f5935c55fb97404988067e94c4fa32143bc6a02a5"},
-    {file = "social_auth_app_django-5.5.1.tar.gz", hash = "sha256:a1435c17227d07d690b06cca54ea47d4ed939de4749dac45dd4393c8a98dac17"},
+    {file = "social_auth_app_django-5.6.0-py3-none-any.whl", hash = "sha256:43ca88cc5cd9161710896165ced58b3155e8aafaaff847e859879194770f138d"},
+    {file = "social_auth_app_django-5.6.0.tar.gz", hash = "sha256:c695501fcbf6fe87f68f5a79e379abe853662f5129e7ec6cb758a75d5b28c888"},
 ]
 
 [package.dependencies]
@@ -1717,18 +1717,18 @@ Django = ">=5.1"
 social-auth-core = ">=4.4,<5.0"
 
 [package.extras]
-dev = ["coverage (>=3.6)", "django-stubs (==5.2.1)", "django-stubs-ext (==5.2.1)", "mypy (==1.16.1)", "pre-commit", "pyright (==1.1.402)", "tox"]
+dev = ["coverage (>=3.6)", "django-stubs (==5.2.7)", "django-stubs-ext (==5.2.7)", "mypy (==1.18.2)", "pre-commit", "pyright (==1.1.406)", "tox"]
 
 [[package]]
 name = "social-auth-core"
-version = "4.8.0"
+version = "4.8.1"
 description = "Python social authentication made simple."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "social_auth_core-4.8.0-py3-none-any.whl", hash = "sha256:ce38786618790d96a86e27d79d369076fe4fb0414ec5d4bf3fc2cff07e678d87"},
-    {file = "social_auth_core-4.8.0.tar.gz", hash = "sha256:d355047d9d6d2caf39990909a585a51d90cc8fd55a897b6180bf69855237766c"},
+    {file = "social_auth_core-4.8.1-py3-none-any.whl", hash = "sha256:9fe54f7c7d566465ae34b165bfe1c0d3ba8fa1f7042dc17df5e7dcef8675f3a0"},
+    {file = "social_auth_core-4.8.1.tar.gz", hash = "sha256:6186576eb4e9f25c789d0ce19b942cc668a3a714a246f9e688c0fb93f65bf111"},
 ]
 
 [package.dependencies]
@@ -1743,9 +1743,8 @@ requests-oauthlib = ">=2.0.0"
 all = ["social-auth-core[azuread]", "social-auth-core[google-onetap]", "social-auth-core[saml]", "social-auth-core[shopify]"]
 allpy3 = ["social-auth-core[all]"]
 azuread = ["cryptography (>=42.0.8)"]
-dev = ["coverage (==7.10.7)", "flake8 (==7.3.0)", "google-auth-stubs (==0.3.0)", "mypy (==1.18.2)", "pyright (==1.1.406)", "pytest (==8.4.2)", "pytest-cov (==7.0.0)", "pytest-github-actions-annotate-failures (==0.3.0)", "pytest-profiling (==1.8.1)", "pytest-xdist (==3.8.0)", "responses (==0.25.8)", "ty (==0.0.1a21)", "types-defusedxml (==0.7.0.20250822)", "types-oauthlib (==3.3.0.20250822)", "types-python-jose (==3.5.0.20250531)", "types-requests (==2.32.4.20250913)", "types-requests-oauthlib (==2.0.0.20250809)"]
+dev = ["coverage (==7.10.7)", "flake8 (==7.3.0)", "google-auth-stubs (==0.3.0)", "mypy (==1.18.2)", "pyright (==1.1.406)", "pytest (==8.4.2)", "pytest-cov (==7.0.0)", "pytest-github-actions-annotate-failures (==0.3.0)", "pytest-profiling (==1.8.1)", "pytest-xdist (==3.8.0)", "responses (==0.25.8)", "ty (==0.0.1a21)", "types-defusedxml (==0.7.0.20250822)", "types-oauthlib (==3.3.0.20250822)", "types-requests (==2.32.4.20250913)", "types-requests-oauthlib (==2.0.0.20250809)"]
 google-onetap = ["google-auth (>=2.40.0,<2.42)"]
-ping = ["python-jose (>=3.4.0,<4.0)"]
 saml = ["python3-saml (>=1.16.0)"]
 shopify = ["ShopifyAPI"]
 
@@ -1813,26 +1812,26 @@ files = [
 
 [[package]]
 name = "tox"
-version = "4.30.3"
+version = "4.31.0"
 description = "tox is a generic virtualenv management and test command line tool"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "tox-4.30.3-py3-none-any.whl", hash = "sha256:a9f17b4b2d0f74fe0d76207236925a119095011e5c2e661a133115a8061178c9"},
-    {file = "tox-4.30.3.tar.gz", hash = "sha256:f3dd0735f1cd4e8fbea5a3661b77f517456b5f0031a6256432533900e34b90bf"},
+    {file = "tox-4.31.0-py3-none-any.whl", hash = "sha256:328f392e6567e46cb0f9b625679456744dde940287dd1b39117627dc4b21d5da"},
+    {file = "tox-4.31.0.tar.gz", hash = "sha256:266381ffef35615ec0d40ae4969a9e43b506017597c0413d6545a603cc8c7561"},
 ]
 
 [package.dependencies]
-cachetools = ">=6.1"
+cachetools = ">=6.2"
 chardet = ">=5.2"
 colorama = ">=0.4.6"
-filelock = ">=3.18"
+filelock = ">=3.20"
 packaging = ">=25"
-platformdirs = ">=4.3.8"
+platformdirs = ">=4.5"
 pluggy = ">=1.6"
 pyproject-api = ">=1.9.1"
-virtualenv = ">=20.31.2"
+virtualenv = ">=20.34"
 
 [[package]]
 name = "tox-current-env"
@@ -1970,14 +1969,14 @@ files = [
 
 [[package]]
 name = "virtualenv"
-version = "20.34.0"
+version = "20.35.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 groups = ["test"]
 files = [
-    {file = "virtualenv-20.34.0-py3-none-any.whl", hash = "sha256:341f5afa7eee943e4984a9207c025feedd768baff6753cd660c857ceb3e36026"},
-    {file = "virtualenv-20.34.0.tar.gz", hash = "sha256:44815b2c9dee7ed86e387b842a84f20b93f7f417f95886ca1996a72a4138eb1a"},
+    {file = "virtualenv-20.35.1-py3-none-any.whl", hash = "sha256:1d9d93cd01d35b785476e2fa7af711a98d40d227a078941695bbae394f8737e2"},
+    {file = "virtualenv-20.35.1.tar.gz", hash = "sha256:041dac43b6899858a91838b616599e80000e545dee01a21172a6a46746472cb2"},
 ]
 
 [package.dependencies]
