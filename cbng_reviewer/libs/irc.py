@@ -25,9 +25,9 @@ class IrcRelay:
 
         # HTTP
         if settings.IRC_RELAY_USE_HTTP:
-            payload = {'channel': target_channel, 'string': text}
+            payload = {"channel": target_channel, "string": text}
             logger.debug(f"Sending to IRC Relay (HTTP): {payload}")
-            r = requests.put(f'http://{settings.IRC_RELAY_HOST}:{settings.IRC_RELAY_PORT}', json=payload, timeout=1)
+            r = requests.put(f"http://{settings.IRC_RELAY_HOST}:{settings.IRC_RELAY_PORT}", json=payload, timeout=1)
             if r.status_code != 200:
                 logger.error(f"Failed to send to IRC Relay (HTTP) {payload}: {r.status_code} / {r.content}")
             return True
