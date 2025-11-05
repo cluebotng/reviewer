@@ -244,6 +244,15 @@ class TrainingData(models.Model):
     page_num_recent_reverts = models.IntegerField()
 
 
+class ScoreData(models.Model):
+    edit = models.OneToOneField(Edit, on_delete=models.CASCADE)
+    reverted = models.FloatField(null=True)
+    training = models.FloatField(null=True)
+
+    def matches(self) -> bool:
+        return self.training is not None and self.training == self.reverted
+
+
 if not settings.IN_TEST:
     pre_delete.connect(notify_irc_about_deleted_account, sender=User)
     post_save.connect(notify_irc_about_pending_account, sender=User)
