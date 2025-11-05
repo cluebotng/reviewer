@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET  # nosec: B405
 
 from django.conf import settings
 
-from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision, EditGroup
+from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision, EditGroup, ScoreData
 
 logger = logging.getLogger(__name__)
 
@@ -111,5 +111,16 @@ class EditSetDumper:
             review_interface = ET.SubElement(wp_edit, "ReviewInterface")
             ET.SubElement(review_interface, "reviewers").text = str(edit.number_of_reviewers)
             ET.SubElement(review_interface, "reviewers_agreeing").text = str(edit.number_of_agreeing_reviewers)
+
+        try:
+            score_data = ScoreData.objects.get(edit=edit)
+        except ScoreData.DoesNotExist:
+            logger.debug(f"Skipping inclusion of scores in WPEdit for {edit.id} due to no data")
+        else:
+            core_scores = ET.SubElement(wp_edit, "core_scores")
+            if score_data.reverted:
+                ET.SubElement(core_scores, "reverted").text = str(score_data.reverted)
+            if score_data.training:
+                ET.SubElement(core_scores, "training").text = str(score_data.training)
 
         return self._xml_to_string(wp_edit, indent_block)
