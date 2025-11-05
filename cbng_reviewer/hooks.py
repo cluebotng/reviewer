@@ -38,6 +38,11 @@ def import_training_data_for_edit(instance, created, **kwargs):
         except kombu.exceptions.OperationalError as e:
             logger.error(f"Failed to create import_training_data task: {e}")
 
+        try:
+            tasks.import_vandalism_score_data.apply_async([instance.id])
+        except kombu.exceptions.OperationalError as e:
+            logger.error(f"Failed to create import_vandalism_score_data task: {e}")
+
 
 def notify_irc_about_pending_edit(instance, created, **kwargs):
     if created:

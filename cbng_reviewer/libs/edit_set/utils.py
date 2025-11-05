@@ -1,10 +1,11 @@
 import logging
+from typing import Optional
 
 from django.conf import settings
 from django.db import transaction
 
 from cbng_reviewer.libs.models.edit_set import WpEdit
-from cbng_reviewer.models import EditGroup, Edit, TrainingData, PreviousRevision, CurrentRevision
+from cbng_reviewer.models import EditGroup, Edit, TrainingData, PreviousRevision, CurrentRevision, ScoreData
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,17 @@ def import_training_data(edit: Edit, wp_edit: WpEdit):
         )
 
     edit.update_training_data_flag(True)
+
+
+def import_score_data(edit: Edit, reverted: Optional[float] = None, training: Optional[float] = None):
+    score_data, _ = ScoreData.objects.get_or_create(edit=edit)
+    if reverted is not None:
+        logger.info(f"[{edit.id}] Setting reverted score to {reverted}")
+        score_data.reverted = reverted
+    if training is not None:
+        logger.info(f"[{edit.id}] Setting training score to {training}")
+        score_data.reverted = training
+    score_data.save()
 
 
 def import_wp_edit_to_edit_group(
