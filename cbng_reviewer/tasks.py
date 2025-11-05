@@ -2,7 +2,10 @@ import logging
 
 from celery import shared_task
 
+from cbng_reviewer.libs.core import Core
 from cbng_reviewer.libs.edit_set import utils
+from cbng_reviewer.libs.edit_set.utils import import_score_data
+from cbng_reviewer.libs.report_interface import ReportInterface
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +37,15 @@ def import_training_data(edit_id: int, force: bool = False) -> None:
     wp_edit = WikipediaTraining().build_wp_edit(edit)
     if wp_edit.has_complete_training_data:
         utils.import_training_data(edit, wp_edit)
+
+        if score := Core().score_edit(edit):
+            import_score_data(edit, training=score)
+
+
+@shared_task
+def import_vandalism_score_data(edit_id: int) -> None:
+    from cbng_reviewer.models import Edit
+
+    edit = Edit.objects.get(id=edit_id)
+    if score := ReportInterface().fetch_vandalism_score(edit):
+        import_score_data(edit, reverted=score)
