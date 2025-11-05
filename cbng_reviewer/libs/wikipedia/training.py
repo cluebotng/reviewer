@@ -190,7 +190,7 @@ class WikipediaTraining:
                 AND
                 `rev_timestamp` > %s
                 AND
-                `rev_timestamp` <= %s
+                `rev_timestamp` < %s
                 """,
                 [
                     settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID[namespace.lower()],
@@ -219,7 +219,7 @@ class WikipediaTraining:
                 AND
                 `rev_timestamp` > %s
                 AND
-                `rev_timestamp` <= %s
+                `rev_timestamp` < %s
                 AND `comment_text` LIKE 'Revert%%'
                 """,
                 [
@@ -243,7 +243,7 @@ class WikipediaTraining:
                 WHERE
                 `rev_actor` = (SELECT actor_id FROM actor WHERE `actor_name` = %s)
                 AND
-                `rev_timestamp` <= %s
+                `rev_timestamp` < %s
                 """,
                 [username, edit_time.strftime("%Y%m%d%H%M%S")],
             )
@@ -263,7 +263,7 @@ class WikipediaTraining:
                 AND
                 `page_title` = %s
                 AND
-                `rev_timestamp` <= %s
+                `rev_timestamp` < %s
                 AND
                 (
                     `comment_text` LIKE '%%warning%%'
@@ -301,7 +301,7 @@ class WikipediaTraining:
                 WHERE
                 `rev_actor` = (SELECT actor_id FROM actor WHERE `actor_name` = %s)
                 AND
-                `rev_timestamp` <= %s
+                `rev_timestamp` < %s
                 """,
                 [username, edit_time.strftime("%Y%m%d%H%M%S")],
             )
