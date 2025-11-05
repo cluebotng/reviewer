@@ -280,10 +280,21 @@ class WikipediaTraining:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
-                -- ClueBot NG Reviewer - Wikipedia - Get User Registration Time
+                -- ClueBot NG Reviewer - Wikipedia - Get User Registration Time - Direct
+                SELECT `user_registration` FROM `user` WHERE `user_name` = %s
+                """,
+                [username],
+            )
+            if row := cursor.fetchone():
+                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
+
+        with connections["replica"].cursor() as cursor:
+            cursor.execute(
+                """
+                -- ClueBot NG Reviewer - Wikipedia - Get User Registration Time - From revisions
                 SELECT `rev_timestamp` FROM `revision_userindex`
-                WHERE
-                `rev_actor` = (SELECT actor_id FROM actor WHERE `actor_name` = %s)
+                JOIN `actor` ON `actor_id` = `rev_actor`
+                WHERE `actor_name` = %s
                 ORDER BY `rev_timestamp`
                 LIMIT 1
                 """,
