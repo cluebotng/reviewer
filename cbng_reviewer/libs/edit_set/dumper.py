@@ -103,12 +103,12 @@ class EditSetDumper:
             ET.SubElement(previous, "timestamp").text = str(previous_revision.timestamp)
             ET.SubElement(previous, "text").text = previous_revision.text.decode("utf-8")
 
-        if edit.status != 2:
-            ET.SubElement(wp_edit, "reviewStatus").text = edit.get_status_display()
-        else:
+        if edit.status == 2:
             ET.SubElement(wp_edit, "isVandalism").text = "true" if edit.classification == 0 else "false"
 
-            review_interface = ET.SubElement(wp_edit, "ReviewInterface")
+        review_interface = ET.SubElement(wp_edit, "ReviewInterface")
+        ET.SubElement(review_interface, "status").text = edit.get_status_display()
+        if edit.status == 2:
             ET.SubElement(review_interface, "reviewers").text = str(edit.number_of_reviewers)
             ET.SubElement(review_interface, "reviewers_agreeing").text = str(edit.number_of_agreeing_reviewers)
 

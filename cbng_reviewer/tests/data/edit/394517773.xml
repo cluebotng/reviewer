@@ -676,6 +676,7 @@ The production, distribution, sale, and possession of methamphetamine is restric
  </previous>
  <isVandalism>false</isVandalism>
  <ReviewInterface>
+  <status>Done</status>
   <reviewers>2</reviewers>
   <reviewers_agreeing>2</reviewers_agreeing>
  </ReviewInterface>
