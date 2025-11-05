@@ -130,6 +130,7 @@ Cope2 has been one of the main targets of the New York City Vandal Squad due to 
  </previous>
  <isVandalism>true</isVandalism>
  <ReviewInterface>
+  <status>Done</status>
   <reviewers>0</reviewers>
   <reviewers_agreeing>0</reviewers_agreeing>
  </ReviewInterface>

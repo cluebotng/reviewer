@@ -99,7 +99,9 @@ class EditSetReaderTestCase(TestCase):
             "  <timestamp>1230</timestamp>\n"
             "  <text>previous</text>\n"
             " </previous>\n"
-            " <reviewStatus>Pending</reviewStatus>\n"
+            " <ReviewInterface>\n"
+            "  <status>Pending</status>\n"
+            " </ReviewInterface>\n"
             "</WPEdit>"
         )  # nosec:B101
 
@@ -158,7 +160,9 @@ class EditSetReaderTestCase(TestCase):
             "  <text>current</text>\n"
             " </current>\n"
             " <previous></previous>\n"
-            " <reviewStatus>Pending</reviewStatus>\n"
+            " <ReviewInterface>\n"
+            "  <status>Pending</status>\n"
+            " </ReviewInterface>\n"
             "</WPEdit>"
         )  # nosec:B101
 
@@ -186,7 +190,7 @@ class EditSetReaderTestCase(TestCase):
         with expected_file.open("r") as fh:
             expected_xml = fh.read().strip()
 
-        assert expected_xml == generated_xml  # nosec:B101
+        assert generated_xml == expected_xml  # nosec:B101
 
     # pytest.mark.parametrize doesn't play well with Django
     @freeze_time("2010-11-24T00:14:06Z")
