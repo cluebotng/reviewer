@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Build container
-        uses: infrabits/ci-python-pack@main
+        uses: infrabits/ci-pack@main
         with:
           image: ghcr.io/${{ github.repository }}:${{ github.sha }}
           builder: tools-harbor.wmcloud.org/toolforge/heroku-builder:24_0.20.7
