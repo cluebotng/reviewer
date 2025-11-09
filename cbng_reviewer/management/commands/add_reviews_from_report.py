@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 import requests
 from django.core.management.base import CommandParser
 
+from cbng_reviewer.libs.report_interface import ReportInterface
 from cbng_reviewer.models import User, Edit, Classification
 from cbng_reviewer.utils.command import CommandWithMetrics
 
@@ -27,9 +28,10 @@ class Command(CommandWithMetrics):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Add reviews from reports."""
+        report_interface = ReportInterface()
         username_to_reviewers = {user.username: user for user in User.objects.filter(is_reviewer=True)}
 
-        for edit_id, usernames in self._get_report_users().items():
+        for edit_id, usernames in report_interface.fetch_deferred_users():
             if options["edit_id"] not in {None, edit_id}:
                 continue
 
