@@ -33,7 +33,7 @@ class Core:
 
         logger.debug(f"[{edit.id}] Core returned: {response}")
         try:
-            et = ET.fromstring(response)
+            et = ET.fromstring(response)  # nosec: B314
         except ET.ParseError as e:
             logger.error(f"[{edit.id}] Core response could not be parsed: {response}: {e}")
             return
