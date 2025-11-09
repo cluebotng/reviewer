@@ -29,13 +29,13 @@ class Command(BaseCommand):
                 logger.warning(f"Missing training data for {edit.id}")
                 continue
 
-            logger.info(f"Checking {edit.id}")
+            logger.debug(f"Checking {edit.id}")
             reverted_score = report_interface.fetch_vandalism_score(edit.id)
             core_score = core.score_edit(edit)
 
-            logger.info(f"[{edit.id}] {reverted_score} vs {core_score}")
+            logger.debug(f"[{edit.id}] {reverted_score} vs {core_score}")
             if reverted_score > core_score and (reverted_score - core_score) > 0.1:
-                logger.info(f"[{edit.id}] Leaving positive review")
+                logger.info(f"[{edit.id}] Leaving positive review ({reverted_score} vs {core_score})")
                 Classification.objects.create(
                     edit=edit,
                     user=user,
