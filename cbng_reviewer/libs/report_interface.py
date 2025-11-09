@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class ReportInterface:
     def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> Set[id]:
         r = requests.get(
-            "https://cluebotng.toolforge.org/api/?action=review.export",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/?action=review.export",
             timeout=10,
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Report Interface Fetch",
@@ -43,7 +43,7 @@ class ReportInterface:
 
     def fetch_vandalism_score(self, edit_id: int) -> float | None:
         r = requests.get(
-            "https://cluebotng.toolforge.org/api/",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/",
             params={"action": "vandalism.get.score", "new_id": edit_id},
             timeout=10,
             headers={
@@ -63,7 +63,7 @@ class ReportInterface:
     def create_report_for_edit(self, edit_id: int) -> float | None:
         # Use the score endpoint to resolve the revert id
         r = requests.get(
-            "https://cluebotng.toolforge.org/api/",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/",
             params={"action": "vandalism.get.score", "new_id": edit_id},
             timeout=10,
             headers={
@@ -76,7 +76,7 @@ class ReportInterface:
 
         # Using the revert id, check if there is a report
         r = requests.get(
-            "https://cluebotng.toolforge.org/api/",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/",
             params={"action": "reports.get", "id": revert_id},
             timeout=10,
             headers={
@@ -96,7 +96,7 @@ class ReportInterface:
         # No report, create one!
         logger.info(f"Creating report for {revert_id}")
         r = requests.post(
-            "https://cluebotng.toolforge.org/?page=Report",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/?page=Report",
             data={
                 "id": revert_id,
                 "submit": "1",

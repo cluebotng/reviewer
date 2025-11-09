@@ -70,8 +70,12 @@ def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
             },
         },
         "core": {
-            "host": os.environ.get("CORE_HOST", "core"),
+            "host": os.environ.get("REDIS_HOST", "core.tool-cluebotng-review.svc.tools.local"),
             "port": 3565,
+        },
+        "report": {
+            "host": os.environ.get("REDIS_HOST", "report-interface.tool-cluebotng.svc.tools.local"),
+            "port": 8000,
         },
         "redis": {
             "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng-review.svc.tools.local"),
