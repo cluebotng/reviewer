@@ -34,7 +34,7 @@ class Command(BaseCommand):
             core_score = core.score_edit(edit)
 
             logger.debug(f"[{edit.id}] {reverted_score} vs {core_score}")
-            if reverted_score > core_score and (reverted_score - core_score) > 0.1:
+            if reverted_score > core_score and ((reverted_score - core_score) > 0.1 or core_score <= 0.85):
                 logger.info(f"[{edit.id}] Leaving positive review ({reverted_score} vs {core_score})")
                 Classification.objects.create(
                     edit=edit,
