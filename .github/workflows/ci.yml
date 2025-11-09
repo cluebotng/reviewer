@@ -155,7 +155,7 @@ jobs:
         uses: infrabits/ci-pack@main
         with:
           image: ghcr.io/${{ github.repository }}:${{ github.sha }}
-          builder: tools-harbor.wmcloud.org/toolforge/heroku-builder:24_0.20.7
+          builder: registry.cloud.releng.team/damian/buildpack-builder/registry.cloud.releng.team/damian/buildpack/builder:latest@sha256:69e29fb66552555c0b870e96e269ae32c626a806b0488ad8925bcd294605fbb6
 
       - name: Authenticate to ghcr.io
         run: |
