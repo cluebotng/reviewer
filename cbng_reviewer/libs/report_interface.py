@@ -40,3 +40,22 @@ class ReportInterface:
                 logger.debug(f"Edit {edit.id} already exists if target group")
 
             edit.save()
+
+    def fetch_vandalism_score(self, edit_id: int) -> float | None:
+        r = requests.get(
+            "https://cluebotng.toolforge.org/api/",
+            params={"action": "vandalism.get.score", "new_id": edit_id},
+            timeout=10,
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Report Interface Fetch",
+            },
+        )
+        r.raise_for_status()
+        data = r.json()
+        if "error" in data:
+            if data["error"] == "No entry found in database":
+                logger.debug(f"[{edit_id}] No vandalism entry found")
+            else:
+                logger.error(f"[{edit_id}] Failed to get score from report: {data}")
+            return
+        return data["score"]
