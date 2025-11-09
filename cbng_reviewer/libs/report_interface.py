@@ -59,3 +59,53 @@ class ReportInterface:
                 logger.error(f"[{edit_id}] Failed to get score from report: {data}")
             return
         return data["score"]
+
+    def create_report_for_edit(self, edit_id: int) -> float | None:
+        # Use the score endpoint to resolve the revert id
+        r = requests.get(
+            "https://cluebotng.toolforge.org/api/",
+            params={"action": "vandalism.get.score", "new_id": edit_id},
+            timeout=10,
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Create Report For Edit",
+            },
+        )
+        r.raise_for_status()
+        revert_id = r.json()["id"]
+        logger.info(f"Got revert id {revert_id} for {edit_id}")
+
+        # Using the revert id, check if there is a report
+        r = requests.get(
+            "https://cluebotng.toolforge.org/api/",
+            params={"action": "reports.get", "id": revert_id},
+            timeout=10,
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Create Report For Edit",
+            },
+        )
+        r.raise_for_status()
+        data = r.json()
+        if "error" not in data:
+            logger.info(f"Report already exists for {revert_id}")
+            return
+
+        if data["error_message"] != "Specified id was not found":
+            logger.error(f"Unknown error while checking for report {revert_id}: {data}")
+            return
+
+        # No report, create one!
+        logger.info(f"Creating report for {revert_id}")
+        r = requests.post(
+            "https://cluebotng.toolforge.org/?page=Report",
+            data={
+                "id": revert_id,
+                "submit": "1",
+                "user": "ClueBot NG",
+                "comment": "Temporary Account Bug",
+            },
+            timeout=10,
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Create Report For Edit",
+            },
+        )
+        r.raise_for_status()
