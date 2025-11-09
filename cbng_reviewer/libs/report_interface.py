@@ -109,3 +109,15 @@ class ReportInterface:
             },
         )
         r.raise_for_status()
+
+    def fetch_deferred_users(self) -> tuple[str, list[str]]:
+        r = requests.get(
+            "https://cluebotng.toolforge.org/api/",
+            params={"action": "review.export.users"},
+            timeout=10,
+            headers={
+                "User-Agent": "ClueBot NG Reviewer - Add Reviews From Report",
+            },
+        )
+        r.raise_for_status()
+        return tuple(r.json().items())
