@@ -33,6 +33,10 @@ class Command(BaseCommand):
             reverted_score = report_interface.fetch_vandalism_score(edit.id)
             core_score = core.score_edit(edit)
 
+            if reverted_score is None or core_score is None:
+                logger.error(f'Failed to get score for {edit.id} ({reverted_score}, {core_score})')
+                continue
+
             logger.debug(f"[{edit.id}] {reverted_score} vs {core_score}")
             if reverted_score > core_score and ((reverted_score - core_score) > 0.1 or core_score <= 0.85):
                 logger.info(f"[{edit.id}] Leaving positive review ({reverted_score} vs {core_score})")
