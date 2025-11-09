@@ -69,6 +69,10 @@ def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
                 "feed": "#wikipedia-en-cbngreview-feed",
             },
         },
+        "core": {
+            "host": os.environ.get("CORE_HOST", "core"),
+            "port": 3565,
+        },
         "redis": {
             "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng-review.svc.tools.local"),
             "port": 6379,

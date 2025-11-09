@@ -201,6 +201,9 @@ IRC_RELAY_USE_HTTP = CONFIG["irc_relay"]["use_http"]
 IRC_RELAY_CHANNEL_ADMIN = CONFIG["irc_relay"]["channel"]["admin"]
 IRC_RELAY_CHANNEL_FEED = CONFIG["irc_relay"]["channel"]["feed"]
 
+CORE_HOST = CONFIG["core"]["host"]
+CORE_PORT = CONFIG["core"]["port"]
+
 REDIS_HOST = CONFIG["redis"]["host"]
 REDIS_PORT = CONFIG["redis"]["port"]
 REDIS_DB = CONFIG["redis"]["db"]
