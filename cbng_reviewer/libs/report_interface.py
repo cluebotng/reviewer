@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 class ReportInterface:
     def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> Set[id]:
         r = requests.get(
-            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/?action=review.export",
+            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/",
+            params={"action": "review.export", "include_in_progress": include_in_progress},
             timeout=10,
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Report Interface Fetch",
             },
-            params={"include_in_progress": True} if include_in_progress else {},
         )
         r.raise_for_status()
         return set(r.json())
