@@ -3,7 +3,6 @@ from typing import Any
 
 from django.core.management import BaseCommand
 
-from cbng_reviewer.libs.core import Core
 from cbng_reviewer.libs.report_interface import ReportInterface
 from cbng_reviewer.models import EditGroup, User, Classification
 
