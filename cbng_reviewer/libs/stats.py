@@ -150,7 +150,7 @@ class Statistics:
             if stats["is_admin"]:
                 markup += "|admin=true\n"
             markup += f"|count={stats['total_classifications']}\n"
-            markup += f"|accuracy={stats['accuracy'] if stats['accuracy'] else 'NaN'}\n"
+            markup += f"|accuracy={round(stats['accuracy'], 1) if stats['accuracy'] else 'NaN'}\n"
             markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
             markup += "}}\n"
 
