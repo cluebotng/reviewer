@@ -14,7 +14,7 @@ jobs:
       tox_lint_envs: ${{ steps.list_envs.outputs.tox_lint_envs }}
       tox_test_envs: ${{ steps.list_envs.outputs.tox_test_envs }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: cluebotng/ci-setup-python-environment@main
         with:
@@ -46,7 +46,7 @@ jobs:
         target: ${{ fromJson(needs.setup-build.outputs.tox_lint_envs) }}
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: cluebotng/ci-setup-python-environment@main
 
@@ -116,7 +116,7 @@ jobs:
           mysql -h 127.0.0.1 -u root -e 'GRANT ALL PRIVILEGES ON `test_cbng_reviewer_%`.* TO `cbng_reviewer`@`%`'
           mysql -h 127.0.0.1 -u root -e 'GRANT ALL PRIVILEGES ON `test_enwiki_p_%`.* TO `cbng_reviewer`@`%`'
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: cluebotng/ci-setup-python-environment@main
 
@@ -149,7 +149,7 @@ jobs:
     needs: [setup-build]
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Build container
         uses: infrabits/ci-pack@main
