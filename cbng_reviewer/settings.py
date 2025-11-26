@@ -108,7 +108,10 @@ SOCIAL_AUTH_MEDIAWIKI_KEY = CONFIG["oauth"]["key"]
 SOCIAL_AUTH_MEDIAWIKI_SECRET = CONFIG["oauth"]["secret"]
 SOCIAL_AUTH_MEDIAWIKI_URL = "https://meta.wikimedia.org/w/index.php"
 SOCIAL_AUTH_MEDIAWIKI_CALLBACK = "oob"
-SOCIAL_AUTH_PIPELINE = DEFAULT_AUTH_PIPELINE + ("cbng_reviewer.libs.auth.pipeline.check_for_auto_reviewer_rights",)
+SOCIAL_AUTH_PIPELINE = DEFAULT_AUTH_PIPELINE + (
+    "cbng_reviewer.libs.auth.pipeline.update_username_from_central_auth",
+    "cbng_reviewer.libs.auth.pipeline.check_for_auto_reviewer_rights",
+)
 
 SOCIAL_AUTH_BACKEND_NAME = "mediawiki"
 AUTHENTICATION_BACKENDS = ["social_core.backends.mediawiki.MediaWiki"]
