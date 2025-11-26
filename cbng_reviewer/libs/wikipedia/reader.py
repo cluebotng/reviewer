@@ -31,7 +31,7 @@ class WikipediaReader:
     def get_central_user(
         self, username: Optional[str] = None, user_id: Optional[int] = None
     ) -> Optional[CentralWikiUser]:
-        if not username and not username:
+        if not username and not user_id:
             raise ValueError("either username or user_id must be passed to get_central_user")
 
         params = {
