@@ -45,21 +45,29 @@ class EditSetDumper:
         self, edit: Edit, edit_group: Optional[EditGroup] = None, indent_block: bool = False
     ) -> Optional[str]:
         try:
-            training_data = TrainingData.objects.get(edit=edit)
+            if hasattr(edit, "trainingdata"):
+                training_data = edit.trainingdata
+            else:
+                training_data = TrainingData.objects.get(edit=edit)
         except TrainingData.DoesNotExist:
             logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no training data")
             return None
 
         try:
-            current_revision = CurrentRevision.objects.get(edit=edit)
+            if hasattr(edit, "currentrevision"):
+                current_revision = edit.currentrevision
+            else:
+                current_revision = CurrentRevision.objects.get(edit=edit)
         except CurrentRevision.DoesNotExist:
             logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no current revision")
             return None
 
         try:
-            previous_revision = PreviousRevision.objects.get(edit=edit)
+            if hasattr(edit, "previousrevision"):
+                previous_revision = edit.previousrevision
+            else:
+                previous_revision = PreviousRevision.objects.get(edit=edit)
         except PreviousRevision.DoesNotExist:
-            logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no previous revision")
             if not current_revision.is_creation:
                 logger.debug(f"Skipping generation of WPEdit for {edit.id} due to no previous revision")
                 return None
