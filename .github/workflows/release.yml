@@ -12,3 +12,10 @@ jobs:
           repo_name: '${{ github.repository }}'
           tag_name: '${{ github.ref }}'
           gh_app_key: '${{ secrets.CI_RELEASE_MAKER_APP_KEY }}'
+
+      - uses: cluebotng/ci-update-component-ref@main
+        with:
+          tool: 'cluebotng-review'
+          component: 'cluebotng-reviewer'
+          ref: '${{ github.ref }}'
+          gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
