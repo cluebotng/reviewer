@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Count
 from prometheus_client import Gauge
 
 from cbng_reviewer.models import (
@@ -50,8 +51,12 @@ edits_with_training_data_count = Gauge(
 
 class MetricsExporter:
     def _update_edits_by_status_count(self):
+        counts_by_status = {
+            row["status"]: row["count"] for row in Edit.objects.values("status").annotate(count=Count("id"))
+        }
+
         for db_id, label in STATUSES:
-            edits_by_status_count.labels(status=label).set(Edit.objects.filter(status=db_id).count())
+            edits_by_status_count.labels(status=label).set(counts_by_status.get(db_id, 0))
 
     def _edit_group_by_status_count(self):
         for edit_group in EditGroup.objects.all():
