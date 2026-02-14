@@ -3,7 +3,7 @@ from typing import Tuple, Optional, List
 
 import requests
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
 from cbng_reviewer.models import User
@@ -13,20 +13,34 @@ logger = logging.getLogger(__name__)
 
 class Statistics:
     def get_edit_group_statistics(self):
+        edits_with_single_group = (
+            Edit.groups.through.objects.values("edit_id")
+            .annotate(group_count=Count("editgroup_id"))
+            .filter(group_count=1)
+            .values("edit_id")
+        )
+
+        edit_group_unique_edits = {
+            row["editgroup_id"]: row["count"]
+            for row in Edit.groups.through.objects.filter(edit_id__in=edits_with_single_group)
+            .values("editgroup_id")
+            .annotate(count=Count("edit_id"))
+        }
+
         return {
             edit_group.contextual_name: {
                 "weight": edit_group.weight,
-                "unique": (
-                    Edit.objects.annotate(group_count=Count("groups", distinct=True))
-                    .filter(groups=edit_group, group_count=1)
-                    .count()
-                ),
-                "pending": edit_group.edit_set.filter(status=0).count(),
-                "partial": edit_group.edit_set.filter(status=1).count(),
-                "done": edit_group.edit_set.filter(status=2).count(),
+                "unique": edit_group_unique_edits.get(edit_group.id, 0),
+                "pending": edit_group.pending,
+                "partial": edit_group.partial,
+                "done": edit_group.done,
             }
-            for edit_group in EditGroup.objects.all()
-            if edit_group.edit_set.count() > 0
+            for edit_group in EditGroup.objects.annotate(
+                total=Count("edit", distinct=True),
+                pending=Count("edit", filter=Q(edit__status=0)),
+                partial=Count("edit", filter=Q(edit__status=1)),
+                done=Count("edit", filter=Q(edit__status=2)),
+            ).filter(total__gt=0)
         }
 
     def _calculate_accuracy(self, user: User) -> Tuple[Optional[float], int]:
