@@ -81,5 +81,13 @@ jobs:
               prerelease: false,
               generate_release_notes: true,
             });
-            console.log(`Created release for tag: ${release.data.name}`);
+            console.log(`Created release for tag ${tag_name}`);
+        if: steps.check-changes.outputs.have_only_renovate_commits == 1
+
+      - uses: cluebotng/ci-update-component-ref@main
+        with:
+          tool: 'cluebotng-review'
+          component: 'cluebotng-reviewer'
+          ref: 'refs/tags/${{ steps.get-tag.outputs.tag_name }}'
+          gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
         if: steps.check-changes.outputs.have_only_renovate_commits == 1
