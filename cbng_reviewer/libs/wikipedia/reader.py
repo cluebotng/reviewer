@@ -11,8 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class WikipediaReader:
+    def __init__(self):
+        self._session = requests.session()
+
     def has_revision_been_deleted(self, revision_id: int) -> bool:
-        r = requests.get(
+        r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Edit Metadata",
@@ -42,7 +45,7 @@ class WikipediaReader:
         params |= {"guiuser": username} if username else {"guiid": user_id}
 
         # Note: We ask meta wiki as it 'owns' central auth
-        r = requests.get(
+        r = self._session.get(
             "https://meta.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Central Auth User Username",
@@ -64,7 +67,7 @@ class WikipediaReader:
 
     def get_local_user(self, username: str) -> Optional[LocalWikiUser]:
         # Note: We ask enwiki specifically as we want the wiki specific rights, not global rights
-        r = requests.get(
+        r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Local User",
