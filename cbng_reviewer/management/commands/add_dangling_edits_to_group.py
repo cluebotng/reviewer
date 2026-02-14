@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+from django.db.models import Count
+
 from cbng_reviewer.models import EditGroup, Edit
 from cbng_reviewer.utils.command import CommandWithMetrics
 
@@ -10,11 +12,7 @@ logger = logging.getLogger(__name__)
 class Command(CommandWithMetrics):
     def handle(self, *args: Any, **options: Any) -> None:
         """Add dangling edits to group."""
-        dangling_edits = []
-        for edit in Edit.objects.all():
-            if edit.groups.count() == 0:
-                dangling_edits.append(edit)
-
+        dangling_edits = Edit.objects.annotate(count=Count("groups")).filter(count=0)
         if dangling_edits:
             logger.info(f"Found {len(dangling_edits)} dangling edits")
 
