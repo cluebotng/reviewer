@@ -1,8 +1,9 @@
 import logging
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Dict
 
 import requests
 from django.conf import settings
+from django.db import models
 from django.db.models import Count, Q
 
 from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
@@ -43,31 +44,35 @@ class Statistics:
             ).filter(total__gt=0)
         }
 
-    def _calculate_accuracy(self, user: User) -> Tuple[Optional[float], int]:
-        total, correct = 0, 0
-        for classification in (
-            Classification.objects.filter(user=user)
-            .filter(edit__status=2)
+    def calculate_user_accuracy(self, users: List[User]) -> Dict[int, Tuple[Optional[float], int]]:
+        user_accuracy = {}
+        for row in (
+            Classification.objects.filter(user__in=users, edit__status=2)
             .exclude(edit__classification=None)
-            .prefetch_related("edit")
+            .exclude(classification=2)
+            .exclude(edit__classification=2)
+            .values("user_id")
+            .annotate(
+                total=Count("id"),
+                correct=Count("id", filter=Q(classification=models.F("edit__classification"))),
+            )
         ):
-            # Skipped
-            if classification.edit.classification == 2 or classification.classification == 2:
-                continue
+            accuracy = None
+            if row["total"] > settings.CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY:
+                accuracy = (row["correct"] / row["total"]) * 100.0 if row["correct"] > 0 else 0.0
 
-            total += 1
-            if classification.edit.classification == classification.classification:
-                correct += 1
+            user_accuracy[row["user_id"]] = (accuracy, row["total"])
 
-        if total > settings.CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY:
-            accuracy = (correct / total) * 100.0 if correct > 0 else 0.0
-            return accuracy, total
-        return None, total
+        return user_accuracy
 
     def get_user_statistics(self, extended=True):
-        user_statistics = {}
+        user_accuracy, user_statistics = {}, {}
 
-        for user in sorted(User.objects.exclude(is_bot=True), key=lambda u: u.username):
+        target_users = list(User.objects.exclude(is_bot=True))
+        if extended:
+            user_accuracy = self.calculate_user_accuracy(target_users)
+
+        for user in sorted(target_users, key=lambda u: u.username):
             if not user.is_reviewer:
                 continue
 
@@ -80,7 +85,7 @@ class Statistics:
 
             # Extended essentially = Wiki not homepage
             if extended:
-                accuracy, accuracy_classifications = self._calculate_accuracy(user)
+                accuracy, accuracy_classifications = user_accuracy.get(user.id, (None, 0))
                 user_statistics[user.username] |= {
                     "accuracy": accuracy,
                     "accuracy_classifications": accuracy_classifications,
