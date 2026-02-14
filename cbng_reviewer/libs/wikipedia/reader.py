@@ -122,9 +122,8 @@ class WikipediaReader:
                 """
                 -- ClueBot NG Reviewer - Wikipedia - Get User Edit Count
                 SELECT COUNT(*) FROM `revision_userindex`
-                JOIN `actor` ON `actor_id` = `rev_actor`
                 WHERE
-                `actor_name` = %s
+                `rev_actor` = (SELECT actor_id FROM actor WHERE `actor_name` = %s)
                 """,
                 [
                     username,
