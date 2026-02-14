@@ -80,10 +80,15 @@ class MetricsExporter:
             edits_by_classification_count.labels(classification=label).set(counts_by_classification.get(db_id, 0))
 
     def _edit_group_by_classification_count(self):
+        counts_by_classification = {
+            (row["groups__id"], row["classification"]): row["count"]
+            for row in Edit.objects.values("groups__id", "classification").annotate(count=Count("id"))
+        }
+
         for edit_group in EditGroup.objects.all():
             for db_id, label in CLASSIFICATIONS:
                 edit_group_by_classification_count.labels(group=edit_group.contextual_name, classification=label).set(
-                    edit_group.edit_set.filter(classification=db_id).count()
+                    counts_by_classification.get((edit_group.id, db_id), 0)
                 )
 
     def _edit_classification_count(self):
