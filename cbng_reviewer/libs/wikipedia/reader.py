@@ -102,7 +102,7 @@ class WikipediaReader:
                 `page_namespace` = %s
                 AND
                 `rev_timestamp` BETWEEN %s AND %s
-                ORDER BY RAND()
+                AND RAND() < 0.05
                 LIMIT %s
                 """,
                 [
