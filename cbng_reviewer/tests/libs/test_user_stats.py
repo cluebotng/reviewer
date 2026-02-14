@@ -18,7 +18,7 @@ class UserStatsTestCase(TestCase):
                 Classification.objects.create(edit=edit, user=user, classification=random.randint(0, 2))  # nosec: B311
 
         user_stats = Statistics().get_user_statistics(False)
-        self.assertEqual(user_stats, {"test-2": {"is_admin": False, "total_classifications": 3}})
+        self.assertEqual({"test-2": {"is_admin": False, "total_classifications": 3}}, user_stats)
 
     def testAdminFlag(self):
         User.objects.create(username="test-1")
@@ -32,11 +32,11 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics(False)
         self.assertEqual(
-            user_stats,
             {
                 "test-2": {"is_admin": False, "total_classifications": 3},
                 "test-3": {"is_admin": True, "total_classifications": 3},
             },
+            user_stats,
         )
 
     def testExtended(self):
@@ -51,7 +51,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "test-2": {
                     "is_admin": False,
@@ -66,6 +65,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 0,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyNotDoneEdits(self):
@@ -82,7 +82,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user-1": {
                     "is_admin": False,
@@ -97,6 +96,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 10,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyOverallSkippedEdits(self):
@@ -111,7 +111,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user": {
                     "is_admin": False,
@@ -120,6 +119,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 10,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyUserSkippedEdits(self):
@@ -134,7 +134,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user": {
                     "is_admin": False,
@@ -143,6 +142,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 10,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyGoodMath(self):
@@ -157,7 +157,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user": {
                     "is_admin": False,
@@ -166,6 +165,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 50,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyQuestionableMath(self):
@@ -182,7 +182,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user": {
                     "is_admin": False,
@@ -191,6 +190,7 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 50,
                 },
             },
+            user_stats,
         )
 
     def testCalculateAccuracyPoorMath(self):
@@ -205,7 +205,6 @@ class UserStatsTestCase(TestCase):
 
         user_stats = Statistics().get_user_statistics()
         self.assertEqual(
-            user_stats,
             {
                 "user": {
                     "is_admin": False,
@@ -214,4 +213,5 @@ class UserStatsTestCase(TestCase):
                     "accuracy_classifications": 50,
                 },
             },
+            user_stats,
         )
