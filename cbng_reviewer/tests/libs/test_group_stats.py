@@ -9,7 +9,7 @@ class GroupStatsTestCase(TestCase):
         EditGroup.objects.create(name="test-1")
         EditGroup.objects.create(name="test-2")
         group_stats = Statistics().get_edit_group_statistics()
-        self.assertEqual(group_stats, {})
+        self.assertEqual({}, group_stats)
 
     def testEditClassifications(self):
         eg = EditGroup.objects.create(name="test-1")
@@ -27,7 +27,7 @@ class GroupStatsTestCase(TestCase):
             edit.groups.add(eg)
 
         group_stats = Statistics().get_edit_group_statistics()
-        self.assertEqual(group_stats, {"test-1": {"weight": 0, "unique": 19, "pending": 10, "partial": 6, "done": 3}})
+        self.assertEqual({"test-1": {"weight": 0, "unique": 19, "pending": 10, "partial": 6, "done": 3}}, group_stats)
 
     def testSharedEdits(self):
         eg1 = EditGroup.objects.create(name="test-1", weight=10)
@@ -48,9 +48,9 @@ class GroupStatsTestCase(TestCase):
 
         group_stats = Statistics().get_edit_group_statistics()
         self.assertEqual(
-            group_stats,
             {
                 "test-1": {"weight": 10, "unique": 10, "pending": 10, "partial": 6, "done": 0},
                 "test-2": {"weight": 20, "unique": 3, "pending": 0, "partial": 6, "done": 3},
             },
+            group_stats,
         )
