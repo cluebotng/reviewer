@@ -22,13 +22,16 @@ logger = logging.getLogger(__name__)
 class WikipediaTraining:
     _RE_NS_PREFIX = re.compile(rf'^({"|".join(settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID.keys())}):', re.IGNORECASE)
 
+    def __init__(self):
+        self._session = requests.session()
+
     def _clean_page_title(self, title: str) -> str:
         title = self._RE_NS_PREFIX.sub("", title)
         title = title.replace(" ", "_")
         return title
 
     def get_edit_metadata(self, revision_id: int) -> Tuple[Optional[str], Optional[str]]:
-        r = requests.get(
+        r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Edit Metadata",
@@ -65,7 +68,7 @@ class WikipediaTraining:
         return minor
 
     def get_page_revisions(self, page_title: str, revision_id: int) -> Tuple[WpRevision, WpRevision]:
-        r = requests.get(
+        r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Page Revisions",
@@ -127,7 +130,7 @@ class WikipediaTraining:
         return current_revision, previous_revision
 
     def get_page_first_revision_id(self, page_title: str) -> Optional[int]:
-        r = requests.get(
+        r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Page Revisions",
