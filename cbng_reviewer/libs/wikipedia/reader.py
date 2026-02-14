@@ -139,7 +139,7 @@ class WikipediaReader:
             cursor.execute(
                 """
                 -- ClueBot NG Reviewer - Wikipedia - Get User Warning Count
-                SELECT COUNT(*), comment_text FROM `page`
+                SELECT COUNT(*) FROM `page`
                 JOIN `revision` ON `rev_page` = `page_id`
                 JOIN `comment` ON `rev_comment_id` = `comment_id`
                 WHERE
