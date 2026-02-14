@@ -71,10 +71,13 @@ class MetricsExporter:
                 )
 
     def _update_edits_by_classification_count(self):
+        counts_by_classification = {
+            row["classification"]: row["count"]
+            for row in Edit.objects.values("classification").annotate(count=Count("id"))
+        }
+
         for db_id, label in CLASSIFICATIONS:
-            edits_by_classification_count.labels(classification=label).set(
-                Edit.objects.filter(classification=db_id).count()
-            )
+            edits_by_classification_count.labels(classification=label).set(counts_by_classification.get(db_id, 0))
 
     def _edit_group_by_classification_count(self):
         for edit_group in EditGroup.objects.all():
