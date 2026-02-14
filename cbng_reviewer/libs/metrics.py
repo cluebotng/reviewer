@@ -59,10 +59,15 @@ class MetricsExporter:
             edits_by_status_count.labels(status=label).set(counts_by_status.get(db_id, 0))
 
     def _edit_group_by_status_count(self):
+        counts_by_status = {
+            (row["groups__id"], row["status"]): row["count"]
+            for row in Edit.objects.values("groups__id", "status").annotate(count=Count("id"))
+        }
+
         for edit_group in EditGroup.objects.all():
             for db_id, label in STATUSES:
                 edit_group_by_status_count.labels(group=edit_group.contextual_name, status=label).set(
-                    edit_group.edit_set.filter(status=db_id).count()
+                    counts_by_status.get((edit_group.id, db_id), 0)
                 )
 
     def _update_edits_by_classification_count(self):
