@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 from prometheus_client import Gauge
 
 from cbng_reviewer.models import (
@@ -92,8 +92,12 @@ class MetricsExporter:
                 )
 
     def _edit_classification_count(self):
-        edits_marked_deleted_count.set(Edit.objects.filter(is_deleted=True).count())
-        edits_with_training_data_count.set(Edit.objects.filter(has_training_data=True).count())
+        counts = Edit.objects.aggregate(
+            deleted=Count("id", filter=Q(is_deleted=True)),
+            has_training=Count("id", filter=Q(has_training_data=True)),
+        )
+        edits_marked_deleted_count.set(counts["deleted"])
+        edits_with_training_data_count.set(counts["has_training"])
 
     def update_metrics(self):
         self._update_edits_by_status_count()
