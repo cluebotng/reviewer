@@ -4,5 +4,11 @@
     "config:recommended"
   ],
   "automerge": true,
-  "automergeStrategy": "rebase"
+  "automergeStrategy": "rebase",
+  "packageRules": [
+    {
+      "matchPackageNames": ["django"],
+      "allowedVersions": "<6.0.0"
+    }
+  ]
 }
