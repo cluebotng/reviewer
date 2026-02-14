@@ -196,6 +196,13 @@ class Edit(models.Model):
         self.save()
         return True
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["is_deleted"]),
+            models.Index(fields=["has_training_data"]),
+        ]
+
 
 class Classification(models.Model):
     edit = models.ForeignKey(Edit, on_delete=models.PROTECT, related_name="user_classification")
