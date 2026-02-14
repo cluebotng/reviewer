@@ -25,7 +25,9 @@ class EditGroupViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.query_params.get("exclude_empty_editsets") == "1":
-            filtered_queryset = queryset.filter(edit__status=2, edit__has_training_data=True).distinct()
+            filtered_queryset = (
+                queryset.filter(edit__status=2, edit__has_training_data=True).distinct().select_related("related_to")
+            )
             expanded_edit_group_ids = []
             for edit_group in filtered_queryset:
                 expanded_edit_group_ids.append(edit_group.pk)
