@@ -87,11 +87,9 @@ class EditGroupViewSet(viewsets.ModelViewSet):
 
         def _xml_generator():
             yield "<WPEditSet>\n"
-            for edit in (
-                Edit.objects.filter(Q(groups__in=all_groups) & Q(status=2) & Q(has_training_data=True))
-                .select_related("trainingdata", "currentrevision", "previousrevision")
-                .iterator()
-            ):
+            for edit in Edit.objects.filter(
+                Q(groups__in=all_groups) & Q(status=2) & Q(has_training_data=True)
+            ).iterator():
                 if wp_edit := dumper.generate_wp_edit(edit, edit_group, True):
                     yield f"{wp_edit}\n"
             yield "</WPEditSet>\n"
