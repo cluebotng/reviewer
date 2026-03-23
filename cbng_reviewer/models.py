@@ -188,10 +188,7 @@ class Edit(models.Model):
             from cbng_reviewer.libs.irc import IrcRelay
             from cbng_reviewer.libs.messages import Messages
 
-            if self.status == 1:
-                IrcRelay().send_message(Messages().notify_irc_about_edit_in_progress(self))
-            elif self.status == 2:
-                IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
+            IrcRelay().send_message(Messages().notify_irc_about_edit_completion(self))
 
         self.save()
         return True

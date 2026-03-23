@@ -65,9 +65,3 @@ class Messages:
             body=f"\x0314[[\x032 New Edit Pending Review \x0314]]\x0301 {edit.id}",
             channel=settings.IRC_RELAY_CHANNEL_FEED,
         )
-
-    def notify_irc_about_edit_in_progress(self, edit: Edit) -> Message:
-        return Message(
-            body=f"\x0314[[\x032 Edit Review In Progress \x0314]]\x0301 {edit.id}",
-            channel=settings.IRC_RELAY_CHANNEL_FEED,
-        )
