@@ -84,6 +84,37 @@ class EditClassificationTestCase(TestCase):
         self.message = Message(body="")
         super(EditClassificationTestCase, self).__init__(*args, **kwargs)
 
+    def testDeletedNotYetCompleteIsProcessed(self):
+        edit = Edit.objects.create(id=1234, status=0, is_deleted=True)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user"), classification=0)
+        self.assertTrue(edit.update_classification())
+
+    def testBelowMinimumClassificationsStaysPartial(self):
+        edit = Edit.objects.create(id=1234)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user"), classification=0)
+        edit.update_classification()
+        self.assertEqual(edit.status, 1)
+        self.assertIsNone(edit.classification)
+
+    def testAtMinimumClassificationsCanComplete(self):
+        edit = Edit.objects.create(id=1234)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-1"), classification=0)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-2"), classification=0)
+        edit.update_classification()
+        self.assertEqual(edit.status, 2)
+        self.assertEqual(edit.classification, 0)
+
+    def testReviewerCountsUpdatedOnCompletion(self):
+        edit = Edit.objects.create(id=1234)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-1"), classification=0)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-2"), classification=0)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-3"), classification=0)
+        Classification.objects.create(edit=edit, user=User.objects.create(username="test-user-4"), classification=1)
+        edit.update_classification()
+        self.assertEqual(edit.status, 2)
+        self.assertEqual(edit.number_of_reviewers, 4)
+        self.assertEqual(edit.number_of_agreeing_reviewers, 3)
+
     def testHistoricalStatus(self):
         edit = Edit.objects.create(id=1234, status=2, classification=0)
         self.assertFalse(edit.update_classification())
