@@ -1,3 +1,5 @@
+let isProcessingClassification = false;
+
 function showSpinner() {
     document.getElementById("spinner").style.display = "block";
 }
@@ -14,6 +16,9 @@ function refreshRender() {
 }
 
 function classifyEdit(csrftoken, classification, confirmation) {
+    if (isProcessingClassification) return;
+    isProcessingClassification = true;
+
     let editId = document.getElementById("edit_id").innerText;
     console.debug("Classifying " + editId + " as " + classification + " (" + confirmation + ")");
     showSpinner();
@@ -34,6 +39,7 @@ function classifyEdit(csrftoken, classification, confirmation) {
     .then(function(response) {
         if (!response.ok) {
             alert('Failed to classify edit');
+            isProcessingClassification = false;
             hideSpinner();
             return null;
         }
@@ -44,6 +50,7 @@ function classifyEdit(csrftoken, classification, confirmation) {
 
         // API wants to confirm - ask the user
         if (data["require_confirmation"]) {
+            isProcessingClassification = false;
             if (!confirm("Are you sure?")) {
                 hideSpinner();
                 return;
@@ -53,10 +60,12 @@ function classifyEdit(csrftoken, classification, confirmation) {
         }
 
         // We are done - onto the next
+        isProcessingClassification = false;
         loadNextEditId();
     })
     .catch(function() {
         alert('Failed to classify edit');
+        isProcessingClassification = false;
         hideSpinner();
     });
 }
