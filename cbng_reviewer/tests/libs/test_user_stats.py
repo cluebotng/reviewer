@@ -193,6 +193,24 @@ class UserStatsTestCase(TestCase):
             user_stats,
         )
 
+    def testHistoricalEditCountIncluded(self):
+        User.objects.create(username="user", is_reviewer=True, historical_edit_count=42)
+        user_stats = Statistics().get_user_statistics(False)
+        self.assertEqual(user_stats["user"]["total_classifications"], 42)
+
+    def testHistoricalEditCountAddedToClassifications(self):
+        user = User.objects.create(username="user", is_reviewer=True, historical_edit_count=10)
+        for edit_id in range(1, 6):
+            edit = Edit.objects.create(id=edit_id)
+            Classification.objects.create(edit=edit, user=user, classification=0)
+        user_stats = Statistics().get_user_statistics(False)
+        self.assertEqual(user_stats["user"]["total_classifications"], 15)
+
+    def testBotsExcluded(self):
+        User.objects.create(username="bot-user", is_reviewer=True, is_bot=True)
+        user_stats = Statistics().get_user_statistics(False)
+        self.assertNotIn("bot-user", user_stats)
+
     def testCalculateAccuracyPoorMath(self):
         user = User.objects.create(username="user", is_reviewer=True)
 
