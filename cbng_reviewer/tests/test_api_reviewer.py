@@ -81,6 +81,46 @@ class ApiReviewerTestCase(TestCase):
         self.assertIsNone(data["edit_id"])
         self.assertEqual(data["message"], "No Pending Edit Found")
 
+    def testExcludeZeroWeightGroups(self):
+        edit_group = EditGroup.objects.create(name="Group 1", weight=0)
+        edit = Edit.objects.create(id=1234)
+        edit.groups.add(edit_group)
+
+        self.client.force_login(user=User.objects.create(username="test-user", is_reviewer=True, is_admin=True))
+        r = self.client.get("/api/v1/reviewer/next-edit/")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertIsNone(data["edit_id"])
+        self.assertEqual(data["message"], "No Pending Edit Found")
+
+    def testExcludeDeletedEdits(self):
+        edit_group = EditGroup.objects.create(name="Group 1", weight=20)
+        edit = Edit.objects.create(id=1234, is_deleted=True)
+        edit.groups.add(edit_group)
+
+        self.client.force_login(user=User.objects.create(username="test-user", is_reviewer=True, is_admin=True))
+        r = self.client.get("/api/v1/reviewer/next-edit/")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertIsNone(data["edit_id"])
+        self.assertEqual(data["message"], "No Pending Edit Found")
+
+    def testPartiallyClassifiedGroupReturnsUnclassifiedEdit(self):
+        edit_group = EditGroup.objects.create(name="Group 1", weight=20)
+        edit_1 = Edit.objects.create(id=1234)
+        edit_1.groups.add(edit_group)
+        edit_2 = Edit.objects.create(id=4321)
+        edit_2.groups.add(edit_group)
+
+        user = User.objects.create(username="test-user", is_reviewer=True, is_admin=True)
+        Classification.objects.create(user=user, edit=edit_1, classification=0)
+
+        self.client.force_login(user=user)
+        r = self.client.get("/api/v1/reviewer/next-edit/")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertEqual(data["edit_id"], edit_2.id)
+
     def testClassifyEditNoConfirmation(self):
         edit_group = EditGroup.objects.create(name="Group 1", weight=20)
         edit_1 = Edit.objects.create(id=1234, classification=1)
