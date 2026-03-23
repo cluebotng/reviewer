@@ -192,6 +192,7 @@ class Edit(models.Model):
             models.Index(fields=["status"]),
             models.Index(fields=["is_deleted"]),
             models.Index(fields=["has_training_data"]),
+            models.Index(fields=["is_deleted", "status"]),
         ]
 
 
