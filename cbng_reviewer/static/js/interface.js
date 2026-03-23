@@ -103,7 +103,7 @@ function loadNextEditId() {
 
 function loadDetails() {
     let editId = document.getElementById("edit_id").innerText;
-    window.open("/admin/edit/" + editId + "/", true);
+    window.open("/admin/edit/" + editId + "/", "_blank");
 }
 
 window.onload = function() {
