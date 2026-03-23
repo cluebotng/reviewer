@@ -15,6 +15,7 @@
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             function handle_keyboard_event(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 if (e.code === 'ArrowLeft') {
                     classifyEdit(csrftoken, 0, false)
                 } else if (e.code === 'ArrowRight') {
