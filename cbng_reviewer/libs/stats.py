@@ -72,15 +72,20 @@ class Statistics:
         if extended:
             user_accuracy = self.calculate_user_accuracy(target_users)
 
+        classification_counts = {
+            row["user_id"]: row["count"]
+            for row in Classification.objects.filter(user__in=target_users)
+            .values("user_id")
+            .annotate(count=Count("id"))
+        }
+
         for user in sorted(target_users, key=lambda u: u.username):
             if not user.is_reviewer:
                 continue
 
             user_statistics[user.username] = {
                 "is_admin": user.is_admin,
-                "total_classifications": (
-                    user.historical_edit_count + Classification.objects.filter(user=user).count()
-                ),
+                "total_classifications": user.historical_edit_count + classification_counts.get(user.id, 0),
             }
 
             # Extended essentially = Wiki not homepage
