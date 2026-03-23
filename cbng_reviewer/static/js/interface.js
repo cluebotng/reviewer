@@ -18,40 +18,47 @@ function classifyEdit(csrftoken, classification, confirmation) {
     console.debug("Classifying " + editId + " as " + classification + " (" + confirmation + ")");
     showSpinner();
 
-    let req = new XMLHttpRequest();
-    req.onreadystatechange = function(){
-        if (this.readyState !== 4) {
-            return;
-        }
-
-        if (this.status !== 200) {
+    fetch("/api/v1/reviewer/classify-edit/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify({
+            "edit_id": parseInt(editId),
+            "comment": document.getElementById("comment").value,
+            "classification": classification,
+            "confirmation": confirmation,
+        }),
+    })
+    .then(function(response) {
+        if (!response.ok) {
             alert('Failed to classify edit');
-            return;
+            hideSpinner();
+            return null;
         }
+        return response.json();
+    })
+    .then(function(data) {
+        if (!data) return;
 
         // API wants to confirm - ask the user
-        let require_confirmation = JSON.parse(this.responseText)["require_confirmation"];
-        if (require_confirmation) {
-            let confirmation = confirm("Are you sure?");
-            if (!confirmation) {
+        if (data["require_confirmation"]) {
+            if (!confirm("Are you sure?")) {
                 hideSpinner();
                 return;
             }
-            return classifyEdit(csrftoken, classification, true);
+            classifyEdit(csrftoken, classification, true);
+            return;
         }
 
         // We are done - onto the next
         loadNextEditId();
-    }
-    req.open("POST", "/api/v1/reviewer/classify-edit/", true);
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.setRequestHeader("X-CSRFToken", csrftoken);
-    req.send(JSON.stringify({
-        "edit_id": parseInt(editId),
-        "comment": document.getElementById("comment").value,
-        "classification": classification,
-        "confirmation": confirmation,
-    }));
+    })
+    .catch(function() {
+        alert('Failed to classify edit');
+        hideSpinner();
+    });
 }
 
 function renderEdit(editId) {
@@ -79,26 +86,25 @@ function renderEdit(editId) {
 function loadNextEditId() {
     document.getElementById("comment").value = "";
 
-    let req = new XMLHttpRequest();
-    req.onreadystatechange = function(){
-        if (this.readyState !== 4) {
-            return;
-        }
-
-        if (this.status !== 200) {
+    fetch("/api/v1/reviewer/next-edit/")
+    .then(function(response) {
+        if (!response.ok) {
             alert('Failed to retrieve pending edit');
-            return;
+            return null;
         }
-
-        let data = JSON.parse(this.responseText);
+        return response.json();
+    })
+    .then(function(data) {
+        if (!data) return;
         if (data["message"]) {
             alert(data["message"]);
         } else {
             renderEdit(data["edit_id"]);
         }
-    }
-    req.open("GET", "/api/v1/reviewer/next-edit/", true);
-    req.send();
+    })
+    .catch(function() {
+        alert('Failed to retrieve pending edit');
+    });
 }
 
 function loadDetails() {
