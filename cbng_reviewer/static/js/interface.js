@@ -70,7 +70,8 @@ function renderEdit(editId) {
             url = "https://en.wikipedia.org/w/index.php?action=render&diffonly=1&diff=" + editId;
         }
         document.getElementById("edit_id").innerText = editId;
-        document.getElementById("iframe").setAttribute("src", url);
+        let iframe = document.getElementById("iframe");
+        iframe.setAttribute("src", url);
         iframe.onload = function() { hideSpinner(); }
     }
 }
