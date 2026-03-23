@@ -106,21 +106,11 @@ class Edit(models.Model):
         if self.has_training_data and not force:
             return
 
-        has_training_data = all(
-            [
-                TrainingData.objects.filter(edit=self).exists(),
-                any(
-                    [
-                        all(
-                            [
-                                CurrentRevision.objects.filter(edit=self).exists(),
-                                PreviousRevision.objects.filter(edit=self).exists(),
-                            ]
-                        ),
-                        CurrentRevision.objects.filter(edit=self, is_creation=True).exists(),
-                    ]
-                ),
-            ]
+        current = CurrentRevision.objects.filter(edit=self).values("is_creation").first()
+        has_training_data = bool(
+            current
+            and TrainingData.objects.filter(edit=self).exists()
+            and (current["is_creation"] or PreviousRevision.objects.filter(edit=self).exists())
         )
         if self.has_training_data != has_training_data:
             logger.info(f"Marking {self.id} has_training_data = {has_training_data}")
