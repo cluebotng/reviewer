@@ -4,6 +4,7 @@ from typing import Optional
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Count, Case, When, IntegerField
 from django.db.models.signals import post_save, pre_delete
 from social_django.models import UserSocialAuth
 
@@ -133,9 +134,12 @@ class Edit(models.Model):
     ) -> bool:
         original_status, original_classification = self.status, self.classification
 
-        vandalism = Classification.objects.filter(edit=self, classification=0).count()
-        constructive = Classification.objects.filter(edit=self, classification=1).count()
-        skipped = Classification.objects.filter(edit=self, classification=2).count()
+        counts = Classification.objects.filter(edit=self).aggregate(
+            vandalism=Count(Case(When(classification=0, then=1), output_field=IntegerField())),
+            constructive=Count(Case(When(classification=1, then=1), output_field=IntegerField())),
+            skipped=Count(Case(When(classification=2, then=1), output_field=IntegerField())),
+        )
+        vandalism, constructive, skipped = counts["vandalism"], counts["constructive"], counts["skipped"]
         total_classifications = vandalism + constructive + skipped
 
         if skip_completed_with_no_internal_classifications and (
