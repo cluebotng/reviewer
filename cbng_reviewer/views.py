@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import auth
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -12,19 +13,21 @@ from cbng_reviewer.models import User
 
 def home(request):
     statistics = Statistics()
+    user_statistics = cache.get_or_set(
+        "home_page_user_statistics",
+        lambda: sorted(
+            [(username, stats["total_classifications"]) for username, stats in statistics.get_user_statistics().items()]
+            + [(username, edit_count) for username, edit_count in statistics.get_historical_user_statistics()],
+            key=lambda x: x[1],
+            reverse=True,
+        ),
+        300,
+    )
     return render(
         request,
         "cbng_reviewer/home.html",
         {
-            "user_statistics": sorted(
-                [
-                    (username, stats["total_classifications"])
-                    for username, stats in statistics.get_user_statistics().items()
-                ]
-                + [(username, edit_count) for username, edit_count in statistics.get_historical_user_statistics()],
-                key=lambda x: x[1],
-                reverse=True,
-            ),
+            "user_statistics": user_statistics,
             "administrators": User.objects.filter(is_admin=True).values_list("username", flat=True),
             "admin_only_mode": settings.CBNG_ADMIN_ONLY,
             "user": request.user,
