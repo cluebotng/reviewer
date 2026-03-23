@@ -29,6 +29,15 @@ class GroupStatsTestCase(TestCase):
         group_stats = Statistics().get_edit_group_statistics()
         self.assertEqual({"test-1": {"weight": 0, "unique": 19, "pending": 10, "partial": 6, "done": 3}}, group_stats)
 
+    def testContextualNameWithRelatedTo(self):
+        parent = EditGroup.objects.create(name="Parent")
+        child = EditGroup.objects.create(name="Child", related_to=parent)
+        edit = Edit.objects.create(id=1)
+        edit.groups.add(child)
+        group_stats = Statistics().get_edit_group_statistics()
+        self.assertIn("Parent - Child", group_stats)
+        self.assertNotIn("Child", group_stats)
+
     def testSharedEdits(self):
         eg1 = EditGroup.objects.create(name="test-1", weight=10)
         eg2 = EditGroup.objects.create(name="test-2", weight=20)
