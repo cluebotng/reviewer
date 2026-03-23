@@ -1,7 +1,82 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.models.message import Message
-from cbng_reviewer.models import Edit, User, Classification
+from cbng_reviewer.models import Edit, User, Classification, TrainingData, CurrentRevision, PreviousRevision
+
+
+TRAINING_DATA_FIELDS = {
+    "timestamp": 0,
+    "user": "user",
+    "user_edit_count": 0,
+    "user_distinct_pages": 0,
+    "user_warns": 0,
+    "user_reg_time": 0,
+    "page_title": "Page",
+    "page_namespace": 0,
+    "page_created_time": 0,
+    "page_creator": "creator",
+    "page_num_recent_edits": 0,
+    "page_num_recent_reverts": 0,
+}
+REVISION_FIELDS = {"is_minor": False, "timestamp": 0, "text": b"text"}
+
+
+class EditTrainingDataFlagTestCase(TestCase):
+    def testEarlyReturnWhenAlreadySet(self):
+        edit = Edit.objects.create(id=1234, has_training_data=True)
+        edit.update_training_data_flag()
+        self.assertTrue(edit.has_training_data)
+
+    def testFalseWithNoRelatedObjects(self):
+        edit = Edit.objects.create(id=1234)
+        edit.update_training_data_flag()
+        self.assertFalse(edit.has_training_data)
+
+    def testFalseWithTrainingDataOnly(self):
+        edit = Edit.objects.create(id=1234)
+        TrainingData.objects.create(edit=edit, **TRAINING_DATA_FIELDS)
+        edit.update_training_data_flag()
+        self.assertFalse(edit.has_training_data)
+
+    def testFalseWithCurrentRevisionOnly(self):
+        edit = Edit.objects.create(id=1234)
+        CurrentRevision.objects.create(edit=edit, is_creation=False, **REVISION_FIELDS)
+        edit.update_training_data_flag()
+        self.assertFalse(edit.has_training_data)
+
+    def testFalseWithCurrentAndPreviousButNoTrainingData(self):
+        edit = Edit.objects.create(id=1234)
+        CurrentRevision.objects.create(edit=edit, is_creation=False, **REVISION_FIELDS)
+        PreviousRevision.objects.create(edit=edit, **REVISION_FIELDS)
+        edit.update_training_data_flag()
+        self.assertFalse(edit.has_training_data)
+
+    def testTrueWithCurrentPreviousAndTrainingData(self):
+        edit = Edit.objects.create(id=1234)
+        TrainingData.objects.create(edit=edit, **TRAINING_DATA_FIELDS)
+        CurrentRevision.objects.create(edit=edit, is_creation=False, **REVISION_FIELDS)
+        PreviousRevision.objects.create(edit=edit, **REVISION_FIELDS)
+        edit.update_training_data_flag()
+        self.assertTrue(edit.has_training_data)
+
+    def testTrueWithCreationEditAndTrainingData(self):
+        edit = Edit.objects.create(id=1234)
+        TrainingData.objects.create(edit=edit, **TRAINING_DATA_FIELDS)
+        CurrentRevision.objects.create(edit=edit, is_creation=True, **REVISION_FIELDS)
+        edit.update_training_data_flag()
+        self.assertTrue(edit.has_training_data)
+
+    def testFalseWithCreationEditButNoTrainingData(self):
+        edit = Edit.objects.create(id=1234)
+        CurrentRevision.objects.create(edit=edit, is_creation=True, **REVISION_FIELDS)
+        edit.update_training_data_flag()
+        self.assertFalse(edit.has_training_data)
+
+    def testForceRecalculatesWhenAlreadyTrue(self):
+        edit = Edit.objects.create(id=1234, has_training_data=True)
+        edit.save()
+        edit.update_training_data_flag(force=True)
+        self.assertFalse(edit.has_training_data)
 
 
 class EditClassificationTestCase(TestCase):
