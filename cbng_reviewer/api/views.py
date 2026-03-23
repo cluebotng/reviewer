@@ -1,7 +1,7 @@
 import random
 from typing import Optional
 
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from django.http import StreamingHttpResponse, Http404, HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
@@ -130,7 +130,7 @@ def store_edit_classification(request):
 @api_view()
 def get_next_edit_id_for_review(request):
     # Check each edit group (the highest weight first)
-    edits_already_classified = set(Classification.objects.filter(user=request.user).values_list("edit_id", flat=True))
+    edits_already_classified = Subquery(Classification.objects.filter(user=request.user).values("edit_id"))
     for edit_group in EditGroup.objects.filter(weight__gt=0).order_by("-weight"):
         if (
             potential_edits := edit_group.edit_set.filter(is_deleted=False)
