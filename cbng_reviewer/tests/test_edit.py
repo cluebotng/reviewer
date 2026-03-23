@@ -3,7 +3,6 @@ from django.test import TestCase
 from cbng_reviewer.libs.models.message import Message
 from cbng_reviewer.models import Edit, User, Classification, TrainingData, CurrentRevision, PreviousRevision
 
-
 TRAINING_DATA_FIELDS = {
     "timestamp": 0,
     "user": "user",

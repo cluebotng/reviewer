@@ -5,7 +5,6 @@ from django.conf import settings
 from cbng_reviewer.libs.auth.rights import AutoReviewerRightsChecker
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 
-
 logger = logging.getLogger(__name__)
 
 
