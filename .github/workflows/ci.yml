@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build container
-        uses: infrabits/ci-pack@main
+        uses: infrabits/ci-pack@0e8fe003a93200be8984ee9abe4dae4953a8b127
         with:
           image: ghcr.io/${{ github.repository }}:${{ github.sha }}
           use_builder: latest
