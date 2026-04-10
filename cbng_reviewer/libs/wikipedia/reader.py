@@ -24,12 +24,31 @@ class WikipediaReader:
             params={
                 "format": "json",
                 "action": "query",
+                "prop": "revisions",
+                "rvprop": "ids|user|comment|content",
+                "rvslots": "main",
                 "revids": revision_id,
             },
         )
+
         r.raise_for_status()
-        bad_revision_ids = {entry["revid"] for entry in r.json()["query"].get("badrevids", {}).values()}
-        return revision_id in bad_revision_ids
+        data = r.json()
+
+        if revision_id in data["query"].get("badrevids", {}).values():
+            return True
+
+        if page := next(iter(data["query"]["pages"].values())):
+            main_slot = page["revisions"][0].get("slots", {}).get("main", {}) if len(page["revisions"]) == 1 else {}
+            if any(
+                [
+                    "userhidden" in main_slot,
+                    "commenthidden" in main_slot,
+                    "texthidden" in main_slot,
+                ]
+            ):
+                return True
+
+        return False
 
     def get_central_user(
         self, username: Optional[str] = None, user_id: Optional[int] = None
