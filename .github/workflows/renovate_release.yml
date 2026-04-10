@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Check changes since last release
         id: check-changes
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: { tag_name: latest_tag } } = await github.rest.repos.getLatestRelease({
@@ -78,7 +78,7 @@ jobs:
     needs: generate-new-tag
     steps:
       - name: Create a new release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const tag_name = '${{ needs.generate-new-tag.outputs.tag_name }}';
