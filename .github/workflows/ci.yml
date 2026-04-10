@@ -3,13 +3,11 @@ on: { pull_request: { } }
 concurrency:
   group: ${{ github.head_ref || github.ref }}
   cancel-in-progress: true
-permissions:
-  checks: write
-  pull-requests: write
-  packages: write
 jobs:
   setup-build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       tox_lint_envs: ${{ steps.list_envs.outputs.tox_lint_envs }}
       tox_test_envs: ${{ steps.list_envs.outputs.tox_test_envs }}
@@ -39,6 +37,9 @@ jobs:
 
   execute-lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     needs: [setup-build]
     strategy:
       fail-fast: false
@@ -76,6 +77,9 @@ jobs:
 
   execute-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     needs: [setup-build]
     strategy:
       fail-fast: false
@@ -146,6 +150,9 @@ jobs:
 
   build-container:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     needs: [setup-build]
     continue-on-error: true
     steps:

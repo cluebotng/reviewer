@@ -1,4 +1,4 @@
-name: Renovate Release
+name: Create Release For Renovate
 on: { push: { branches: [ 'main' ] } }
 permissions:
   deployments: write
@@ -94,9 +94,9 @@ jobs:
             });
             console.log(`Created release for tag ${tag_name}`);
 
-      - uses: cluebotng/ci-update-component-ref@main
-        with:
-          tool: 'cluebotng-review'
-          component: 'cluebotng-reviewer'
-          ref: 'refs/tags/${{ needs.generate-new-tag.outputs.tag_name }}'
-          gh_app_key: '${{ secrets.CI_COMPONENT_CONFIGS_APP_KEY }}'
+  deploy:
+    needs: [generate-new-tag, create-release]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: 'refs/tags/${{ needs.generate-new-tag.outputs.tag_name }}'
+    secrets: inherit
