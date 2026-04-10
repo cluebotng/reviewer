@@ -37,7 +37,7 @@ class WikipediaReader:
         if revision_id in data["query"].get("badrevids", {}).values():
             return True
 
-        if page := next(iter(data["query"].get("pages", {}).values())):
+        if page := next(iter(data["query"].get("pages", {}).values()), None):
             main_slot = page["revisions"][0].get("slots", {}).get("main", {}) if len(page["revisions"]) == 1 else {}
             if any(
                 [
