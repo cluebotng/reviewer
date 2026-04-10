@@ -176,7 +176,8 @@ class WikipediaTraining:
                 ],
             )
             if row := cursor.fetchone():
-                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S"), row[1].decode("utf-8")
+                if row[0]:
+                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S"), row[1].decode("utf-8")
         return None, None
 
     def get_page_recent_edit_count(self, page_title: str, namespace: str, edit_time: datetime) -> Optional[int]:
@@ -289,7 +290,8 @@ class WikipediaTraining:
                 [username],
             )
             if row := cursor.fetchone():
-                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
+                if row[0]:
+                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
 
         with connections["replica"].cursor() as cursor:
             cursor.execute(
@@ -304,7 +306,8 @@ class WikipediaTraining:
                 [username],
             )
             if row := cursor.fetchone():
-                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
+                if row[0]:
+                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
 
     def _get_user_distinct_pages_count(self, username: str, edit_time: datetime) -> Optional[int]:
         with connections["replica"].cursor() as cursor:
