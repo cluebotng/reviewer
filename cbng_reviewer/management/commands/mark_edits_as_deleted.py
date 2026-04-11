@@ -27,7 +27,7 @@ class Command(CommandWithMetrics):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
-        parser.add_argument("--workers", type=int, default=20)
+        parser.add_argument("--workers", type=int, default=10)
 
     def _handle_edit(self, edit: Edit):
         if not self._wikipedia_reader.has_revision_been_deleted(edit.id):
