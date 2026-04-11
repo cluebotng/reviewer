@@ -15,39 +15,20 @@ class WikipediaReader:
         self._session = requests.session()
 
     def has_revision_been_deleted(self, revision_id: int) -> bool:
-        r = self._session.get(
-            "https://en.wikipedia.org/w/api.php",
-            headers={
-                "User-Agent": "ClueBot NG Reviewer - Wikipedia - Fetch Edit Metadata",
-            },
-            timeout=10,
-            params={
-                "format": "json",
-                "action": "query",
-                "prop": "revisions",
-                "rvprop": "ids|user|comment|content",
-                "rvslots": "main",
-                "revids": revision_id,
-            },
-        )
-
-        r.raise_for_status()
-        data = r.json()
-
-        if revision_id in data["query"].get("badrevids", {}).values():
-            return True
-
-        if page := next(iter(data["query"].get("pages", {}).values()), None):
-            main_slot = page["revisions"][0].get("slots", {}).get("main", {}) if len(page["revisions"]) == 1 else {}
-            if any(
+        with connections["replica"].cursor() as cursor:
+            cursor.execute(
+                """
+                -- ClueBot NG Reviewer - Wikipedia - Has Revision Been Deleted
+                SELECT rev_deleted FROM `revision` WHERE `rev_id` = %s
+                """,
                 [
-                    "userhidden" in main_slot,
-                    "commenthidden" in main_slot,
-                    "texthidden" in main_slot,
-                ]
-            ):
-                return True
+                    revision_id,
+                ],
+            )
+            if row := cursor.fetchone():
+                return row[0] == 1
 
+        logger.warning(f"Failed to get revision id for {revision_id}")
         return False
 
     def get_central_user(
