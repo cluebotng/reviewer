@@ -2,7 +2,7 @@
 name = "reviewer"
 requires-python = ">=3.13"
 dependencies = [
-    "Django>=5.0.0,<6.0.0",  # T417494
+    "Django",
     "social-auth-app-django",
     "mysqlclient",
     "requests",
