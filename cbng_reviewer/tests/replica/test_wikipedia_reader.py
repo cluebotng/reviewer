@@ -17,3 +17,13 @@ class WikipediaReaderTestCase(WikipediaReplicaTransactionTestCase):
             1,
         )
         self.assertEqual(len(sampled_edits), 1)
+
+    @load_replica_sql("sampled_revisions")
+    def testRevisionHasNotBeenDeleted(self):
+        wikipedia_reader = WikipediaReader()
+        self.assertFalse(wikipedia_reader.has_revision_been_deleted(57160200))
+
+    @load_replica_sql("sampled_revisions")
+    def testRevisionHasBeenDeleted(self):
+        wikipedia_reader = WikipediaReader()
+        self.assertTrue(wikipedia_reader.has_revision_been_deleted(57160201))
