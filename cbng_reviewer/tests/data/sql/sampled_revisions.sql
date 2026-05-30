@@ -59,5 +59,5 @@ INSERT INTO revision (
 (NULL, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary)),
 (NULL, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary)),
 (NULL, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary)),
-(NULL, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary)),
-(NULL, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary));
+(57160200, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 0, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary)),
+(57160201, 57160200, 470082501, 3351, DATE_FORMAT((NOW() - INTERVAL 1 DAY), "%Y%m%d%H%i%S"), 1, 1, 211, 1250742711, CAST("4v2vctrh55r356n6zxi2pt5poyvunoz" as binary));
