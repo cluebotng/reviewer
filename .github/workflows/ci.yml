@@ -14,42 +14,13 @@ jobs:
       environments: ${{ needs.setup-build.outputs.lint }}
 
   execute-test:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      checks: write
     needs: [setup-build]
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{ fromJson(needs.setup-build.outputs.test) }}
-    services:
-      selenium:
-        image: ${{ matrix.target == 'test-interactive' && 'selenium/standalone-chrome' || '' }}
-        options: --shm-size=2gb
-
-      mysql:
-        image: mariadb
-        env: { "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD": "1" }
-        ports: [3306:3306]
-
-      redis:
-        image: redis
-        ports: [6379:6379]
-    continue-on-error: true
-    steps:
-      - uses: infrabits/ci-setup-mysql@main
-        with:
-          username: cbng_reviewer
-          schemas: test_cbng_reviewer,test_enwiki_p,test_cbng_reviewer_%,test_enwiki_p_%
-
-      - uses: actions/checkout@v6
-
-      - uses: infrabits/ci-setup-python@main
-
-      - uses: infrabits/ci-run-tox-env@main
-        with:
-          environment: ${{ matrix.target }}
+    uses: infrabits/ci-run-tox-env/.github/workflows/run.yml@main
+    with:
+      environments: ${{ needs.setup-build.outputs.test }}
+      install_dependencies: 'true'
+      services: '{"*": ["mysql", "redis"], "test-interactive": ["selenium"]}'
+      mysql_config: '{"username": "cbng_reviewer", "schemas": "test_cbng_reviewer,test_enwiki_p,test_cbng_reviewer_%,test_enwiki_p_%"}'
 
   build-container:
     runs-on: ubuntu-latest
