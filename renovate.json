@@ -1,14 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
   ],
   "automerge": true,
-  "automergeStrategy": "rebase",
-  "packageRules": [
-    {
-      "matchPackageNames": ["django"],
-      "allowedVersions": "<6.0.0"
-    }
-  ]
+  "automergeStrategy": "rebase"
 }
