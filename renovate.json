@@ -5,11 +5,5 @@
     "helpers:pinGitHubActionDigests"
   ],
   "automerge": true,
-  "automergeStrategy": "rebase",
-  "packageRules": [
-    {
-      "matchPackageNames": ["django"],
-      "allowedVersions": "<6.0.0"
-    }
-  ]
+  "automergeStrategy": "rebase"
 }
