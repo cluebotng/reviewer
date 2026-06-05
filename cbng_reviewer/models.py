@@ -128,8 +128,14 @@ class Edit(models.Model):
             vandalism=Count(Case(When(classification=0, then=1), output_field=IntegerField())),
             constructive=Count(Case(When(classification=1, then=1), output_field=IntegerField())),
             skipped=Count(Case(When(classification=2, then=1), output_field=IntegerField())),
+            human=Count(Case(When(user__is_bot=False, then=1), output_field=IntegerField())),
         )
-        vandalism, constructive, skipped = counts["vandalism"], counts["constructive"], counts["skipped"]
+        vandalism, constructive, skipped, human_classifications = (
+            counts["vandalism"],
+            counts["constructive"],
+            counts["skipped"],
+            counts["human"],
+        )
         total_classifications = vandalism + constructive + skipped
 
         if skip_completed_with_no_internal_classifications and (
@@ -145,7 +151,10 @@ class Edit(models.Model):
             return False
 
         self.status = 0 if total_classifications == 0 else 1
-        if max(constructive, max(vandalism, skipped)) >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT:
+        if (
+            max(constructive, max(vandalism, skipped)) >= settings.CBNG_MINIMUM_CLASSIFICATIONS_FOR_EDIT
+            and human_classifications >= settings.CBNG_MINIMUM_HUMAN_CLASSIFICATIONS_FOR_EDIT
+        ):
             if 2 * skipped > vandalism + constructive + skipped:
                 self.classification = 2
                 self.status = 2
