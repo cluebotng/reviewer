@@ -42,6 +42,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
+    "cbng_reviewer.libs.django.AuthenticatedRequestLogMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
