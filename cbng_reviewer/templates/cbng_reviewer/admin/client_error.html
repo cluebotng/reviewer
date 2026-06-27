@@ -1,0 +1,18 @@
+{% extends "cbng_reviewer/admin/base.html" %}
+{% block content %}
+    <div class="container">
+        <h1>Client Error #{{ client_error.id }}</h1>
+        <table class="table table-borderless">
+            <tr><th scope="row">Time</th><td>{{ client_error.created|date:"Y-m-d H:i:s" }} UTC</td></tr>
+            <tr><th scope="row">User</th><td><a href="{% url 'admin-view-user' client_error.user.id %}">{{ client_error.user.username }}</a></td></tr>
+            <tr><th scope="row">Page</th><td>{{ client_error.page_url|default:"-" }}</td></tr>
+            <tr><th scope="row">Source</th><td>{{ client_error.source|default:"-" }}</td></tr>
+            <tr><th scope="row">Line / Col</th><td>{{ client_error.lineno|default:"-" }} / {{ client_error.colno|default:"-" }}</td></tr>
+            <tr><th scope="row">Message</th><td><code>{{ client_error.message }}</code></td></tr>
+        </table>
+        {% if client_error.stack %}
+            <h2>Stack Trace</h2>
+            <pre class="border rounded p-3 bg-light">{{ client_error.stack }}</pre>
+        {% endif %}
+    </div>
+{% endblock content %}

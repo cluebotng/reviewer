@@ -3,10 +3,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from cbng_reviewer.admin.forms import EditGroupForm, AddUserForm
 from cbng_reviewer.libs.auth.utils import create_user
-from cbng_reviewer.libs.django import admin_required
+from cbng_reviewer.libs.django import admin_required, superuser_required
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
-from cbng_reviewer.models import User, EditGroup, Edit, Classification
+from cbng_reviewer.models import User, EditGroup, Edit, Classification, ClientError
 
 
 @admin_required()
@@ -112,6 +112,21 @@ def view_edit_group(request, id: int):
             "form": form,
         },
     )
+
+
+@superuser_required()
+def client_errors(request):
+    return render(
+        request,
+        "cbng_reviewer/admin/client_errors.html",
+        {"client_errors": ClientError.objects.select_related("user").order_by("-created")[:200]},
+    )
+
+
+@superuser_required()
+def view_client_error(request, id: int):
+    client_error = get_object_or_404(ClientError, id=id)
+    return render(request, "cbng_reviewer/admin/client_error.html", {"client_error": client_error})
 
 
 @admin_required()

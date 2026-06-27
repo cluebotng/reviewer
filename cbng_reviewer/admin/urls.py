@@ -10,4 +10,6 @@ urlpatterns = [
     path("edit-groups/", views.edit_groups, name="admin-edit-groups"),
     path("edit-groups/<int:id>/", views.view_edit_group, name="admin-edit-group"),
     path("edit/<int:id>/", views.view_edit, name="admin-edit"),
+    path("client-errors/", views.client_errors, name="admin-client-errors"),
+    path("client-errors/<int:id>/", views.view_client_error, name="admin-client-error"),
 ]

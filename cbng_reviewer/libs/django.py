@@ -39,6 +39,23 @@ class AuthenticatedRequestLogMiddleware:
         return response
 
 
+def superuser_required() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(request: HttpRequest, *args: Any, **kwargs: Any) -> Any:
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.path)
+
+            if not request.user.is_superuser:
+                raise PermissionDenied
+
+            return func(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 def admin_required() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)

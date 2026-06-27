@@ -12,6 +12,11 @@
             </li>
             {% if user.is_superuser %}
                 <li class="nav-item">
+                    <a class="nav-link px-2 link-secondary" href="{% url 'admin-client-errors' %}">Client Errors</a>
+                </li>
+            {% endif %}
+            {% if user.is_superuser %}
+                <li class="nav-item">
                     <a class="nav-link px-2 link-secondary" href="{% url 'admin:index' %}">Django Admin</a>
                 </li>
             {% endif %}
