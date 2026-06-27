@@ -8,6 +8,57 @@ function hideSpinner() {
     document.getElementById("spinner").style.display = "none";
 }
 
+function showAlert(message) {
+    var p = document.createElement('p');
+    p.innerText = message;
+
+    var box = document.getElementById('modal-box');
+    box.innerHTML = '';
+    box.append(p);
+
+    document.getElementById('modal-overlay').style.display = 'block';
+    hideSpinner();
+}
+
+function showConfirm(message, callback) {
+    var p = document.createElement('p');
+    p.innerText = message;
+
+    var buttons = document.createElement('div');
+
+    function onKeyDown(e) {
+        if (e.keyCode === 13 || e.key === 'Enter') {
+            e.preventDefault();
+            dismiss(true);
+        }
+    }
+
+    function dismiss(result) {
+        document.removeEventListener('keydown', onKeyDown);
+        document.getElementById('modal-overlay').style.display = 'none';
+        callback(result);
+    }
+
+    var ok = document.createElement('button');
+    ok.innerText = 'Yes';
+    ok.onclick = function() { dismiss(true); };
+    buttons.appendChild(ok);
+
+    var cancel = document.createElement('button');
+    cancel.innerText = 'No';
+    cancel.onclick = function() { dismiss(false); };
+    buttons.appendChild(cancel);
+
+    var box = document.getElementById('modal-box');
+    box.innerHTML = '';
+    box.append(p);
+    box.append(buttons);
+
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.addEventListener('keydown', onKeyDown);
+    hideSpinner();
+}
+
 function refreshRender() {
     let editId = document.getElementById("edit_id").innerText;
     console.debug("Refreshing type for " + editId);
@@ -38,24 +89,26 @@ function classifyEdit(csrftoken, classification, confirmation) {
     })
     .then(function(response) {
         if (!response.ok) {
-            alert('Failed to classify edit');
+            showAlert('Failed to classify edit');
             isProcessingClassification = false;
-            hideSpinner();
             return null;
         }
         return response.json();
     })
     .then(function(data) {
-        if (!data) return;
+        if (!data) {
+            showAlert('Unexpected response from API');
+            return;
+        }
 
         // API wants to confirm - ask the user
         if (data["require_confirmation"]) {
             isProcessingClassification = false;
-            if (!confirm("Are you sure?")) {
-                hideSpinner();
-                return;
-            }
-            classifyEdit(csrftoken, classification, true);
+            showConfirm("Are you sure?", function(confirmed) {
+                if (confirmed) {
+                    classifyEdit(csrftoken, classification, true);
+                }
+            });
             return;
         }
 
@@ -64,9 +117,8 @@ function classifyEdit(csrftoken, classification, confirmation) {
         loadNextEditId();
     })
     .catch(function() {
-        alert('Failed to classify edit');
+        showAlert('Failed to classify edit');
         isProcessingClassification = false;
-        hideSpinner();
     });
 }
 
@@ -98,21 +150,22 @@ function loadNextEditId() {
     fetch("/api/v1/reviewer/next-edit/")
     .then(function(response) {
         if (!response.ok) {
-            alert('Failed to retrieve pending edit');
+            showAlert('Failed to retrieve pending edit');
             return null;
         }
         return response.json();
     })
     .then(function(data) {
-        if (!data) return;
-        if (data["message"]) {
-            alert(data["message"]);
+        if (!data) {
+            showAlert('Unexpected response from API');
+        } else if (data["message"]) {
+            showAlert(data["message"]);
         } else {
             renderEdit(data["edit_id"]);
         }
     })
     .catch(function() {
-        alert('Failed to retrieve pending edit');
+        showAlert('Failed to retrieve pending edit');
     });
 }
 
