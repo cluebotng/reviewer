@@ -125,3 +125,34 @@ window.onload = function() {
     showSpinner();
     loadNextEditId();
 }
+
+// Basic error reporting
+function reportClientError(message, source, lineno, colno, stack) {
+    fetch("/api/v1/internal/client-error/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": csrftoken},
+        body: JSON.stringify({
+            message: String(message || ""),
+            source: source || null,
+            lineno: lineno || null,
+            colno: colno || null,
+            stack: stack || null,
+            page_url: window.location.href,
+        }),
+    }).catch(function(e) {});
+}
+
+window.onerror = function(message, source, lineno, colno, error) {
+    reportClientError(message, source, lineno, colno, error ? error.stack : null);
+    return false;
+};
+
+window.addEventListener("unhandledrejection", function(event) {
+    const error = event.reason;
+    reportClientError(
+        error instanceof Error ? error.message : String(error),
+        null, null, null,
+        error instanceof Error ? error.stack : null
+    );
+});

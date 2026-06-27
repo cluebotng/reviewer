@@ -252,6 +252,23 @@ class TrainingData(models.Model):
     page_num_recent_reverts = models.IntegerField()
 
 
+class ClientError(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+    source = models.CharField(max_length=2048, null=True, blank=True)
+    lineno = models.IntegerField(null=True, blank=True)
+    colno = models.IntegerField(null=True, blank=True)
+    stack = models.TextField(null=True, blank=True)
+    page_url = models.CharField(max_length=2048, null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["created"]),
+        ]
+
+
 if not settings.IN_TEST:
     pre_delete.connect(notify_irc_about_deleted_account, sender=User)
     post_save.connect(notify_irc_about_pending_account, sender=User)

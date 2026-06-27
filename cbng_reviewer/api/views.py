@@ -8,7 +8,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from cbng_reviewer.api.serializers import EditGroupSerializer
+from cbng_reviewer.api.serializers import EditGroupSerializer, ClientErrorSerializer
 from cbng_reviewer.libs.django import reviewer_required
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
 from cbng_reviewer.models import EditGroup, Edit, Classification, CLASSIFICATION_IDS
@@ -151,6 +151,16 @@ def get_next_edit_id_for_review(request):
                 return Response({"edit_id": selected_edit})
 
     return Response({"edit_id": None, "message": "No Pending Edit Found"})
+
+
+@reviewer_required()
+@api_view(["POST"])
+def store_client_error(request):
+    serializer = ClientErrorSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=400)
+    serializer.save(user=request.user)
+    return Response(status=201)
 
 
 @api_view()
