@@ -93,15 +93,21 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {"format": "%(asctime)s %(levelname)s %(filename)s %(funcName)s: %(message)s"},
+        "message_only": {"format": "%(message)s"},
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "console_message": {
+            "class": "logging.StreamHandler",
+            "formatter": "message_only",
+        },
     },
     "loggers": {
         "": {"handlers": ["console"], "level": "INFO", "propagate": True, "stream": sys.stdout},
+        "cbng_reviewer.access_log": {"handlers": ["console_message"], "level": "INFO", "propagate": False},
     },
 }
 
