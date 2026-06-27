@@ -129,26 +129,31 @@ def store_edit_classification(request):
 @reviewer_required()
 @api_view()
 def get_next_edit_id_for_review(request):
-    # Check each edit group (the highest weight first)
-    edits_already_classified = Subquery(Classification.objects.filter(user=request.user).values("edit_id"))
-    for edit_group in EditGroup.objects.filter(weight__gt=0).order_by("-weight"):
-        if (
-            potential_edits := edit_group.edit_set.filter(is_deleted=False)
-            .exclude(status=2)
-            .exclude(id__in=edits_already_classified)
-            .values_list("id", "status")
-        ):
-            # Prefer edits that are in progress (complete them before starting new edits)
-            selected_edit = None
-            if potential_in_progress := [edit_id for edit_id, status in potential_edits if status == 1]:
-                selected_edit = random.choice(potential_in_progress)  # nosec: B311
+    already_classified = Subquery(Classification.objects.filter(user=request.user).values("edit_id"))
 
-            # Otherwise any edit
-            elif potential_pending := [edit_id for edit_id, status in potential_edits if status == 0]:
-                selected_edit = random.choice(potential_pending)  # nosec: B311
-
-            if selected_edit:
-                return Response({"edit_id": selected_edit})
+    # Loop over our groups, ordered by weight and status, preferring a larger weight and in progress edits
+    for potential_group in (
+        Edit.objects.filter(groups__weight__gt=0, is_deleted=False, status__in=[0, 1])
+        .exclude(id__in=already_classified)
+        .order_by("-groups__weight", "-status")
+        .values("groups__weight", "status")
+        .distinct()
+    ):
+        # Find any edits we have available in this group
+        potential_edits = (
+            Edit.objects.filter(
+                groups__weight=potential_group["groups__weight"],
+                is_deleted=False,
+                status=potential_group["status"],
+            )
+            .exclude(id__in=already_classified)
+            .distinct()
+            .values_list("id", flat=True)
+        )
+        if count := potential_edits.count():
+            # Return a random entry from the group
+            edit_id = potential_edits[random.randint(0, count - 1)]  # nosec: B311
+            return Response({"edit_id": edit_id})
 
     return Response({"edit_id": None, "message": "No Pending Edit Found"})
 
