@@ -7,16 +7,14 @@ from freezegun import freeze_time
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
 from cbng_reviewer.libs.edit_set.parser import EditSetParser
 from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
-from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision, EditGroup, Classification, User
+from cbng_reviewer.models import Classification, CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData, User
 
 
 class EditSetReaderTestCase(TestCase):
     def testNoExportOnMissingTrainingData(self):
         edit = Edit.objects.create(id=1234)
-        CurrentRevision.objects.create(
-            edit=edit, text="current".encode("utf-8"), is_minor=False, is_creation=False, timestamp=1234
-        )
-        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), is_minor=False, timestamp=1230)
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234)
+        PreviousRevision.objects.create(edit=edit, text=b"previous", is_minor=False, timestamp=1230)
         self.assertIsNone(EditSetDumper().generate_wp_edit(edit))
 
     def testNoExportOnMissingCurrentRevision(self):
@@ -37,7 +35,7 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), is_minor=False, timestamp=1230)
+        PreviousRevision.objects.create(edit=edit, text=b"previous", is_minor=False, timestamp=1230)
         self.assertIsNone(EditSetDumper().generate_wp_edit(edit))
 
     @freeze_time("2025-09-05T16:00Z")
@@ -60,10 +58,8 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        CurrentRevision.objects.create(
-            edit=edit, text="current".encode("utf-8"), is_minor=False, is_creation=False, timestamp=1234
-        )
-        PreviousRevision.objects.create(edit=edit, text="previous".encode("utf-8"), is_minor=False, timestamp=1230)
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234)
+        PreviousRevision.objects.create(edit=edit, text=b"previous", is_minor=False, timestamp=1230)
 
         wp_edit_xml = EditSetDumper().generate_wp_edit(edit)
         self.assertIsNotNone(wp_edit_xml)
@@ -125,9 +121,7 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        CurrentRevision.objects.create(
-            edit=edit, text="current".encode("utf-8"), is_minor=False, is_creation=True, timestamp=1234
-        )
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=True, timestamp=1234)
 
         wp_edit_xml = EditSetDumper().generate_wp_edit(edit)
         self.assertIsNotNone(wp_edit_xml)
@@ -177,7 +171,7 @@ class EditSetReaderTestCase(TestCase):
         # Fake some entries (reviews) to get the Edit metadata into a state that matches what we expect
         edit = target_group.edit_set.all()[0]
 
-        for x in range(0, reviewers):
+        for x in range(reviewers):
             Classification.objects.create(
                 edit=edit, user=User.objects.create(username=f"test_{x}"), classification=classification
             )

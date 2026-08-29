@@ -5,7 +5,7 @@ import requests
 from django.core.management.base import CommandParser
 from django.db.models import Q
 
-from cbng_reviewer.models import User, Edit, Classification, TrainingData
+from cbng_reviewer.models import Classification, Edit, TrainingData, User
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)

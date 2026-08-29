@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Optional
 
 import requests
 from django.db import connections
@@ -31,9 +30,7 @@ class WikipediaReader:
         logger.warning(f"Failed to get revision id for {revision_id}")
         return False
 
-    def get_central_user(
-        self, username: Optional[str] = None, user_id: Optional[int] = None
-    ) -> Optional[CentralWikiUser]:
+    def get_central_user(self, username: str | None = None, user_id: int | None = None) -> CentralWikiUser | None:
         if not username and not user_id:
             raise ValueError("either username or user_id must be passed to get_central_user")
 
@@ -65,7 +62,7 @@ class WikipediaReader:
                 )
         return None
 
-    def get_local_user(self, username: str) -> Optional[LocalWikiUser]:
+    def get_local_user(self, username: str) -> LocalWikiUser | None:
         # Note: We ask enwiki specifically as we want the wiki specific rights, not global rights
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
@@ -119,7 +116,7 @@ class WikipediaReader:
             return [row[0] for row in cursor.fetchall()]
 
     # This logic matches that used by the box
-    def get_user_edit_count(self, username: str) -> Optional[int]:
+    def get_user_edit_count(self, username: str) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -136,7 +133,7 @@ class WikipediaReader:
                 return row[0]
         return None
 
-    def get_user_warning_count(self, username: str) -> Optional[int]:
+    def get_user_warning_count(self, username: str) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """

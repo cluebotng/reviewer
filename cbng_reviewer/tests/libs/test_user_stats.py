@@ -3,7 +3,7 @@ import random
 from django.test import TestCase
 
 from cbng_reviewer.libs.stats import Statistics
-from cbng_reviewer.models import User, Edit, Classification
+from cbng_reviewer.models import Classification, Edit, User
 
 
 class UserStatsTestCase(TestCase):
@@ -12,7 +12,7 @@ class UserStatsTestCase(TestCase):
         User.objects.create(username="test-2", is_reviewer=True)
         User.objects.create(username="test-3", is_admin=True)
 
-        for edit_id in {1, 2, 3}:
+        for edit_id in (1, 2, 3):
             edit = Edit.objects.create(id=edit_id)
             for user in User.objects.filter(username__in={"test-1", "test-2", "test-3"}):
                 Classification.objects.create(edit=edit, user=user, classification=random.randint(0, 2))  # nosec: B311
@@ -25,7 +25,7 @@ class UserStatsTestCase(TestCase):
         User.objects.create(username="test-2", is_reviewer=True)
         User.objects.create(username="test-3", is_reviewer=True, is_admin=True)
 
-        for edit_id in {1, 2, 3}:
+        for edit_id in (1, 2, 3):
             edit = Edit.objects.create(id=edit_id)
             for user in User.objects.filter(username__in={"test-1", "test-2", "test-3"}):
                 Classification.objects.create(edit=edit, user=user, classification=random.randint(0, 2))  # nosec: B311
@@ -44,7 +44,7 @@ class UserStatsTestCase(TestCase):
         User.objects.create(username="test-2", is_reviewer=True)
         User.objects.create(username="test-3", is_reviewer=True, is_admin=True)
 
-        for edit_id in {1, 2, 3}:
+        for edit_id in (1, 2, 3):
             edit = Edit.objects.create(id=edit_id)
             for user in User.objects.filter(username__in={"test-1", "test-2", "test-3"}):
                 Classification.objects.create(edit=edit, user=user, classification=random.randint(0, 2))  # nosec: B311

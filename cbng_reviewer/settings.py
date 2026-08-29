@@ -4,7 +4,7 @@ from pathlib import Path
 import prometheus_client
 from social_core.pipeline import DEFAULT_AUTH_PIPELINE
 
-from cbng_reviewer.utils.config import load_config, detect_if_running_in_test
+from cbng_reviewer.utils.config import detect_if_running_in_test, load_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 IN_TEST = detect_if_running_in_test()

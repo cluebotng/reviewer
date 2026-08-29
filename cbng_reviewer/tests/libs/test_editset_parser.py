@@ -1,7 +1,6 @@
 from datetime import datetime
 from pathlib import PosixPath
 from tempfile import NamedTemporaryFile
-from typing import List
 
 from django.conf import settings
 from django.test import TestCase
@@ -11,7 +10,7 @@ from cbng_reviewer.libs.models.edit_set import WpEdit
 
 
 class CallbackHandler:
-    wp_edits: List[WpEdit]
+    wp_edits: list[WpEdit]
 
     def __init__(self):
         self.wp_edits = []

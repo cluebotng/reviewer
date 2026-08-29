@@ -1,5 +1,6 @@
 from pathlib import PosixPath
-from fabric import Connection, Config, task
+
+from fabric import Config, Connection, task
 
 TOOL_USER = "cluebotng-review"
 TOOL_DIR = PosixPath("/data/project") / TOOL_USER

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import transaction
 
 from cbng_reviewer.libs.models.edit_set import WpEdit
-from cbng_reviewer.models import EditGroup, Edit, TrainingData, PreviousRevision, CurrentRevision
+from cbng_reviewer.models import CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData
 
 logger = logging.getLogger(__name__)
 

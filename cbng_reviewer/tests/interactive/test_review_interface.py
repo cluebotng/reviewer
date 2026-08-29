@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from cbng_reviewer.models import Edit, User, Classification, EditGroup
+from cbng_reviewer.models import Classification, Edit, EditGroup, User
 
 
 class ReviewInterfaceTestCase(LiveServerTestCase):

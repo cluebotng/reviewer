@@ -1,16 +1,15 @@
 import logging
-from typing import Set
 
 import requests
 from django.conf import settings
 
-from cbng_reviewer.models import EditGroup, Edit
+from cbng_reviewer.models import Edit, EditGroup
 
 logger = logging.getLogger(__name__)
 
 
 class ReportInterface:
-    def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> Set[id]:
+    def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> set[id]:
         r = requests.get(
             f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/",
             params={"action": "review.export", "include_in_progress": include_in_progress},

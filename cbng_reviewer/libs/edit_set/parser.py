@@ -1,7 +1,8 @@
 import logging
 import xml.etree.ElementTree as ET  # nosec: B405
+from collections.abc import Callable
 from pathlib import PosixPath
-from typing import Optional, Dict, Any, Tuple, Callable
+from typing import Any
 
 from cbng_reviewer.libs.models.edit_set import WpEdit
 
@@ -35,7 +36,7 @@ class EditSetParser:
         self._revision_fields = ["minor", "timestamp", "text"]
         self._review_interface_fields = ["reviewers", "reviewers_agreeing"]
 
-    def _new_processing_context(self, in_edit: bool = False) -> Dict[str, Any]:
+    def _new_processing_context(self, in_edit: bool = False) -> dict[str, Any]:
         return {
             "edit": {"current": {}, "previous": {}},
             "in_edit": in_edit,
@@ -46,8 +47,8 @@ class EditSetParser:
         }
 
     def _process_element(
-        self, ctx: Dict[str, Any], context: str, elem: ET.Element
-    ) -> Tuple[Dict[str, Any], Optional[WpEdit]]:
+        self, ctx: dict[str, Any], context: str, elem: ET.Element
+    ) -> tuple[dict[str, Any], WpEdit | None]:
         if elem.tag == "WPEdit":
             wp_edit = None
             # We have an exit context and are at </WPEdit>, load the data into the model
@@ -108,7 +109,7 @@ class EditSetParser:
 
         return ctx, None
 
-    def read_file(self, path: PosixPath, callback_func: Optional[Callable] = None) -> bool:
+    def read_file(self, path: PosixPath, callback_func: Callable | None = None) -> bool:
         if not path.exists():
             logger.error(f"Specified file does not exist: {path.as_posix()}")
             return False
