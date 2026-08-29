@@ -2,7 +2,6 @@ from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -34,10 +33,9 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
     def testNoEditsPending(self):
         self._authenticate_as_reviewer()
         self.driver.get(f"{self.live_server_url}/review")
-        WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-        alert = Alert(self.driver)
-        self.assertEqual(alert.text, "No Pending Edit Found")
-        alert.accept()
+        WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, "modal-overlay")))
+        modal_box = self.driver.find_element(by=By.ID, value="modal-box")
+        self.assertEqual(modal_box.text, "No Pending Edit Found")
 
     def testEditLoad(self):
         edit_group = EditGroup.objects.create(name="Example Group", weight=20)
@@ -139,7 +137,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -169,7 +167,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -200,7 +198,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -230,7 +228,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -261,7 +259,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -291,7 +289,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -333,10 +331,10 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         button = self.driver.find_element(by=By.XPATH, value="//span[@id='classify']//button[text()='Vandalism']")
         button.click()
 
-        WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-        alert = Alert(self.driver)
-        self.assertEqual(alert.text, "Are you sure?")
-        alert.dismiss()
+        WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, "modal-overlay")))
+        modal_box = self.driver.find_element(by=By.ID, value="modal-box")
+        self.assertIn("Are you sure?", modal_box.text)
+        modal_box.find_element(by=By.XPATH, value=".//button[text()='No']").click()
 
         # Check we are on the same edit
         WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located(loading_spinner))
@@ -351,7 +349,7 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         edit_1 = Edit.objects.create(id=688772969, classification=1)
         edit_1.groups.add(edit_group_1)
 
-        # Provide a second one so the flow is 'normal' i.e. no alert
+        # Provide a second one so the flow is 'normal' i.e. no modal
         edit_group_2 = EditGroup.objects.create(name="Example Group 2", weight=10)
         edit_2 = Edit.objects.create(id=695551216)
         edit_2.groups.add(edit_group_2)
@@ -368,10 +366,10 @@ class ReviewInterfaceTestCase(LiveServerTestCase):
         button = self.driver.find_element(by=By.XPATH, value="//span[@id='classify']//button[text()='Vandalism']")
         button.click()
 
-        WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-        alert = Alert(self.driver)
-        self.assertEqual(alert.text, "Are you sure?")
-        alert.accept()
+        WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, "modal-overlay")))
+        modal_box = self.driver.find_element(by=By.ID, value="modal-box")
+        self.assertIn("Are you sure?", modal_box.text)
+        modal_box.find_element(by=By.XPATH, value=".//button[text()='Yes']").click()
 
         # Check we loaded the next edit
         WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located(loading_spinner))
