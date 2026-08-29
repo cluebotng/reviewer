@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django import forms
 
 from cbng_reviewer.models import EditGroup
@@ -7,7 +9,7 @@ from cbng_reviewer.models import EditGroup
 class EditGroupForm(forms.ModelForm):
     class Meta:
         model = EditGroup
-        fields = ["name", "weight", "related_to", "group_type"]
+        fields: ClassVar = ["name", "weight", "related_to", "group_type"]
 
 
 class AddUserForm(forms.Form):

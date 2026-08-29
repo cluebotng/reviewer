@@ -1,4 +1,5 @@
 import logging
+from typing import ClassVar
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -84,7 +85,7 @@ class EditGroup(models.Model):
         return self.contextual_name
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["name", "related_to"], name="unique_contextual_name")]
+        constraints: ClassVar = [models.UniqueConstraint(fields=["name", "related_to"], name="unique_contextual_name")]
 
 
 class Edit(models.Model):
@@ -196,7 +197,7 @@ class Edit(models.Model):
         return True
 
     class Meta:
-        indexes = [
+        indexes: ClassVar = [
             models.Index(fields=["status"]),
             models.Index(fields=["is_deleted"]),
             models.Index(fields=["has_training_data"]),
@@ -212,7 +213,9 @@ class Classification(models.Model):
     comment = models.TextField(null=True, default=None)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["edit", "user"], name="one_edit_classification_per_user")]
+        constraints: ClassVar = [
+            models.UniqueConstraint(fields=["edit", "user"], name="one_edit_classification_per_user")
+        ]
 
 
 class CurrentRevision(models.Model):
@@ -262,7 +265,7 @@ class ClientError(models.Model):
     page_url = models.CharField(max_length=2048, null=True, blank=True)
 
     class Meta:
-        indexes = [
+        indexes: ClassVar = [
             models.Index(fields=["user"]),
             models.Index(fields=["created"]),
         ]

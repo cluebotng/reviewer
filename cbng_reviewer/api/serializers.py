@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from rest_framework import serializers
 
 from cbng_reviewer.models import ClientError, Edit, EditGroup
@@ -15,16 +17,16 @@ class EditGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EditGroup
-        fields = ["id", "name", "related_to", "type"]
+        fields: ClassVar = ["id", "name", "related_to", "type"]
 
 
 class DeletedEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Edit
-        fields = ["id", "name"]
+        fields: ClassVar = ["id", "name"]
 
 
 class ClientErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientError
-        fields = ["message", "source", "lineno", "colno", "stack", "page_url"]
+        fields: ClassVar = ["message", "source", "lineno", "colno", "stack", "page_url"]

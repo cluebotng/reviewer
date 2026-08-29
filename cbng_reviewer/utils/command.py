@@ -36,7 +36,7 @@ def send_metrics_to_pushgateway(command: str):
             data=generate_latest(management_command_registry),
             timeout=2,
         )
-    except Exception as e:
+    except requests.RequestException as e:
         logger.debug(f"Exception occurred while sending metrics to pushgateway: {e}")
     else:
         if r.status_code != 200:
@@ -55,8 +55,8 @@ class CommandWithMetrics(BaseCommand, ABC):
             management_command_execute_time.set((end_time - start_time).total_seconds())
             management_command_last_run_time.set(end_time.timestamp())
             management_command_successful.set(1)
-        except Exception as e:
+        except Exception:
             management_command_successful.set(0)
-            raise e
+            raise
         finally:
             send_metrics_to_pushgateway(command)

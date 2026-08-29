@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import PosixPath
 from tempfile import NamedTemporaryFile
 
@@ -59,11 +59,11 @@ class EditSetParserTestCase(TestCase):
         self.assertEqual(edit.comment, "Hello World")
         self.assertEqual(edit.user, "Bob Smith")
         self.assertEqual(edit.creator, "Jane Smith")
-        self.assertEqual(edit.page_made_time, datetime(1970, 1, 1, 0, 20, 20))
+        self.assertEqual(edit.page_made_time, datetime(1970, 1, 1, 0, 20, 20, tzinfo=UTC))
         self.assertEqual(edit.user_edit_count, 5)
         self.assertEqual(edit.user_distinct_pages, 6)
         self.assertEqual(edit.user_warns, 2)
-        self.assertEqual(edit.user_reg_time, datetime(1970, 1, 1, 15, 5, 21))
+        self.assertEqual(edit.user_reg_time, datetime(1970, 1, 1, 15, 5, 21, tzinfo=UTC))
         self.assertEqual(edit.prev_user, "Jill Smith")
         self.assertEqual(edit.num_recent_edits, 1)
         self.assertEqual(edit.num_recent_reversions, 3)
@@ -71,11 +71,11 @@ class EditSetParserTestCase(TestCase):
 
         self.assertEqual(edit.current.is_minor, True)
         self.assertEqual(edit.current.text, "current")
-        self.assertEqual(edit.current.timestamp, datetime(1970, 1, 1, 0, 20, 34))
+        self.assertEqual(edit.current.timestamp, datetime(1970, 1, 1, 0, 20, 34, tzinfo=UTC))
 
         self.assertEqual(edit.previous.is_minor, False)
         self.assertEqual(edit.previous.text, "previous")
-        self.assertEqual(edit.previous.timestamp, datetime(1970, 1, 1, 0, 20, 30))
+        self.assertEqual(edit.previous.timestamp, datetime(1970, 1, 1, 0, 20, 30, tzinfo=UTC))
 
     def testMultipleEdits(self):
         callback = CallbackHandler()

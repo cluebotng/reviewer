@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from django.conf import settings
 
@@ -9,7 +9,7 @@ from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, load_
 class WikipediaReaderTestCase(WikipediaReplicaTransactionTestCase):
     @load_replica_sql("sampled_revisions")
     def testSampledEdits(self):
-        current_time = datetime.now()
+        current_time = datetime.now(tz=UTC)
         sampled_edits = WikipediaReader().get_sampled_edits(
             settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID["main"],
             current_time - timedelta(days=settings.CBNG_SAMPLED_EDITS_LOOKBACK_DAYS),

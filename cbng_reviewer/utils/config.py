@@ -11,10 +11,7 @@ def detect_if_running_in_test() -> bool:
     if len(sys.argv) >= 2 and sys.argv[0].endswith("manage.py") and sys.argv[1] == "test":
         return True
 
-    if "PYTEST_VERSION" in os.environ:
-        return True
-
-    return False
+    return "PYTEST_VERSION" in os.environ
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:

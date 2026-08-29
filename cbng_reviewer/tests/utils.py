@@ -1,4 +1,5 @@
 import logging
+from typing import ClassVar
 
 from django.conf import settings
 from django.db import connections
@@ -16,7 +17,7 @@ def load_replica_sql(file_name):
 
 
 class WikipediaReplicaTransactionTestCase(TransactionTestCase):
-    databases = {"default", "replica"}
+    databases: ClassVar = {"default", "replica"}
 
     def setUp(self):
         super().setUp()

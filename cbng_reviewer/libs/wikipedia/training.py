@@ -1,7 +1,7 @@
 import logging
 import re
 from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import requests
@@ -50,7 +50,7 @@ class WikipediaTraining:
         r.raise_for_status()
         data = r.json()
 
-        if "badrevids" in data.get("query", {}).keys():
+        if "badrevids" in data.get("query", {}):
             logger.warning(f"Bad revision id {revision_id}")
             return None, None
 
@@ -149,9 +149,10 @@ class WikipediaTraining:
         r.raise_for_status()
         data = r.json()
 
-        if page_data := next(iter(data.get("query", {}).get("pages", {}).values()), None):
-            if revision := next(iter(page_data.get("revisions", [])), []):
-                return revision.get("revid")
+        if (page_data := next(iter(data.get("query", {}).get("pages", {}).values()), None)) and (
+            revision := next(iter(page_data.get("revisions", [])), [])
+        ):
+            return revision.get("revid")
 
         return None
 
@@ -175,9 +176,10 @@ class WikipediaTraining:
                     self._clean_page_title(page_title),
                 ],
             )
-            if row := cursor.fetchone():
-                if row[0]:
-                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S"), row[1].decode("utf-8")
+            if (row := cursor.fetchone()) and row[0]:
+                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S").replace(tzinfo=UTC), row[1].decode(
+                    "utf-8"
+                )
         return None, None
 
     def get_page_recent_edit_count(self, page_title: str, namespace: str, edit_time: datetime) -> int | None:
@@ -304,9 +306,8 @@ class WikipediaTraining:
                 """,
                 [username],
             )
-            if row := cursor.fetchone():
-                if row[0]:
-                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
+            if (row := cursor.fetchone()) and row[0]:
+                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S").replace(tzinfo=UTC)
 
     def _get_user_distinct_pages_count(self, username: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
@@ -341,10 +342,13 @@ class WikipediaTraining:
             if previous_revision.has_complete_training_data:
                 wp_edit = replace(wp_edit, previous=previous_revision, prev_user=previous_revision.user)
 
-        if wp_edit.previous is None and wp_edit.current is not None:
-            if revision_id := self.get_page_first_revision_id(page_title=wp_edit.title):
-                if revision_id == wp_edit.current.revision_id:
-                    wp_edit = replace(wp_edit, current=replace(wp_edit.current, is_creation=True))
+        if (
+            wp_edit.previous is None
+            and wp_edit.current is not None
+            and (revision_id := self.get_page_first_revision_id(page_title=wp_edit.title))
+            and revision_id == wp_edit.current.revision_id
+        ):
+            wp_edit = replace(wp_edit, current=replace(wp_edit.current, is_creation=True))
 
         if wp_edit.current:
             wp_edit = replace(

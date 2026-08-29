@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from django.conf import settings
@@ -38,7 +38,7 @@ class Command(CommandWithMetrics):
             self._ensure_edit_exists(edit_group, options["edit_id"])
             return
 
-        end_time = datetime.now()
+        end_time = datetime.now(tz=UTC)
         start_time = end_time - timedelta(days=settings.CBNG_SAMPLED_EDITS_LOOKBACK_DAYS)
         namespace_id = settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID["main"]
         quantity = settings.CBNG_SAMPLED_EDITS_QUANTITY
