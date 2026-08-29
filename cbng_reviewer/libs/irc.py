@@ -1,6 +1,5 @@
 import logging
 import socket
-from typing import Optional
 
 import requests
 from django.conf import settings
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class IrcRelay:
-    def send_message(self, message: Message, channel: Optional[str] = None) -> bool:
+    def send_message(self, message: Message, channel: str | None = None) -> bool:
         target_channel = channel if channel else message.channel
         text = message.body.strip() if message.body else None
 
@@ -33,7 +32,7 @@ class IrcRelay:
             return True
 
         # UDP
-        payload = f"{target_channel}:{text}\n".encode("utf-8")
+        payload = f"{target_channel}:{text}\n".encode()
         logger.debug(f"Sending to IRC Relay (UDP): {payload}")
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:

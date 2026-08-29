@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management import CommandParser
 
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
-from cbng_reviewer.models import EditGroup, Edit
+from cbng_reviewer.models import Edit, EditGroup
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)

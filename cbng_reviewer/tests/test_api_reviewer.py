@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from cbng_reviewer.models import Edit, User, Classification, EditGroup
+from cbng_reviewer.models import Classification, Edit, EditGroup, User
 
 
 class ApiReviewerTestCase(TestCase):

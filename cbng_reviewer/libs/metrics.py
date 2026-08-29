@@ -5,10 +5,10 @@ from django.db.models import Count, Q
 from prometheus_client import Gauge
 
 from cbng_reviewer.models import (
-    EditGroup,
-    Edit,
-    STATUSES,
     CLASSIFICATIONS,
+    STATUSES,
+    Edit,
+    EditGroup,
 )
 
 logger = logging.getLogger(__name__)

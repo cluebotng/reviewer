@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 import yaml
 from deepmerge import always_merger
@@ -17,14 +17,14 @@ def detect_if_running_in_test() -> bool:
     return False
 
 
-def _load_yaml(path: Path) -> Dict[str, Any]:
+def _load_yaml(path: Path) -> dict[str, Any]:
     if path.is_file():
         with path.open("r") as fh:
             return yaml.load(fh, Loader=yaml.SafeLoader)
     return {}
 
 
-def load_config(base_dir: Path, in_test: bool) -> Dict[str, Any]:
+def load_config(base_dir: Path, in_test: bool) -> dict[str, Any]:
     # Defaults
     cfg = {
         "django": {

@@ -3,7 +3,7 @@ from typing import Any
 
 from django.db.models import Count
 
-from cbng_reviewer.models import EditGroup, Edit
+from cbng_reviewer.models import Edit, EditGroup
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)

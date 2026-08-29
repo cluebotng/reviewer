@@ -2,8 +2,8 @@ from django.conf import settings
 from django.contrib import auth
 from django.core.cache import cache
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from django.shortcuts import redirect, render
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from cbng_reviewer.libs.django import reviewer_required
 from cbng_reviewer.libs.metrics import MetricsExporter

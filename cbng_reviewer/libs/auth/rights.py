@@ -1,6 +1,5 @@
 import functools
 import logging
-from typing import Tuple, Optional
 
 from cbng_reviewer.libs.auth.notifications import notify_user_review_rights_granted
 from cbng_reviewer.libs.models.wikipedia import LocalWikiUser
@@ -14,27 +13,27 @@ class AutoReviewerRightsChecker:
     def __init__(self):
         self._wikipedia_reader = WikipediaReader()
 
-    def _user_is_rollbacker(self, wiki_user: Optional[LocalWikiUser]) -> Tuple[bool, Optional[str]]:
+    def _user_is_rollbacker(self, wiki_user: LocalWikiUser | None) -> tuple[bool, str | None]:
         if wiki_user and "rollbacker" in wiki_user.groups:
             return True, "user has rollbacker access"
         return False, None
 
-    def _user_is_reviewer(self, wiki_user: Optional[LocalWikiUser]) -> Tuple[bool, Optional[str]]:
+    def _user_is_reviewer(self, wiki_user: LocalWikiUser | None) -> tuple[bool, str | None]:
         if wiki_user and "reviewer" in wiki_user.groups:
             return True, "user has reviewer access"
         return False, None
 
-    def _user_is_admin(self, wiki_user: Optional[LocalWikiUser]) -> Tuple[bool, Optional[str]]:
+    def _user_is_admin(self, wiki_user: LocalWikiUser | None) -> tuple[bool, str | None]:
         if wiki_user and "sysop" in wiki_user.groups:
             return True, "user has admin access"
         return False, None
 
-    def _user_is_extendedconfirmed(self, wiki_user: Optional[LocalWikiUser]) -> Tuple[bool, Optional[str]]:
+    def _user_is_extendedconfirmed(self, wiki_user: LocalWikiUser | None) -> tuple[bool, str | None]:
         if wiki_user and "extendedconfirmed" in wiki_user.groups:
             return True, "user is extended confirmed"
         return False, None
 
-    def _user_has_edit_history(self, wiki_user: Optional[LocalWikiUser]) -> Tuple[bool, Optional[str]]:
+    def _user_has_edit_history(self, wiki_user: LocalWikiUser | None) -> tuple[bool, str | None]:
         # Edits > 50, warnings < 10%. The same logic the bot uses for exclusion.
         if wiki_user:
             edit_count = self._wikipedia_reader.get_user_edit_count(wiki_user.username)
@@ -54,7 +53,7 @@ class AutoReviewerRightsChecker:
                 logger.debug(f"{wiki_user.username} has edit count, but > 10% are warnings ({warning_perc})")
         return False, None
 
-    def should_have_access(self, user: User) -> Tuple[bool, Optional[str]]:
+    def should_have_access(self, user: User) -> tuple[bool, str | None]:
         wiki_user = self._wikipedia_reader.get_local_user(user.username)
 
         # Quickest to slowest

@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.db import connections
@@ -10,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def load_replica_sql(file_name):
     def decorator(func):
-        setattr(func, "_test_sql_file_name", file_name)
+        func._test_sql_file_name = file_name
         return func
 
     return decorator
@@ -35,7 +34,7 @@ class WikipediaReplicaTransactionTestCase(TransactionTestCase):
         # Load the base schema and requested data into the test db
         self._load_sql_to_test_database()
 
-    def _get_test_sql_file_name(self) -> Optional[str]:
+    def _get_test_sql_file_name(self) -> str | None:
         test_method = getattr(self, self._testMethodName)
         return getattr(test_method, "_test_sql_file_name", None)
 

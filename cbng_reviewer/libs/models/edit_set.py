@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -9,12 +9,12 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class WpRevision:
     timestamp: datetime = None
-    user: Optional[str] = None
-    comment: Optional[str] = None
-    text: Optional[str] = None
+    user: str | None = None
+    comment: str | None = None
+    text: str | None = None
     is_minor: bool = False
     is_creation: bool = False
-    revision_id: Optional[int] = None
+    revision_id: int | None = None
 
     @property
     def has_complete_training_data(self) -> bool:
@@ -24,7 +24,7 @@ class WpRevision:
         return f"WpRevision<{self.revision_id}>"
 
     @staticmethod
-    def from_xml(data: Dict[str, Any]) -> Optional["WpRevision"]:
+    def from_xml(data: dict[str, Any]) -> Optional["WpRevision"]:
         if not data.get("timestamp"):
             return None
         return WpRevision(
@@ -42,20 +42,20 @@ class WpEdit:
     comment: str = None
     user: str = None
     creator: str = None
-    user_edit_count: Optional[int] = None
-    user_distinct_pages: Optional[int] = None
-    user_warns: Optional[int] = None
-    prev_user: Optional[str] = None
+    user_edit_count: int | None = None
+    user_distinct_pages: int | None = None
+    user_warns: int | None = None
+    prev_user: str | None = None
     user_reg_time: datetime = None
     page_made_time: datetime = None
-    num_recent_edits: Optional[int] = None
-    num_recent_reversions: Optional[int] = None
+    num_recent_edits: int | None = None
+    num_recent_reversions: int | None = None
     is_vandalism: bool = None
     current: WpRevision = None
-    previous: Optional[WpRevision] = None
-    editdb_source: Optional[str] = None
-    reviewers: Optional[int] = None
-    reviewers_agreeing: Optional[int] = None
+    previous: WpRevision | None = None
+    editdb_source: str | None = None
+    reviewers: int | None = None
+    reviewers_agreeing: int | None = None
 
     def __str__(self) -> str:
         return f"WpEdit<{self.edit_id}>"
@@ -89,13 +89,13 @@ class WpEdit:
         return True
 
     @staticmethod
-    def from_xml(data: Dict[str, Any]) -> "WpEdit":
-        def handle_optional_int(data: Dict[str, Any], key: str) -> Optional[int]:
-            if key in data and data[key]:
+    def from_xml(data: dict[str, Any]) -> "WpEdit":
+        def handle_optional_int(data: dict[str, Any], key: str) -> int | None:
+            if data.get(key):
                 return int(data[key])
             return None
 
-        def handle_optional_str(data: Dict[str, Any], key: str) -> Optional[int]:
+        def handle_optional_str(data: dict[str, Any], key: str) -> int | None:
             if key in data and data[key] is not None and len(data[key].strip()) > 0:
                 return data[key]
             return None

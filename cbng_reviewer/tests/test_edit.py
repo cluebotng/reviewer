@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.models.message import Message
-from cbng_reviewer.models import Edit, User, Classification, TrainingData, CurrentRevision, PreviousRevision
+from cbng_reviewer.models import Classification, CurrentRevision, Edit, PreviousRevision, TrainingData, User
 
 TRAINING_DATA_FIELDS = {
     "timestamp": 0,
@@ -81,7 +81,7 @@ class EditTrainingDataFlagTestCase(TestCase):
 class EditClassificationTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         self.message = Message(body="")
-        super(EditClassificationTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def testDeletedNotYetCompleteIsProcessed(self):
         edit = Edit.objects.create(id=1234, status=0, is_deleted=True)

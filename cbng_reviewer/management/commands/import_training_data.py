@@ -17,7 +17,7 @@ class Command(CommandWithMetrics):
     def __init__(self, *args, **kwargs):
         self._wikipedia_reader = WikipediaReader()
         self._wikipedia_training = WikipediaTraining()
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--workers", type=int, default=5)

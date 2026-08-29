@@ -8,7 +8,7 @@ from cbng_reviewer.libs.models.message import Message
 class IrcRelayTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         self.message = Message(body="")
-        super(IrcRelayTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def testNoMessageOnMissingConfig(self):
         with override_settings(IRC_RELAY_HOST=None, IRC_RELAY_PORT=None, IRC_RELAY_CHANNEL=None):

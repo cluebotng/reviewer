@@ -1,17 +1,16 @@
 import random
-from typing import Optional
 
 from django.db.models import Q, Subquery
-from django.http import StreamingHttpResponse, Http404, HttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from cbng_reviewer.api.serializers import EditGroupSerializer, ClientErrorSerializer
+from cbng_reviewer.api.serializers import ClientErrorSerializer, EditGroupSerializer
 from cbng_reviewer.libs.django import reviewer_required
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
-from cbng_reviewer.models import EditGroup, Edit, Classification, CLASSIFICATION_IDS
+from cbng_reviewer.models import CLASSIFICATION_IDS, Classification, Edit, EditGroup
 
 
 class EditGroupViewSet(viewsets.ModelViewSet):
@@ -42,7 +41,7 @@ class EditGroupViewSet(viewsets.ModelViewSet):
         if edit_group.group_type != 1:
             raise Http404
 
-        def _calculate_report_status(edit: Edit) -> Optional[int]:
+        def _calculate_report_status(edit: Edit) -> int | None:
             """
             0 => statusNameToId('Queued to be reviewed'),
             1 => statusNameToId('Partially reviewed'),

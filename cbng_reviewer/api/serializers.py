@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from cbng_reviewer.models import EditGroup, Edit, ClientError
+from cbng_reviewer.models import ClientError, Edit, EditGroup
 
 
 class EditGroupSerializer(serializers.ModelSerializer):

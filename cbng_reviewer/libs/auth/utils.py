@@ -1,4 +1,3 @@
-from typing import Optional
 
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User
@@ -6,7 +5,7 @@ from cbng_reviewer.models import User
 
 def create_user(
     username: str, require_central_id: bool = True, grant_reviewer_rights: bool = False, auto_grant_rights: bool = True
-) -> Optional[User]:
+) -> User | None:
     central_user = WikipediaReader().get_central_user(username=username)
     if not central_user and require_central_id:
         return None

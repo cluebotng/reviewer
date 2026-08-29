@@ -1,11 +1,11 @@
 import logging
 from abc import ABC
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 from django.conf import settings
 from django.core.management import BaseCommand
-from prometheus_client import Gauge, CollectorRegistry, generate_latest
+from prometheus_client import CollectorRegistry, Gauge, generate_latest
 
 logger = logging.getLogger(__name__)
 management_command_registry = CollectorRegistry()
@@ -48,9 +48,9 @@ class CommandWithMetrics(BaseCommand, ABC):
     def execute(self, *args, **options):
         command = self.__class__.__module__.split(".")[-1]
         try:
-            start_time = datetime.now(tz=timezone.utc)
-            super(CommandWithMetrics, self).execute(*args, **options)
-            end_time = datetime.now(tz=timezone.utc)
+            start_time = datetime.now(tz=UTC)
+            super().execute(*args, **options)
+            end_time = datetime.now(tz=UTC)
 
             management_command_execute_time.set((end_time - start_time).total_seconds())
             management_command_last_run_time.set(end_time.timestamp())

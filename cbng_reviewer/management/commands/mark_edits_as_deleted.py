@@ -7,12 +7,12 @@ from django.core.management import CommandParser
 from cbng_reviewer.libs.edit_set.utils import mark_edit_as_deleted
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import (
-    Edit,
-    TrainingData,
     Classification,
-    EditGroup,
     CurrentRevision,
+    Edit,
+    EditGroup,
     PreviousRevision,
+    TrainingData,
 )
 from cbng_reviewer.utils.command import CommandWithMetrics
 
@@ -23,7 +23,7 @@ class Command(CommandWithMetrics):
     def __init__(self, *args, **kwargs):
         self._wikipedia_reader = WikipediaReader()
         self._review_groups = set(EditGroup.objects.filter(group_type=1).values_list("id", flat=True))
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")

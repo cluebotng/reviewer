@@ -1,12 +1,12 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 
-from cbng_reviewer.admin.forms import EditGroupForm, AddUserForm
+from cbng_reviewer.admin.forms import AddUserForm, EditGroupForm
 from cbng_reviewer.libs.auth.utils import create_user
 from cbng_reviewer.libs.django import admin_required, superuser_required
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
-from cbng_reviewer.models import User, EditGroup, Edit, Classification, ClientError
+from cbng_reviewer.models import Classification, ClientError, Edit, EditGroup, User
 
 
 @admin_required()
