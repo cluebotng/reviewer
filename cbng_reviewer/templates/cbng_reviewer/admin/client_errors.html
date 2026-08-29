@@ -17,9 +17,13 @@
                     <tr>
                         <td class="text-nowrap">{{ error.created|date:"Y-m-d H:i:s" }}</td>
                         <td>{{ error.user.username }}</td>
-                        <td><code>{{ error.message|truncatechars:80 }}</code></td>
+                        <td>
+                            <code>{{ error.message|truncatechars:80 }}</code>
+                        </td>
                         <td>{{ error.page_url|truncatechars:60 }}</td>
-                        <td><a href="{% url 'admin-client-error' error.id %}">Details</a></td>
+                        <td>
+                            <a href="{% url 'admin-client-error' error.id %}">Details</a>
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>

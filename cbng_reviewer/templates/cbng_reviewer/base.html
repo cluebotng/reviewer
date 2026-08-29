@@ -1,7 +1,8 @@
 {% extends "django_bootstrap5/bootstrap5.html" %}
 {% load django_bootstrap5 %}
 {% block bootstrap5_title %}
-    {% block title %}{% endblock title %}
+    {% block title %}
+    {% endblock title %}
 {% endblock bootstrap5_title %}
 {% block bootstrap5_content %}
     <div class="container">
@@ -23,11 +24,11 @@
                     </li>
                 {% endif %}
                 {% if user.is_reviewer %}
-                {% if not admin_only_mode or user.is_admin %}
-                    <li class="nav-item">
-                        <a class="nav-link px-2" href="{% url 'review' %}">Review</a>
-                    </li>
-                {% endif %}
+                    {% if not admin_only_mode or user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link px-2" href="{% url 'review' %}">Review</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <div class="col-md-3 text-end">
@@ -38,10 +39,13 @@
                 {% endif %}
             </div>
         </header>
-        {% block sub_header %}<div class="mb-4"></div>{% endblock sub_header %}
+        {% block sub_header %}
+            <div class="mb-4"></div>
+        {% endblock sub_header %}
         {% autoescape off %}
             {% bootstrap_messages %}
         {% endautoescape %}
-        {% block content %}{% endblock content %}
+        {% block content %}
+        {% endblock content %}
     </div>
 {% endblock bootstrap5_content %}

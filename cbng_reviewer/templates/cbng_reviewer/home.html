@@ -1,6 +1,8 @@
 {% extends "cbng_reviewer/base.html" %}
 {% load django_bootstrap5 %}
-{% block title %}ClueBot NG Review Interface{% endblock title %}
+{% block title %}
+    ClueBot NG Review Interface
+{% endblock title %}
 {% block content %}
     <div class="container">
         <div class="row">
@@ -63,15 +65,15 @@
                         If it's vandalism, mark it as such!
                     </p>
                     {% if admin_only_mode %}
-                    <p>
-                        The system is currently in admin mode, this is usually done for maintenance.
-                        Please return later to access the review interface.
-                    </p>
+                        <p>
+                            The system is currently in admin mode, this is usually done for maintenance.
+                            Please return later to access the review interface.
+                        </p>
                     {% endif %}
                     {% if not admin_only_mode or user.is_admin %}
-                    <p>
-                        To get started, <a href="{% url 'review' %}">click here</a>.
-                    </p>
+                        <p>
+                            To get started, <a href="{% url 'review' %}">click here</a>.
+                        </p>
                     {% endif %}
                 {% elif user.is_authenticated %}
                     <p>
