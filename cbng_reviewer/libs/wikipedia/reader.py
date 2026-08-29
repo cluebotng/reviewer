@@ -30,9 +30,7 @@ class WikipediaReader:
         logger.warning(f"Failed to get revision id for {revision_id}")
         return False
 
-    def get_central_user(
-        self, username: str | None = None, user_id: int | None = None
-    ) -> CentralWikiUser | None:
+    def get_central_user(self, username: str | None = None, user_id: int | None = None) -> CentralWikiUser | None:
         if not username and not user_id:
             raise ValueError("either username or user_id must be passed to get_central_user")
 

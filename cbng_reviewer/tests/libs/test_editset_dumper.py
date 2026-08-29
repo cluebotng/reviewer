@@ -13,9 +13,7 @@ from cbng_reviewer.models import Classification, CurrentRevision, Edit, EditGrou
 class EditSetReaderTestCase(TestCase):
     def testNoExportOnMissingTrainingData(self):
         edit = Edit.objects.create(id=1234)
-        CurrentRevision.objects.create(
-            edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234
-        )
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234)
         PreviousRevision.objects.create(edit=edit, text=b"previous", is_minor=False, timestamp=1230)
         self.assertIsNone(EditSetDumper().generate_wp_edit(edit))
 
@@ -60,9 +58,7 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        CurrentRevision.objects.create(
-            edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234
-        )
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=False, timestamp=1234)
         PreviousRevision.objects.create(edit=edit, text=b"previous", is_minor=False, timestamp=1230)
 
         wp_edit_xml = EditSetDumper().generate_wp_edit(edit)
@@ -125,9 +121,7 @@ class EditSetReaderTestCase(TestCase):
             page_num_recent_edits=1,
             page_num_recent_reverts=3,
         )
-        CurrentRevision.objects.create(
-            edit=edit, text=b"current", is_minor=False, is_creation=True, timestamp=1234
-        )
+        CurrentRevision.objects.create(edit=edit, text=b"current", is_minor=False, is_creation=True, timestamp=1234)
 
         wp_edit_xml = EditSetDumper().generate_wp_edit(edit)
         self.assertIsNotNone(wp_edit_xml)

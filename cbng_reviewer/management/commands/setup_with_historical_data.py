@@ -123,9 +123,7 @@ class Command(CommandWithMetrics):
                     download_file(target_file, source_url)
                     editset_parser.read_file(target_file, callback_func)
 
-    def _ensure_edit_db_data(
-        self, local_path: str | None = None, name: str | None = None, skip_existing: bool = False
-    ):
+    def _ensure_edit_db_data(self, local_path: str | None = None, name: str | None = None, skip_existing: bool = False):
         logger.info(f"Ensuring editdb entries from {name}")
         target_parent_group, _ = EditGroup.objects.get_or_create(name="Edit DB")
         editset_parser = EditSetParser()
