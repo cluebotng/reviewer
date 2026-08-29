@@ -1,4 +1,3 @@
-
 from cbng_reviewer.libs.irc import IrcRelay
 from cbng_reviewer.libs.messages import Messages
 from cbng_reviewer.libs.wikipedia.management import WikipediaManagement

@@ -1,4 +1,3 @@
-
 from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
 from cbng_reviewer.models import User
 
