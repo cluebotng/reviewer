@@ -26,7 +26,7 @@ class Core:
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((self._target_host, self._target_port))
-            s.sendall(f'<?xml version="1.0"?>\n<WPEditSet>\n{wp_edit}\n</WPEditSet>'.encode("utf-8"))
+            s.sendall(f'<?xml version="1.0"?>\n<WPEditSet>\n{wp_edit}\n</WPEditSet>'.encode())
 
             response = ""
             while True:

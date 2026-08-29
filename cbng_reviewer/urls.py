@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.http import HttpResponse
-from django.urls import path, include
+from django.urls import include, path
 
 from cbng_reviewer import views
 

@@ -3,7 +3,7 @@ import json
 import logging
 import tempfile
 from pathlib import PosixPath
-from typing import Any, Optional
+from typing import Any
 
 from django.conf import settings
 from django.core.management import CommandParser
@@ -12,7 +12,7 @@ from cbng_reviewer.libs.auth.utils import create_user
 from cbng_reviewer.libs.edit_set.parser import EditSetParser
 from cbng_reviewer.libs.edit_set.utils import import_wp_edit_to_edit_group
 from cbng_reviewer.libs.utils import download_file
-from cbng_reviewer.models import User, EditGroup, Edit
+from cbng_reviewer.models import Edit, EditGroup, User
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ class Command(CommandWithMetrics):
             edit.save()
 
     def _ensure_edit_set_data(
-        self, local_path: Optional[str] = None, name: Optional[str] = None, skip_existing: bool = False
+        self, local_path: str | None = None, name: str | None = None, skip_existing: bool = False
     ):
         # These come from the 'edit set' files
         editset_parser = EditSetParser()
@@ -124,7 +124,7 @@ class Command(CommandWithMetrics):
                     editset_parser.read_file(target_file, callback_func)
 
     def _ensure_edit_db_data(
-        self, local_path: Optional[str] = None, name: Optional[str] = None, skip_existing: bool = False
+        self, local_path: str | None = None, name: str | None = None, skip_existing: bool = False
     ):
         logger.info(f"Ensuring editdb entries from {name}")
         target_parent_group, _ = EditGroup.objects.get_or_create(name="Edit DB")

@@ -4,7 +4,7 @@ from typing import Any
 from django.core.management.base import CommandParser
 
 from cbng_reviewer.libs.core import Core
-from cbng_reviewer.models import User, Classification, EditGroup
+from cbng_reviewer.models import Classification, EditGroup, User
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)

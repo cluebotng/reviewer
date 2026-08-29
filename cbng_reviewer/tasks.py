@@ -17,9 +17,9 @@ def update_edit_classification(edit_id: int) -> None:
 
 @shared_task
 def import_training_data(edit_id: int, force: bool = False) -> None:
-    from cbng_reviewer.models import Edit
     from cbng_reviewer.libs.wikipedia.reader import WikipediaReader
     from cbng_reviewer.libs.wikipedia.training import WikipediaTraining
+    from cbng_reviewer.models import Edit
 
     edit = Edit.objects.get(id=edit_id)
     if edit.has_training_data and not force:

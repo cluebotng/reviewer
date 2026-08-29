@@ -1,16 +1,15 @@
 import logging
-from typing import Optional
 from xml.etree import ElementTree as ET  # nosec: B405
 
 from django.conf import settings
 
-from cbng_reviewer.models import Edit, TrainingData, CurrentRevision, PreviousRevision, EditGroup
+from cbng_reviewer.models import CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData
 
 logger = logging.getLogger(__name__)
 
 
 class EditSetDumper:
-    def _extended_escape_cdata(self, text: Optional[str]) -> Optional[str]:
+    def _extended_escape_cdata(self, text: str | None) -> str | None:
         text = ET._original_escape_cdata(text)
         # This matches the old behaviour, though is not an XML standard =\
         if '"' in text:
@@ -42,8 +41,8 @@ class EditSetDumper:
         return output
 
     def generate_wp_edit(
-        self, edit: Edit, edit_group: Optional[EditGroup] = None, indent_block: bool = False
-    ) -> Optional[str]:
+        self, edit: Edit, edit_group: EditGroup | None = None, indent_block: bool = False
+    ) -> str | None:
         try:
             training_data = TrainingData.objects.get(edit=edit)
         except TrainingData.DoesNotExist:

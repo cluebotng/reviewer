@@ -1,11 +1,11 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 from django.core.management.base import CommandParser
 
 from cbng_reviewer.libs.report_interface import ReportInterface
-from cbng_reviewer.models import User, Edit, Classification
+from cbng_reviewer.models import Classification, Edit, User
 from cbng_reviewer.utils.command import CommandWithMetrics
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
 
-    def _get_report_users(self) -> Dict[str, List[str]]:
+    def _get_report_users(self) -> dict[str, list[str]]:
         r = requests.get(
             "https://cluebotng.toolforge.org/api/?action=review.export.users",
             timeout=10,

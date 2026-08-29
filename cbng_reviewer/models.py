@@ -1,19 +1,18 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField
+from django.db.models import Case, Count, IntegerField, When
 from django.db.models.signals import post_save, pre_delete
 from social_django.models import UserSocialAuth
 
 from cbng_reviewer.hooks import (
+    import_training_data_for_edit,
     notify_irc_about_deleted_account,
     notify_irc_about_pending_account,
-    update_edit_classification_from_classification,
-    import_training_data_for_edit,
     notify_irc_about_pending_edit,
+    update_edit_classification_from_classification,
 )
 
 logger = logging.getLogger(__name__)
@@ -44,7 +43,7 @@ class User(AbstractUser):
     historical_edit_count = models.IntegerField(default=0)
 
     @property
-    def central_user_id(self) -> Optional[int]:
+    def central_user_id(self) -> int | None:
         try:
             return UserSocialAuth.objects.get(provider=settings.SOCIAL_AUTH_BACKEND_NAME, user_id=self.id).uid
         except UserSocialAuth.DoesNotExist:

@@ -2,7 +2,7 @@ import logging
 import re
 from dataclasses import replace
 from datetime import datetime, timedelta
-from typing import Optional, Tuple, Dict, Any
+from typing import Any
 
 import requests
 from django.conf import settings
@@ -30,7 +30,7 @@ class WikipediaTraining:
         title = title.replace(" ", "_")
         return title
 
-    def get_edit_metadata(self, revision_id: int) -> Tuple[Optional[str], Optional[str]]:
+    def get_edit_metadata(self, revision_id: int) -> tuple[str | None, str | None]:
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -61,13 +61,13 @@ class WikipediaTraining:
 
         return page_data["title"], settings.WIKIPEDIA_NAMESPACE_ID_TO_NAME[page_data["ns"]]
 
-    def _is_revision_minor(self, revision: Dict[str, Any]) -> bool:
+    def _is_revision_minor(self, revision: dict[str, Any]) -> bool:
         minor = revision.get("minor", False)
         if minor == "":
             minor = False
         return minor
 
-    def get_page_revisions(self, page_title: str, revision_id: int) -> Tuple[WpRevision, WpRevision]:
+    def get_page_revisions(self, page_title: str, revision_id: int) -> tuple[WpRevision, WpRevision]:
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -129,7 +129,7 @@ class WikipediaTraining:
 
         return current_revision, previous_revision
 
-    def get_page_first_revision_id(self, page_title: str) -> Optional[int]:
+    def get_page_first_revision_id(self, page_title: str) -> int | None:
         r = self._session.get(
             "https://en.wikipedia.org/w/api.php",
             headers={
@@ -155,7 +155,7 @@ class WikipediaTraining:
 
         return None
 
-    def get_page_creation_metadata(self, page_title: str, namespace: str) -> Tuple[Optional[datetime], Optional[str]]:
+    def get_page_creation_metadata(self, page_title: str, namespace: str) -> tuple[datetime | None, str | None]:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -180,7 +180,7 @@ class WikipediaTraining:
                     return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S"), row[1].decode("utf-8")
         return None, None
 
-    def get_page_recent_edit_count(self, page_title: str, namespace: str, edit_time: datetime) -> Optional[int]:
+    def get_page_recent_edit_count(self, page_title: str, namespace: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -208,7 +208,7 @@ class WikipediaTraining:
             if row := cursor.fetchone():
                 return row[0]
 
-    def get_page_recent_revert_count(self, page_title: str, namespace: str, edit_time: datetime) -> Optional[int]:
+    def get_page_recent_revert_count(self, page_title: str, namespace: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -238,7 +238,7 @@ class WikipediaTraining:
             if row := cursor.fetchone():
                 return row[0]
 
-    def get_user_edit_count(self, username: str, edit_time: datetime) -> Optional[int]:
+    def get_user_edit_count(self, username: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -254,7 +254,7 @@ class WikipediaTraining:
             if row := cursor.fetchone():
                 return row[0]
 
-    def get_user_warning_count(self, username: str, edit_time: datetime) -> Optional[int]:
+    def get_user_warning_count(self, username: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -280,7 +280,7 @@ class WikipediaTraining:
             if row := cursor.fetchone():
                 return row[0]
 
-    def get_user_registration_time(self, username: str) -> Optional[datetime]:
+    def get_user_registration_time(self, username: str) -> datetime | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """
@@ -289,9 +289,8 @@ class WikipediaTraining:
                 """,
                 [username],
             )
-            if row := cursor.fetchone():
-                if row[0]:
-                    return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
+            if (row := cursor.fetchone()) and row[0]:
+                return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S").replace(tzinfo=UTC)
 
         with connections["replica"].cursor() as cursor:
             cursor.execute(
@@ -309,7 +308,7 @@ class WikipediaTraining:
                 if row[0]:
                     return datetime.strptime(row[0].decode("utf-8"), "%Y%m%d%H%M%S")
 
-    def _get_user_distinct_pages_count(self, username: str, edit_time: datetime) -> Optional[int]:
+    def _get_user_distinct_pages_count(self, username: str, edit_time: datetime) -> int | None:
         with connections["replica"].cursor() as cursor:
             cursor.execute(
                 """

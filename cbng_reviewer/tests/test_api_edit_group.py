@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from cbng_reviewer.libs.edit_set.dumper import EditSetDumper
-from cbng_reviewer.models import Edit, EditGroup, TrainingData, CurrentRevision, PreviousRevision
+from cbng_reviewer.models import CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData
 
 
 class ApiEditGroupTestCase(TestCase):

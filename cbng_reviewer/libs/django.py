@@ -1,8 +1,9 @@
 import logging
 import time
-from datetime import datetime, timezone
+from collections.abc import Callable
+from datetime import UTC, datetime
 from functools import wraps
-from typing import Callable, Any
+from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
@@ -26,7 +27,7 @@ class AuthenticatedRequestLogMiddleware:
             self._logger.info(
                 '%s [%s] "%s %s" %d %s "%s" "%s" %dms',
                 request.user.get_username(),
-                datetime.now(timezone.utc).strftime("%d/%b/%Y:%H:%M:%S +0000"),
+                datetime.now(UTC).strftime("%d/%b/%Y:%H:%M:%S +0000"),
                 request.method,
                 request.get_full_path(),
                 response.status_code,

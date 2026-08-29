@@ -1,12 +1,11 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.template import loader
 from django.utils.html import escape
 
 from cbng_reviewer.libs.models.message import Message
-from cbng_reviewer.models import User, Edit
+from cbng_reviewer.models import Edit, User
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ class Messages:
     def notify_irc_about_deleted_account(self, user: User) -> Message:
         return Message(body=f"\x0314[[\x0313 Removed User Account \x0314]]\x0301 {escape(user.username)}")
 
-    def notify_irc_about_granted_reviewer_access(self, user: User, reason: Optional[str] = None) -> Message:
+    def notify_irc_about_granted_reviewer_access(self, user: User, reason: str | None = None) -> Message:
         body = f"\x0314[[\x0307 Reviewer Access Granted \x0314]]\x0301 {escape(user.username)}"
         if reason:
             body += f" ({reason})"

@@ -1,13 +1,11 @@
 import logging
-from typing import Tuple, Optional, List, Dict
 
 import requests
 from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
 
-from cbng_reviewer.models import EditGroup, Classification, Edit, TrainingData, CurrentRevision, PreviousRevision
-from cbng_reviewer.models import User
+from cbng_reviewer.models import Classification, CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData, User
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +42,7 @@ class Statistics:
             ).filter(total__gt=0)
         }
 
-    def calculate_user_accuracy(self, users: List[User]) -> Dict[int, Tuple[Optional[float], int]]:
+    def calculate_user_accuracy(self, users: list[User]) -> dict[int, tuple[float | None, int]]:
         user_accuracy = {}
         for row in (
             Classification.objects.filter(user__in=users, edit__status=2)
@@ -114,7 +112,7 @@ class Statistics:
             ("Number Of Previous Revision Entries", PreviousRevision.objects.all().count()),
         ]
 
-    def get_historical_user_statistics(self) -> List[Tuple[str, int]]:
+    def get_historical_user_statistics(self) -> list[tuple[str, int]]:
         return [
             ("tonyb", 15),
             ("Dvyjones2", 40),
@@ -145,7 +143,7 @@ class Statistics:
             ("Number Of Reports Pending", len(r.json().keys())),
         ]
 
-    def generate_wikimarkup(self) -> Optional[str]:
+    def generate_wikimarkup(self) -> str | None:
         users = self.get_user_statistics(True)
         historical_users = self.get_historical_user_statistics()
         edit_groups = self.get_edit_group_statistics()
