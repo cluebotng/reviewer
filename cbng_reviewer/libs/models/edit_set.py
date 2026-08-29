@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class WpRevision:
         if not data.get("timestamp"):
             return None
         return WpRevision(
-            timestamp=datetime.fromtimestamp(int(data["timestamp"])),
+            timestamp=datetime.fromtimestamp(int(data["timestamp"]), tz=UTC),
             is_minor=data.get("minor") == "true",
             text=data.get("text"),
         )
@@ -109,8 +109,8 @@ class WpEdit:
             num_recent_edits=handle_optional_int(data, "num_recent_edits"),
             num_recent_reversions=handle_optional_int(data, "num_recent_reversions"),
             is_vandalism=data["is_vandalism"] == "true",
-            user_reg_time=datetime.fromtimestamp(handle_optional_int(data, "user_reg_time")),
-            page_made_time=datetime.fromtimestamp(handle_optional_int(data, "page_made_time")),
+            user_reg_time=datetime.fromtimestamp(handle_optional_int(data, "user_reg_time"), tz=UTC),
+            page_made_time=datetime.fromtimestamp(handle_optional_int(data, "page_made_time"), tz=UTC),
             namespace=data.get("namespace", "main"),
             # WpRevision instances
             current=WpRevision.from_xml(data["current"]),

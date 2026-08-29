@@ -71,7 +71,7 @@ class Command(CommandWithMetrics):
             for future in futures:
                 try:
                     future.result()
-                except Exception as e:
-                    logger.exception(e)
+                except Exception:
+                    logger.exception("Failed to mark edit as deleted")
 
             executor.shutdown()

@@ -41,6 +41,6 @@ class IrcRelay:
         except socket.gaierror as e:
             if e.errno == 8:
                 logger.debug(f"Could not connect to IRC Relay {payload}: {e}")
-        except Exception as e:
+        except OSError as e:
             logger.error(f"Failed to send to IRC Relay {payload}: {e}")
         return False
