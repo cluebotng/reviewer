@@ -7,8 +7,8 @@
         <meta name="description" content="ClueBot Review Interface">
         <meta name="keywords" content="">
         <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-        <link href="{% static 'css/interface.css' %}" rel="stylesheet" type="text/css">
-        <script src="{% static 'js/interface.js' %}" type="text/javascript" defer></script>
+        <link href="{% static 'css/interface.css' %}" rel="stylesheet">
+        <script src="{% static 'js/interface.js' %}" defer></script>
         {% csrf_token %}
         <script>
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -48,7 +48,11 @@
             </svg>
         </div>
         <div id="iframediv">
-            <iframe frameborder="0" id="iframe" credentialless="true" referrerpolicy="no-referrer" src="about:blank"></iframe>
+            <iframe frameborder="0"
+                    id="iframe"
+                    credentialless="true"
+                    referrerpolicy="no-referrer"
+                    src="about:blank"></iframe>
         </div>
         <div id="top">
             <span id="options">
@@ -66,7 +70,8 @@
                 <button onclick="classifyEdit(csrftoken, 2, false)" type="button">Skip</button>
                 <input id="comment" placeholder="Comment" type="text" />
             </span>
-            <span id="edit">Edit: <span id="edit_id" onclick="{% if user.is_admin %} loadDetails(){% endif %}"></span></span>
+            <span id="edit">Edit: <span id="edit_id"
+       onclick="{% if user.is_admin %} loadDetails(){% endif %}"></span></span>
             <span id="username">Username: {{ user.username }}</span>
         </div>
     </body>
