@@ -1,10 +1,10 @@
 import logging
 
-import requests
 from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
 
+from cbng_reviewer.libs.report_interface import ReportInterface
 from cbng_reviewer.models import Classification, CurrentRevision, Edit, EditGroup, PreviousRevision, TrainingData, User
 
 logger = logging.getLogger(__name__)
@@ -130,17 +130,9 @@ class Statistics:
         ]
 
     def get_external_statistics(self):
-        r = requests.get(
-            "https://cluebotng.toolforge.org/api/",
-            timeout=10,
-            params={
-                "action": "reports.list",
-                "status": 0,
-            },
-        )
-        r.raise_for_status()
+        statistics = ReportInterface().fetch_statistics()
         return [
-            ("Number Of Reports Pending", len(r.json().keys())),
+            ("Number Of Reports Pending", statistics["pending_reports"]),
         ]
 
     def generate_wikimarkup(self) -> str | None:

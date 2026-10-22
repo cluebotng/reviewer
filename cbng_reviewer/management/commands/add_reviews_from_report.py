@@ -1,7 +1,6 @@
 import logging
 from typing import Any
 
-import requests
 from django.core.management.base import CommandParser
 
 from cbng_reviewer.libs.report_interface import ReportInterface
@@ -14,17 +13,6 @@ logger = logging.getLogger(__name__)
 class Command(CommandWithMetrics):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--edit-id")
-
-    def _get_report_users(self) -> dict[str, list[str]]:
-        r = requests.get(
-            "https://cluebotng.toolforge.org/api/?action=review.export.users",
-            timeout=10,
-            headers={
-                "User-Agent": "ClueBot NG Reviewer - Add Reviews From Report",
-            },
-        )
-        r.raise_for_status()
-        return r.json()
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Add reviews from reports."""
