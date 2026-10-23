@@ -56,6 +56,7 @@ def load_config(base_dir: Path, in_test: bool) -> dict[str, Any]:
             "admin_only": os.environ.get("CBNG_ADMIN_ONLY") == "true",
             "enable_irc_messaging": os.environ.get("CBNG_ENABLE_IRC_MESSAGING") == "true",
             "enable_user_messaging": os.environ.get("CBNG_ENABLE_USER_MESSAGING") == "true",
+            "monitoring_shared_secret": os.environ.get("MONITORING_SHARED_SECRET"),
         },
         "irc_relay": {
             "host": os.environ.get("IRC_RELAY_HOST", "irc-relay"),

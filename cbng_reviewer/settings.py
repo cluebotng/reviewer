@@ -245,6 +245,7 @@ CBNG_REPORT_EDIT_SET = "Report Interface Import"
 CBNG_ADMIN_ONLY = CONFIG["cbng"]["admin_only"]
 CBNG_ENABLE_IRC_MESSAGING = CONFIG["cbng"]["enable_irc_messaging"]
 CBNG_ENABLE_USER_MESSAGING = CONFIG["cbng"]["enable_user_messaging"]
+CBNG_MONITORING_SHARED_SECRET = CONFIG["cbng"]["monitoring_shared_secret"]
 
 # No default metrics
 PROMETHEUS_METRIC_NAMESPACE = "cbng_reviewer"

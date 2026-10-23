@@ -1,7 +1,9 @@
+import secrets
+
 from django.conf import settings
 from django.contrib import auth
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
@@ -41,6 +43,12 @@ def logout(request):
 
 
 def metrics(request):
+    if shared_secret := settings.CBNG_MONITORING_SHARED_SECRET:
+        if not secrets.compare_digest(
+            request.headers.get("Authorization", "").encode(), f"Bearer {shared_secret}".encode()
+        ):
+            return HttpResponseForbidden()
+
     MetricsExporter().update_metrics()
     return HttpResponse(content=generate_latest(), content_type=CONTENT_TYPE_LATEST)
 
