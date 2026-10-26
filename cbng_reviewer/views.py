@@ -43,11 +43,10 @@ def logout(request):
 
 
 def metrics(request):
-    if shared_secret := settings.CBNG_MONITORING_SHARED_SECRET:
-        if not secrets.compare_digest(
-            request.headers.get("Authorization", "").encode(), f"Bearer {shared_secret}".encode()
-        ):
-            return HttpResponseForbidden()
+    if settings.CBNG_MONITORING_SHARED_SECRET and not secrets.compare_digest(
+        request.headers.get("Authorization", "").encode(), f"Bearer {settings.CBNG_MONITORING_SHARED_SECRET}".encode()
+    ):
+        return HttpResponseForbidden()
 
     MetricsExporter().update_metrics()
     return HttpResponse(content=generate_latest(), content_type=CONTENT_TYPE_LATEST)
