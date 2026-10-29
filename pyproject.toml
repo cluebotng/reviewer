@@ -2,39 +2,39 @@
 name = "reviewer"
 requires-python = ">=3.13"
 dependencies = [
-    "Django",
-    "social-auth-app-django",
-    "mysqlclient",
-    "requests",
-    "deepmerge",
-    "djangorestframework",
-    "django_bootstrap5",
-    "PyYAML",
-    "gunicorn",
-    "whitenoise",
-    "celery[redis]",
-    "prometheus-client",
+    "Django>=6.1.2",
+    "social-auth-app-django>=7.2.0",
+    "mysqlclient>=2.3.0",
+    "requests>=2.34.2",
+    "deepmerge>=4.0.0",
+    "djangorestframework>=3.18.3",
+    "django_bootstrap5>=26.4",
+    "PyYAML>=6.0.3",
+    "gunicorn>=26.2.0",
+    "whitenoise>=6.12.0",
+    "celery[redis]>=5.6.3",
+    "prometheus-client>=0.26.0",
     # Unreleased master supports Django 6.1; switch back to PyPI once released
     # renovate-gate: django-prometheus==2.5.0
     "django-prometheus @ git+https://github.com/django-commons/django-prometheus@c04929aac027bde8410bde20af6ca864a1e6929d",
-    "flower",
+    "flower>=2.2.0",
 ]
 
 [tool.poetry]
 package-mode = false
 
 [tool.poetry.group.test.dependencies]
-tox = "*"
-tox-current-env = "*"
-black = "*"
-ruff = "*"
-djlint = "*"
-bandit = "*"
-selenium = "*"
-pytest-django = "*"
-pytest = "*"
-pytest-xdist = "*"
-freezegun = "*"
+tox = ">=4.67.4"
+tox-current-env = ">=0.0.17"
+black = ">=26.10.1"
+ruff = ">=0.17.3"
+djlint = ">=1.47.1"
+bandit = ">=1.9.4"
+selenium = ">=4.52.0"
+pytest-django = ">=4.14.0"
+pytest = ">=9.2.0"
+pytest-xdist = ">=3.8.0"
+freezegun = ">=1.5.5"
 
 [tool.ruff]
 exclude = ['*/migrations/*', 've/*', '.tox/*']
