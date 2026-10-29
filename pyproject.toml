@@ -14,7 +14,9 @@ dependencies = [
     "whitenoise",
     "celery[redis]",
     "prometheus-client",
-    "django-prometheus",
+    # Unreleased master supports Django 6.1; switch back to PyPI once released
+    # renovate-gate: django-prometheus==2.5.0
+    "django-prometheus @ git+https://github.com/django-commons/django-prometheus@c04929aac027bde8410bde20af6ca864a1e6929d",
     "flower",
 ]
 
