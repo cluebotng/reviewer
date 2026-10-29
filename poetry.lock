@@ -701,19 +701,23 @@ jinja = ["jinja2 (>=3.0,<4)"]
 
 [[package]]
 name = "django-prometheus"
-version = "2.4.1"
+version = "2.6.0.dev1"
 description = "Django middlewares to monitor your application with Prometheus.io."
 optional = false
-python-versions = "*"
+python-versions = ">=3.10"
 groups = ["main"]
-files = [
-    {file = "django_prometheus-2.4.1-py2.py3-none-any.whl", hash = "sha256:7fe5af7f7c9ad9cd8a429fe0f3f1bf651f0e244f77162147869eab7ec09cc5e7"},
-    {file = "django_prometheus-2.4.1.tar.gz", hash = "sha256:073628243d2a6de6a8a8c20e5b512872dfb85d66e1b60b28bcf1eca0155dad95"},
-]
+files = []
+develop = false
 
 [package.dependencies]
-Django = ">=4.2,<6.0"
+Django = ">=4.2,<5.0 || >=5.1.dev0,<6.2"
 prometheus-client = ">=0.7"
+
+[package.source]
+type = "git"
+url = "https://github.com/django-commons/django-prometheus"
+reference = "c04929aac027bde8410bde20af6ca864a1e6929d"
+resolved_reference = "c04929aac027bde8410bde20af6ca864a1e6929d"
 
 [[package]]
 name = "djangorestframework"
@@ -2221,4 +2225,4 @@ h11 = ">=0.16.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "98a4e711fc72f8d6adb7dcee3eb0609174ac0e5a6c8a01d74a4fe8cbf6b4fbf5"
+content-hash = "6491c8e3f713d9d9f96ecb48c45564b95213bad8ffac3862d59c2b7d985ca912"

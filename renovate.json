@@ -5,5 +5,25 @@
     "helpers:pinGitHubActionDigests"
   ],
   "automerge": true,
-  "automergeStrategy": "rebase"
+  "automergeStrategy": "rebase",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Watch PyPI for releases of packages temporarily pinned to git",
+      "managerFilePatterns": ["/^pyproject\\.toml$/"],
+      "matchStrings": [
+        "#\\s*renovate-gate:\\s*(?<depName>[A-Za-z0-9_.-]+)==(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "pypi"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["custom.regex"],
+      "automerge": false,
+      "prBodyNotes": [
+        "This package is pinned to a git commit in `pyproject.toml`. Replace the git pin with `{{{depName}}}>={{{newVersion}}}` and remove the `renovate-gate` comment before merging."
+      ]
+    }
+  ]
 }
