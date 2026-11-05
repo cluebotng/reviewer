@@ -11,6 +11,7 @@ urlpatterns = [
     path("internal/metrics/", views.metrics),
     # Authentication
     path("oauth/", include("social_django.urls", namespace="social")),
+    path("login/", views.login, name="login"),
     path("logout/", views.logout, name="logout"),
     # Api
     path("api/", include("cbng_reviewer.api.urls")),

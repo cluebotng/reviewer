@@ -124,7 +124,7 @@ SOCIAL_AUTH_BACKEND_NAME = "mediawiki"
 AUTHENTICATION_BACKENDS = ["social_core.backends.mediawiki.MediaWiki"]
 
 AUTH_USER_MODEL = "cbng_reviewer.User"
-LOGIN_URL = f"/oauth/login/{SOCIAL_AUTH_BACKEND_NAME}/"
+LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ["groups"]
 
