@@ -118,7 +118,11 @@
                         Classifying edits in this interface may allow Cluebot-NG to catch 5% or more of additional vandalism.
                     </p>
                     <p>
-                        To begin, you need to <a href="{% url 'social:begin' 'mediawiki' %}">log in</a>.
+                        <form class="d-inline" method="post" action="{% url 'social:begin' 'mediawiki' %}">
+                            {% csrf_token %}
+                            To begin, you need to
+                            <button type="submit" class="btn btn-link p-0 align-baseline">log in</button>.
+                        </form>
                     </p>
                 {% endif %}
             </div>
