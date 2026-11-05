@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from cbng_reviewer.libs.django import reviewer_required
@@ -35,6 +36,18 @@ def home(request):
             "user": request.user,
         },
     )
+
+
+def login(request):
+    next_url = request.GET.get("next", "")
+    if not url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        next_url = ""
+
+    if request.user.is_authenticated:
+        return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+    return render(request, "cbng_reviewer/login.html", {"next": next_url})
 
 
 def logout(request):

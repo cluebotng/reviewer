@@ -1,0 +1,21 @@
+{% extends "cbng_reviewer/base.html" %}
+{% block title %}
+    ClueBot NG Review Interface - Login
+{% endblock title %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-6 text-center">
+                <p>
+                    You need to log in to access this page.
+                    Authentication is handled by Wikimedia, you will be redirected to Meta-Wiki to approve access with your Wikipedia account.
+                </p>
+                <form method="post" action="{% url 'social:begin' 'mediawiki' %}">
+                    {% csrf_token %}
+                    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                    <button type="submit" class="btn btn-primary">Login with Wikimedia</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
