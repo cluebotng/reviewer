@@ -215,7 +215,6 @@ CORE_HOST = CONFIG["core"]["host"]
 CORE_PORT = CONFIG["core"]["port"]
 
 REPORT_HOST = CONFIG["report"]["host"]
-REPORT_PORT = CONFIG["report"]["port"]
 
 REDIS_HOST = CONFIG["redis"]["host"]
 REDIS_PORT = CONFIG["redis"]["port"]
