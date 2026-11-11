@@ -5,7 +5,6 @@ from cbng_reviewer.tests.utils import WikipediaReplicaTransactionTestCase, load_
 
 
 class WikipediaTrainingTestCase(WikipediaReplicaTransactionTestCase):
-
     @load_replica_sql("page_creation_metadata")
     # Database based
     def testGetPageCreationMetadata(self):

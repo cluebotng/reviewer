@@ -16,8 +16,8 @@ class WikipediaReaderTestCase(TestCase):
 
     def testLocalUserLookup(self):
         wikipedia_reader = WikipediaReader()
-        self.assertIn("rollback", wikipedia_reader.get_local_user("DamianZaremba").rights),
-        self.assertIn("rollbacker", wikipedia_reader.get_local_user("DamianZaremba").groups),
+        self.assertIn("rollback", wikipedia_reader.get_local_user("DamianZaremba").rights)
+        self.assertIn("rollbacker", wikipedia_reader.get_local_user("DamianZaremba").groups)
 
     def testLocalUserMissing(self):
         wikipedia_reader = WikipediaReader()
