@@ -72,8 +72,7 @@ def load_config(base_dir: Path, in_test: bool) -> dict[str, Any]:
             "port": 3565,
         },
         "report": {
-            "host": os.environ.get("REPORT_HOST", "reporter-interface.tool-cluebotng.svc.tools.local"),
-            "port": 8000,
+            "host": os.environ.get("REPORT_HOST", "http://reporter-interface.tool-cluebotng.svc.tools.local:8000"),
         },
         "redis": {
             "host": os.environ.get("REDIS_HOST", "redis.tool-cluebotng-review.svc.tools.local"),

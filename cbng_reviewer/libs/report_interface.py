@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class ReportInterface:
     def fetch_edit_ids_requiring_review(self, include_in_progress: bool) -> set[id]:
         r = requests.get(
-            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/v1/review/export/",
+            f"{settings.REPORT_HOST}/api/v1/review/export/",
             params={"include_in_progress": "1"} if include_in_progress else {},
             timeout=10,
             headers={
@@ -42,7 +42,7 @@ class ReportInterface:
 
     def fetch_statistics(self) -> dict[str, int]:
         r = requests.get(
-            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/v1/statistics/",
+            f"{settings.REPORT_HOST}/api/v1/statistics/",
             timeout=10,
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Report Interface Statistics",
@@ -53,7 +53,7 @@ class ReportInterface:
 
     def fetch_deferred_users(self) -> tuple[str, list[str]]:
         r = requests.get(
-            f"http://{settings.REPORT_HOST}:{settings.REPORT_PORT}/api/v1/review/export/users/",
+            f"{settings.REPORT_HOST}/api/v1/review/export/users/",
             timeout=10,
             headers={
                 "User-Agent": "ClueBot NG Reviewer - Add Reviews From Report",
