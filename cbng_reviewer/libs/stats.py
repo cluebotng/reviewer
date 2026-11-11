@@ -55,10 +55,7 @@ class Statistics:
                 correct=Count("id", filter=Q(classification=models.F("edit__classification"))),
             )
         ):
-            accuracy = None
-            if row["total"] > settings.CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY:
-                accuracy = (row["correct"] / row["total"]) * 100.0 if row["correct"] > 0 else 0.0
-
+            accuracy = (row["correct"] / row["total"]) * 100.0 if row["correct"] > 0 else 0.0
             user_accuracy[row["user_id"]] = (accuracy, row["total"])
 
         return user_accuracy
@@ -159,12 +156,18 @@ class Statistics:
         markup += "{{/UserHeader}}\n"
 
         for username, stats in sorted(users.items(), key=lambda s: (s[1]["total_classifications"], s[0]), reverse=True):
+            accuracy = "NaN"
+            if stats["accuracy_classifications"] > settings.CBNG_MINIMUM_EDITS_FOR_USER_ACCURACY:
+                accuracy = round(stats["accuracy"], 1)
+            elif stats["accuracy"]:
+                accuracy += f"<!-- {round(stats['accuracy'], 1)} -->"
+
             markup += "{{/User\n"
             markup += f"|nick={username}\n"
             if stats["is_admin"]:
                 markup += "|admin=true\n"
             markup += f"|count={stats['total_classifications']}\n"
-            markup += f"|accuracy={round(stats['accuracy'], 1) if stats['accuracy'] else 'NaN'}\n"
+            markup += f"|accuracy={accuracy}\n"
             markup += f"|accuracyedits={stats['accuracy_classifications']}\n"
             markup += "}}\n"
 
