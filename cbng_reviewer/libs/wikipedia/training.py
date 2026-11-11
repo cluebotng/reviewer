@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # This should provide a somewhat consistent view as to what the bot would have seen at the time the edit
 # was (roughly) processed.
 class WikipediaTraining:
-    _RE_NS_PREFIX = re.compile(rf'^({"|".join(settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID.keys())}):', re.IGNORECASE)
+    _RE_NS_PREFIX = re.compile(rf"^({'|'.join(settings.WIKIPEDIA_NAMESPACE_NAME_TO_ID.keys())}):", re.IGNORECASE)
 
     def __init__(self):
         self._session = requests.session()

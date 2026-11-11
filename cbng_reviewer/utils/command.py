@@ -44,7 +44,6 @@ def send_metrics_to_pushgateway(command: str):
 
 
 class CommandWithMetrics(BaseCommand, ABC):
-
     def execute(self, *args, **options):
         command = self.__class__.__module__.split(".")[-1]
         try:
