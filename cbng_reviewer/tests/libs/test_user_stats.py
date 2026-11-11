@@ -86,13 +86,13 @@ class UserStatsTestCase(TestCase):
                 "user-1": {
                     "is_admin": False,
                     "total_classifications": 50,
-                    "accuracy": None,
+                    "accuracy": 100.0,
                     "accuracy_classifications": 10,
                 },
                 "user-2": {
                     "is_admin": False,
                     "total_classifications": 50,
-                    "accuracy": None,
+                    "accuracy": 100.0,
                     "accuracy_classifications": 10,
                 },
             },
@@ -115,7 +115,7 @@ class UserStatsTestCase(TestCase):
                 "user": {
                     "is_admin": False,
                     "total_classifications": 50,
-                    "accuracy": None,
+                    "accuracy": 100.0,
                     "accuracy_classifications": 10,
                 },
             },
@@ -138,7 +138,7 @@ class UserStatsTestCase(TestCase):
                 "user": {
                     "is_admin": False,
                     "total_classifications": 50,
-                    "accuracy": None,
+                    "accuracy": 100.0,
                     "accuracy_classifications": 10,
                 },
             },
